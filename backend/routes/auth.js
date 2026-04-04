@@ -1,43 +1,9 @@
 const express = require('express');
+const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const pool = require('../config/db');
 
 const router = express.Router();
-
-// Demo users (until database is connected)
-const DEMO_USERS = {
-  'owner@restaurant.com': {
-    id: 1,
-    name: 'Owner Ali',
-    email: 'owner@restaurant.com',
-    password: 'password123',
-    role: 'owner',
-    location_id: 1
-  },
-  'manager@restaurant.com': {
-    id: 2,
-    name: 'Manager Sara',
-    email: 'manager@restaurant.com',
-    password: 'password123',
-    role: 'manager',
-    location_id: 1
-  },
-  'waiter@restaurant.com': {
-    id: 3,
-    name: 'Waiter Tom',
-    email: 'waiter@restaurant.com',
-    password: 'password123',
-    role: 'waiter',
-    location_id: 1
-  },
-  'kitchen@restaurant.com': {
-    id: 4,
-    name: 'Chef Marco',
-    email: 'kitchen@restaurant.com',
-    password: 'password123',
-    role: 'kitchen',
-    location_id: 1
-  }
-};
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
@@ -48,9 +14,16 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    const user = DEMO_USERS[email];
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
 
-    if (!user || user.password !== password) {
+    const user = result.rows[0];
+    const validPassword = await bcryptjs.compare(password, user.password_hash);
+
+    if (!validPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
@@ -76,25 +49,21 @@ router.post('/register', async (req, res) => {
   }
 
   try {
-    // Check if user already exists
-    if (DEMO_USERS[email]) {
+    const checkUser = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    
+    if (checkUser.rows.length > 0) {
       return res.status(409).json({ error: 'Email already registered' });
     }
 
-    // For demo purposes, just create user in memory
-    const newUser = {
-      id: Object.keys(DEMO_USERS).length + 1,
-      name,
-      email,
-      password,
-      role,
-      location_id
-    };
+    const hashedPassword = await bcryptjs.hash(password, 10);
+    const result = await pool.query(
+      'INSERT INTO users (name, email, password_hash, role, location_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, role',
+      [name, email, hashedPassword, role, location_id]
+    );
 
-    DEMO_USERS[email] = newUser;
-
+    const newUser = result.rows[0];
     const token = jwt.sign(
-      { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role, location_id: newUser.location_id },
+      { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role, location_id },
       process.env.JWT_SECRET || 'your-secret-key-change-in-production',
       { expiresIn: '24h' }
     );
