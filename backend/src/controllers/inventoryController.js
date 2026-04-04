@@ -51,6 +51,8 @@ const update = async (req, res, next) => {
       [name, quantity, unit, min_threshold, req.params.id]
     );
 
+    if (result.rows.length === 0) return res.status(404).json({ message: 'Inventory item not found' });
+
     const change = quantity - current.rows[0].quantity;
     await db.query(
       'INSERT INTO inventory_logs (inventory_id, changed_by, change_amount, reason) VALUES ($1, $2, $3, $4)',
