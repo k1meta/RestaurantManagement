@@ -1,0 +1,1 @@
+{\n  "name": "restaurant-management-backend",\n  "version": "1.0.0",\n  "description": "Backend for Restaurant Management System",\n  "main": "index.js",\n  "scripts": {\n    "start": "node index.js"\n  },\n  "dependencies": {\n    "express": "^4.17.1"\n  },\n  "author": "TarikTopalovic",\n  "license": "ISC"\n}
