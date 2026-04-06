@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "Restaurant Management",
+    "slug": "restaurant-management",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "restaurantmanagement",
+    "platforms": ["android", "ios", "web"],
+    "jsEngine": "hermes",
+    "extra": {
+      "apiUrl": "http://10.0.2.2:3000"
+    }
+  }
+}

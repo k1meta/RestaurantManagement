@@ -21,7 +21,7 @@ export default function WaiterScreen({ navigation }) {
 
   const fetchOrders = useCallback(async () => {
     try {
-      const res = await getOrders();
+      const res = await getOrders({ include_items: true, include_closed: false });
       setOrders(res.data.orders);
     } catch (err) {
       Alert.alert('Error', 'Could not load orders');

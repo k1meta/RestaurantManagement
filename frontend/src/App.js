@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import LoginPage from './pages/LoginPage';
 import WaiterDashboard from './pages/WaiterDashboard';
 import KitchenDashboard from './pages/KitchenDashboard';
 import ManagerDashboard from './pages/ManagerDashboard';
 import OwnerDashboard from './pages/OwnerDashboard';
-
-const API_URL = 'http://localhost:3000/api';
+import { getMe, login, setAuthToken } from './api/client';
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -14,27 +12,52 @@ export default function App() {
 
   // Load user from localStorage on mount
   useEffect(() => {
-    const savedToken = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
-    if (savedToken && savedUser) {
-      setUser(JSON.parse(savedUser));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
+    async function restoreSession() {
+      const savedToken = localStorage.getItem('token');
+      const savedUserRaw = localStorage.getItem('user');
+
+      if (!savedToken) {
+        setLoading(false);
+        return;
+      }
+
+      await setAuthToken(savedToken);
+
+      if (savedUserRaw) {
+        try {
+          setUser(JSON.parse(savedUserRaw));
+        } catch (_) {
+          localStorage.removeItem('user');
+        }
+      }
+
+      try {
+        const response = await getMe();
+        const me = response.data.user;
+        localStorage.setItem('user', JSON.stringify(me));
+        setUser(me);
+      } catch (err) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        await setAuthToken(null);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
     }
-    setLoading(false);
+
+    restoreSession();
   }, []);
 
   const handleLogin = async (email, password) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, {
-        email,
-        password,
-      });
+      const response = await login(email, password);
 
       const { token, user: userData } = response.data;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(userData));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      
+      await setAuthToken(token);
+
       setUser(userData);
       return { success: true };
     } catch (err) {
@@ -45,10 +68,10 @@ export default function App() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    delete axios.defaults.headers.common['Authorization'];
+    await setAuthToken(null);
     setUser(null);
   };
 

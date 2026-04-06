@@ -14,7 +14,7 @@ export default function KitchenScreen() {
 
   const fetchOrders = useCallback(async () => {
     try {
-      const res = await getOrders();
+      const res = await getOrders({ include_closed: false });
       // Kitchen only cares about non-closed orders
       setOrders(res.data.orders.filter(o => o.status !== 'closed'));
     } catch {

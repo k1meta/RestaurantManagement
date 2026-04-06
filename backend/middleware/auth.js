@@ -1,19 +1,20 @@
 const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../config/auth');
 
 /**
  * Verifies the JWT token sent in the Authorization header.
  * Attaches the decoded user payload to req.user.
  */
 function authenticate(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // "Bearer <token>"
+  const authHeader = req.headers.authorization || '';
+  const [scheme, token] = authHeader.split(' ');
 
-  if (!token) {
+  if (scheme !== 'Bearer' || !token) {
     return res.status(401).json({ error: 'Access denied — no token provided' });
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded; // { id, name, email, role, location_id }
     next();
   } catch (err) {
@@ -37,3 +38,4 @@ function authorize(...roles) {
 }
 
 module.exports = { authenticate, authorize };
+

@@ -2,8 +2,10 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ActivityIndicator, View } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 
 import { AuthProvider, useAuth } from './src/context/AuthContext';
+import AppErrorBoundary from './src/components/AppErrorBoundary';
 
 // Screens
 import LoginScreen    from './src/screens/LoginScreen';
@@ -82,10 +84,13 @@ function RoleRouter() {
 // ─── Root app ────────────────────────────────────────────────────────────────
 export default function App() {
   return (
-    <AuthProvider>
-      <NavigationContainer>
-        <RoleRouter />
-      </NavigationContainer>
-    </AuthProvider>
+    <AppErrorBoundary>
+      <AuthProvider>
+        <NavigationContainer>
+          <RoleRouter />
+          <StatusBar style="light" />
+        </NavigationContainer>
+      </AuthProvider>
+    </AppErrorBoundary>
   );
 }

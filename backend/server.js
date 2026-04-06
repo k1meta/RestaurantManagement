@@ -7,6 +7,7 @@ const authRoutes        = require('./routes/auth');
 const orderRoutes       = require('./routes/orders');
 const inventoryRoutes   = require('./routes/inventory');
 const menuSalesRoutes   = require('./routes/menuAndSales');
+const organizationRoutes = require('./routes/organization');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -20,6 +21,7 @@ app.use('/api/auth',      authRoutes);
 app.use('/api/orders',    orderRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api',           menuSalesRoutes);  // /api/menu and /api/sales
+app.use('/api',           organizationRoutes); // /api/locations and /api/users
 
 // ─── Health check ───────────────────────────────────────────────────────────
 app.get('/health', (req, res) => {
