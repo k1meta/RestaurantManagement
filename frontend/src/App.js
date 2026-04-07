@@ -14,12 +14,25 @@ export default function App() {
 
   // Load user from localStorage on mount
   useEffect(() => {
-    const savedToken = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
-    if (savedToken && savedUser) {
-      setUser(JSON.parse(savedUser));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
+    console.log('App.js useEffect running...');
+    try {
+      const savedToken = localStorage.getItem('token');
+      const savedUser = localStorage.getItem('user');
+      console.log('localStorage token:', !!savedToken, 'user:', !!savedUser);
+      if (savedToken && savedUser) {
+        const userData = typeof savedUser === 'string' ? JSON.parse(savedUser) : savedUser;
+        setUser(userData);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
+        console.log('User restored from localStorage:', userData);
+      } else {
+        console.log('No saved user in localStorage');
+      }
+    } catch (err) {
+      console.error('Error loading user from storage:', err);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
     }
+    console.log('Setting loading to false');
     setLoading(false);
   }, []);
 
@@ -54,11 +67,12 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          <p className="mt-4 text-on-surface font-headline">Loading...</p>
+      <div style={{ width: '100%', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f5f5f5' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ display: 'inline-block', animation: 'spin 1s linear infinite', width: '48px', height: '48px', border: '4px solid #e0e0e0', borderTop: '4px solid #2196F3', borderRadius: '50%' }}></div>
+          <p style={{ marginTop: '16px', color: '#555', fontWeight: '600' }}>Loading...</p>
         </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }

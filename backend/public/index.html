@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Management - Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-container {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.2);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #764ba2;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .test-accounts {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #ddd;
+        }
+        .test-accounts h3 {
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .account-btn {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #333;
+            transition: all 0.3s;
+        }
+        .account-btn:hover {
+            background: #e8e8e8;
+            border-color: #667eea;
+        }
+        .account-btn.owner { border-left: 4px solid #ff6b6b; }
+        .account-btn.manager { border-left: 4px solid #ffd93d; }
+        .account-btn.waiter { border-left: 4px solid #6bcf7f; }
+        .account-btn.kitchen { border-left: 4px solid #4d96ff; }
+        .error {
+            color: #d32f2f;
+            font-size: 13px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            margin-top: 10px;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>🍽️ Restaurant</h1>
+        <p class="subtitle">Management System</p>
+        
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+            </div>
+            <div id="error" class="error"></div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <span>Logging in...</span>
+            </div>
+            <button type="submit" id="loginBtn">Login</button>
+        </form>
+
+        <div class="test-accounts">
+            <h3>📝 Quick Login (Test Accounts)</h3>
+            <button class="account-btn owner" onclick="quickLogin('owner@restaurant.com', 'password123')">
+                👑 Owner Ali
+            </button>
+            <button class="account-btn manager" onclick="quickLogin('manager@restaurant.com', 'password123')">
+                📊 Manager Sara
+            </button>
+            <button class="account-btn waiter" onclick="quickLogin('waiter@restaurant.com', 'password123')">
+                🍽️ Waiter Tom
+            </button>
+            <button class="account-btn kitchen" onclick="quickLogin('kitchen@restaurant.com', 'password123')">
+                👨‍🍳 Kitchen Marco
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:3000/api';
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+            document.getElementById('loginBtn').disabled = show;
+        }
+
+        function showError(message) {
+            document.getElementById('error').textContent = message;
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            await login(email, password);
+        }
+
+        function quickLogin(email, password) {
+            document.getElementById('email').value = email;
+            document.getElementById('password').value = password;
+            login(email, password);
+        }
+
+        async function login(email, password) {
+            try {
+                showError('');
+                showLoading(true);
+
+                const response = await fetch(`${API}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    showError(data.error || 'Login failed');
+                    showLoading(false);
+                    return;
+                }
+
+                const data = await response.json();
+                
+                // Store token and user info
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+
+                // Redirect based on role
+                const role = data.user.role;
+                window.location.href = `/${role}.html`;
+            } catch (err) {
+                console.error('Login error:', err);
+                showError('Connection error. Check if backend is running.');
+                showLoading(false);
+            }
+        }
+    </script>
+</body>
+</html>

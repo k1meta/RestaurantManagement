@@ -7,6 +7,7 @@ const authRoutes        = require('./routes/auth');
 const orderRoutes       = require('./routes/orders');
 const inventoryRoutes   = require('./routes/inventory');
 const menuSalesRoutes   = require('./routes/menuAndSales');
+const dashboardRoutes   = require('./routes/dashboard');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -15,10 +16,14 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());                  // Allow requests from React Native dev client
 app.use(express.json());          // Parse JSON bodies
 
+// Serve static HTML files
+app.use(express.static(__dirname + '/public'));
+
 // ─── Routes ─────────────────────────────────────────────────────────────────
 app.use('/api/auth',      authRoutes);
 app.use('/api/orders',    orderRoutes);
 app.use('/api/inventory', inventoryRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 app.use('/api',           menuSalesRoutes);  // /api/menu and /api/sales
 
 // ─── Health check ───────────────────────────────────────────────────────────
@@ -27,8 +32,18 @@ app.get('/health', (req, res) => {
 });
 
 // ─── 404 handler ────────────────────────────────────────────────────────────
+// Serve index.html for non-API routes (SPA support)
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
+});
+
 app.use((req, res) => {
-  res.status(404).json({ error: `Route ${req.method} ${req.path} not found` });
+  // If it's not an API route, try to serve index.html
+  if (!req.path.startsWith('/api/')) {
+    res.sendFile(__dirname + '/public/index.html');
+  } else {
+    res.status(404).json({ error: `Route ${req.method} ${req.path} not found` });
+  }
 });
 
 // ─── Global error handler ───────────────────────────────────────────────────

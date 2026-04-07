@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Kinetic Editorial - Kitchen Queue</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&amp;family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-fixed": "#1c1b1b",
+                        "inverse-surface": "#313030",
+                        "outline": "#747878",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "on-error": "#ffffff",
+                        "on-tertiary-container": "#d76100",
+                        "on-tertiary-fixed": "#331200",
+                        "on-secondary-container": "#217128",
+                        "on-primary-fixed-variant": "#474646",
+                        "on-secondary-fixed-variant": "#005312",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#ebe7e7",
+                        "on-tertiary-fixed-variant": "#773200",
+                        "tertiary": "#000000",
+                        "secondary": "#1b6d24",
+                        "background": "#fcf9f8",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-tint": "#5f5e5e",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#a3f69c",
+                        "primary": "#000000",
+                        "outline-variant": "#c4c7c7",
+                        "on-background": "#1c1b1b",
+                        "tertiary-fixed-dim": "#ffb68f",
+                        "primary-fixed": "#e5e2e1",
+                        "on-surface-variant": "#444748",
+                        "tertiary-container": "#331200",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#f0edec",
+                        "on-primary": "#ffffff",
+                        "inverse-on-surface": "#f3f0ef",
+                        "inverse-primary": "#c8c6c5",
+                        "surface-container-highest": "#e5e2e1",
+                        "on-secondary-fixed": "#002204",
+                        "surface-bright": "#fcf9f8",
+                        "on-surface": "#1c1b1b",
+                        "tertiary-fixed": "#ffdbca",
+                        "surface": "#fcf9f8",
+                        "primary-container": "#1c1b1b",
+                        "secondary-container": "#a0f399",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#88d982",
+                        "on-primary-container": "#858383",
+                        "surface-variant": "#e5e2e1",
+                        "surface-dim": "#dcd9d9"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Work Sans"],
+                        "label": ["Work Sans"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                    animation: {
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background-color: #fcf9f8;
+            min-height: max(884px, 100dvh);
+        }
+        .editorial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.25rem;
+        }
+        @keyframes pulse-amber {
+            0%, 100% { background-color: #ffdbca; }
+            50% { background-color: #ffb68f; }
+        }
+        .animate-pulse-amber {
+            animation: pulse-amber 1.5s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="text-on-surface select-none pb-20">
+<!-- TopAppBar: Refined with Prep Time Metrics -->
+<header class="bg-[#fcf9f8] dark:bg-[#121212] flex flex-col w-full sticky top-0 z-40">
+<div class="flex justify-between items-center px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-black dark:text-white text-2xl">restaurant_menu</span>
+<div class="flex flex-col">
+<h1 class="font-['Space_Grotesk'] font-bold tracking-tighter uppercase text-lg text-black dark:text-white leading-none">
+                    The Kinetic Editorial <span class="mx-1 opacity-20">/</span> Kitchen
+                </h1>
+<span class="text-[10px] font-['Space_Grotesk'] font-bold uppercase tracking-[0.2em] text-on-surface-variant">Station A • Main Line</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<!-- Prep Time Meter -->
+<div class="hidden sm:flex flex-col items-end mr-4">
+<p class="font-['Space_Grotesk'] text-[9px] font-black uppercase tracking-widest text-on-surface-variant mb-1">Avg Prep Time</p>
+<div class="flex gap-0.5 h-3 items-end">
+<div class="w-1.5 h-1 bg-secondary"></div>
+<div class="w-1.5 h-2 bg-secondary"></div>
+<div class="w-1.5 h-3 bg-secondary"></div>
+<div class="w-1.5 h-2 bg-outline-variant"></div>
+<div class="w-1.5 h-1 bg-outline-variant"></div>
+<span class="ml-2 font-['Space_Grotesk'] text-xs font-black">12m</span>
+</div>
+</div>
+<div class="w-10 h-10 bg-surface-container-highest flex items-center justify-center rounded-full overflow-hidden border border-outline-variant">
+<img alt="Chef" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfInp6S9dWyRVdT-8-PZVJBrK4r40BVwKa4Fv0TMxb3DR-D3bKKT3AykIo-_-bK8NNWhQoQNcgGow6_WjxNDko0oGEwDj_DN2xlbryCxGZG113OGDa8-uVEpBW3PT_lBymg9n-2huY-n65h0h-dSQxmX_I29MFvtzhY0yo84q5G2HJWXNSD9uXstf7D1jeBSiBtaGIAD3JIntYVna93e2S3R2r3Ne9qj5wa6YZgJi3JQfb207u0VC1IQwvjlAgybsbZNBP2IH5sV4"/>
+</div>
+</div>
+</div>
+<div class="bg-[#f6f3f2] dark:bg-[#1c1b1b] h-[1px] w-full"></div>
+</header>
+<main class="p-6 max-w-[1600px] mx-auto">
+<!-- Status Board -->
+<section class="mb-10 grid grid-cols-2 md:grid-cols-4 gap-3">
+<div class="bg-primary text-on-primary p-5 flex flex-col justify-between h-32">
+<p class="font-['Space_Grotesk'] text-[10px] font-bold uppercase tracking-widest opacity-70 leading-none">Active Tickets</p>
+<h2 class="font-['Space_Grotesk'] text-5xl font-black leading-none">14</h2>
+</div>
+<div class="bg-surface-container-low border border-outline-variant/30 p-5 flex flex-col justify-between h-32">
+<p class="font-['Space_Grotesk'] text-[10px] font-bold uppercase tracking-widest text-on-surface-variant leading-none">Target Goal</p>
+<div class="flex items-baseline gap-1">
+<h2 class="font-['Space_Grotesk'] text-4xl font-bold leading-none">15</h2>
+<span class="font-['Work_Sans'] text-xs font-medium opacity-50 uppercase">Min</span>
+</div>
+</div>
+<div class="bg-error-container p-5 flex flex-col justify-between h-32">
+<p class="font-['Space_Grotesk'] text-[10px] font-bold uppercase tracking-widest text-on-error-container leading-none">Delayed</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-error text-3xl font-bold">warning</span>
+<h2 class="font-['Space_Grotesk'] text-4xl font-black text-on-error-container leading-none">02</h2>
+</div>
+</div>
+<div class="bg-secondary-container p-5 flex flex-col justify-between h-32">
+<p class="font-['Space_Grotesk'] text-[10px] font-bold uppercase tracking-widest text-on-secondary-container leading-none">Ready</p>
+<h2 class="font-['Space_Grotesk'] text-4xl font-black text-on-secondary-container leading-none">05</h2>
+</div>
+</section>
+<!-- Kitchen Queue -->
+<div class="editorial-grid">
+<!-- Ticket 1: URGENT KITCHEN -->
+<div class="bg-white flex flex-col border-2 border-error relative shadow-xl">
+<div class="bg-error text-white px-4 py-2 flex justify-between items-center animate-pulse">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">priority_high</span>
+<span class="font-['Space_Grotesk'] text-[11px] font-black uppercase tracking-widest">Urgent • Kitchen</span>
+</div>
+<div class="font-['Space_Grotesk'] text-[11px] font-bold uppercase">Ticket T-14</div>
+</div>
+<div class="p-5 flex justify-between items-start border-b border-outline-variant/20">
+<h3 class="font-['Space_Grotesk'] text-6xl font-black tracking-tighter">14:22</h3>
+<div class="text-right flex flex-col items-end">
+<span class="font-['Space_Grotesk'] text-2xl font-black text-error animate-pulse-fast">18m</span>
+<span class="text-[9px] font-black uppercase opacity-60">Over Target</span>
+</div>
+</div>
+<div class="p-5 flex-grow space-y-3">
+<div class="flex justify-between items-center p-3 bg-red-50 border-l-4 border-error">
+<span class="font-['Space_Grotesk'] font-black text-xl uppercase tracking-tight text-black">2x Margherita Pizza</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold uppercase bg-error/10 px-1 text-error">Main</span>
+</div>
+<div class="flex justify-between items-center p-3 bg-surface-container-low border-l-4 border-outline-variant">
+<span class="font-['Space_Grotesk'] font-black text-xl uppercase tracking-tight text-black">1x Caesar Salad</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold uppercase bg-black/10 px-1">Side</span>
+</div>
+<div class="bg-tertiary-fixed p-3 mt-4">
+<div class="flex items-center gap-1 mb-1">
+<span class="material-symbols-outlined text-sm">sticky_note_2</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold uppercase tracking-widest">Kitchen Notes</span>
+</div>
+<p class="font-['Work_Sans'] text-sm font-bold italic">"Dressing on the side, no croutons."</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-px bg-outline-variant/30">
+<button class="bg-white text-black py-6 font-['Space_Grotesk'] font-black uppercase tracking-widest text-sm hover:bg-surface-container transition-colors active:scale-95">
+                    Bump
+                </button>
+<button class="bg-error text-white py-6 font-['Space_Grotesk'] font-black uppercase tracking-widest text-sm hover:brightness-110 transition-all active:scale-95">
+                    Mark Ready
+                </button>
+</div>
+</div>
+<!-- Ticket 2: NORMAL BAKERY (With Warning Timer) -->
+<div class="bg-white flex flex-col border border-outline-variant relative">
+<div class="bg-tertiary text-white px-4 py-2 flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">bakery_dining</span>
+<span class="font-['Space_Grotesk'] text-[11px] font-black uppercase tracking-widest">Normal • Bakery</span>
+</div>
+<div class="font-['Space_Grotesk'] text-[11px] font-bold uppercase">Ticket T-08</div>
+</div>
+<div class="p-5 flex justify-between items-start border-b border-outline-variant/20">
+<h3 class="font-['Space_Grotesk'] text-6xl font-black tracking-tighter">14:35</h3>
+<div class="text-right flex flex-col items-end">
+<span class="font-['Space_Grotesk'] text-2xl font-black text-on-tertiary-fixed-variant animate-pulse-amber px-2">15m</span>
+<span class="text-[9px] font-black uppercase opacity-60">Approaching</span>
+</div>
+</div>
+<div class="p-5 flex-grow space-y-3">
+<div class="flex justify-between items-center p-3 bg-surface-container-low border-l-4 border-on-tertiary-container">
+<span class="font-['Space_Grotesk'] font-black text-xl uppercase tracking-tight text-black">4x Sourdough Loaf</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold uppercase bg-black/10 px-1">Retail</span>
+</div>
+<div class="flex justify-between items-center p-3 bg-surface-container-low border-l-4 border-on-tertiary-container">
+<span class="font-['Space_Grotesk'] font-black text-xl uppercase tracking-tight text-black">2x Almond Croissant</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold uppercase bg-black/10 px-1">Pastry</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-px bg-outline-variant/30">
+<button class="bg-white text-black py-6 font-['Space_Grotesk'] font-black uppercase tracking-widest text-sm hover:bg-surface-container transition-colors active:scale-95">
+                    Bump
+                </button>
+<button class="bg-secondary text-white py-6 font-['Space_Grotesk'] font-black uppercase tracking-widest text-sm hover:brightness-110 transition-all active:scale-95">
+                    Mark Ready
+                </button>
+</div>
+</div>
+<!-- Ticket 3: NORMAL KITCHEN (Active) -->
+<div class="bg-white flex flex-col border border-outline-variant relative">
+<div class="bg-black text-white px-4 py-2 flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">restaurant</span>
+<span class="font-['Space_Grotesk'] text-[11px] font-black uppercase tracking-widest">Active • Kitchen</span>
+</div>
+<div class="font-['Space_Grotesk'] text-[11px] font-bold uppercase">Ticket T-22</div>
+</div>
+<div class="p-5 flex justify-between items-start border-b border-outline-variant/20">
+<h3 class="font-['Space_Grotesk'] text-6xl font-black tracking-tighter">14:38</h3>
+<div class="text-right flex flex-col items-end">
+<span class="font-['Space_Grotesk'] text-2xl font-black text-secondary">02m</span>
+<span class="text-[9px] font-black uppercase opacity-60">Just Started</span>
+</div>
+</div>
+<div class="p-5 flex-grow space-y-3">
+<div class="flex justify-between items-center p-3 bg-surface-container-low border-l-4 border-black">
+<span class="font-['Space_Grotesk'] font-black text-xl uppercase tracking-tight text-black">1x Wagyu Burger</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold uppercase bg-black/10 px-1">Main</span>
+</div>
+<div class="flex justify-between items-center p-3 bg-surface-container-low border-l-4 border-black">
+<span class="font-['Space_Grotesk'] font-black text-xl uppercase tracking-tight text-black">1x Truffle Fries</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold uppercase bg-black/10 px-1">Side</span>
+</div>
+<div class="bg-surface-container-highest p-3 italic border border-outline-variant/30">
+<p class="font-['Work_Sans'] text-sm font-bold">"Medium Rare, Extra Napkins."</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-px bg-outline-variant/30">
+<button class="bg-white text-black py-6 font-['Space_Grotesk'] font-black uppercase tracking-widest text-sm hover:bg-surface-container transition-colors active:scale-95">
+                    Bump
+                </button>
+<button class="bg-black text-white py-6 font-['Space_Grotesk'] font-black uppercase tracking-widest text-sm hover:bg-neutral-800 transition-all active:scale-95">
+                    Mark Ready
+                </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Navigation Shell: BottomNavBar (Component 8 Integration) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-stretch bg-black shadow-[0_-4px_20px_rgba(0,0,0,0.2)] h-20">
+<a class="flex flex-col items-center justify-center text-[#e5e2e1]/70 w-full hover:bg-[#1c1b1b] transition-all" href="#">
+<span class="material-symbols-outlined mb-1">receipt_long</span>
+<span class="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">Orders</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#1c1b1b] text-white rounded-none border-t-4 border-[#1b6d24] h-full w-full" href="#">
+<span class="material-symbols-outlined mb-1">chef_hat</span>
+<span class="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">Kitchen</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#e5e2e1]/70 w-full hover:bg-[#1c1b1b] transition-all" href="#">
+<span class="material-symbols-outlined mb-1">inventory_2</span>
+<span class="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">Inventory</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#e5e2e1]/70 w-full hover:bg-[#1c1b1b] transition-all" href="#">
+<span class="material-symbols-outlined mb-1">monitoring</span>
+<span class="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">Analytics</span>
+</a>
+</nav>
+<!-- FAB: Manual ticket creation -->
+<div class="fixed bottom-24 right-6 z-40">
+<button class="bg-primary text-white w-14 h-14 rounded-none shadow-2xl flex items-center justify-center active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-3xl font-bold">add</span>
+</button>
+</div>
+<script src="/js/dashboard-common.js"></script>
+<script src="/js/kitchen-view.js"></script>
+</body></html>

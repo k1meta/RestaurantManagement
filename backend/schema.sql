@@ -90,10 +90,10 @@ ON CONFLICT DO NOTHING;
 
 -- bcrypt hash of "password123" with saltRounds=10
 INSERT INTO users (name, email, password_hash, role, location_id) VALUES
-  ('Owner Ali',    'owner@restaurant.com',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'owner',   NULL),
-  ('Manager Sara', 'manager@restaurant.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'manager', 1),
-  ('Waiter Tom',   'waiter@restaurant.com',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'waiter',  1),
-  ('Chef Marco',   'kitchen@restaurant.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'kitchen', 1)
+  ('Owner Ali',    'owner@restaurant.com',   '$2a$10$5VWjX2EHBO./gKnxIql6Fu2BvmaVJFjVNiKx7OByMPFW1HnGq7smG', 'owner',   NULL),
+  ('Manager Sara', 'manager@restaurant.com', '$2a$10$5VWjX2EHBO./gKnxIql6Fu2BvmaVJFjVNiKx7OByMPFW1HnGq7smG', 'manager', 1),
+  ('Waiter Tom',   'waiter@restaurant.com',  '$2a$10$5VWjX2EHBO./gKnxIql6Fu2BvmaVJFjVNiKx7OByMPFW1HnGq7smG', 'waiter',  1),
+  ('Chef Marco',   'kitchen@restaurant.com', '$2a$10$5VWjX2EHBO./gKnxIql6Fu2BvmaVJFjVNiKx7OByMPFW1HnGq7smG', 'kitchen', 1)
 ON CONFLICT DO NOTHING;
 
 INSERT INTO menu_items (name, category, price) VALUES

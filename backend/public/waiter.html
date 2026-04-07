@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Kinetic Editorial - Waiter Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&amp;family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-fixed": "#1c1b1b",
+                        "inverse-surface": "#313030",
+                        "outline": "#747878",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "on-error": "#ffffff",
+                        "on-tertiary-container": "#d76100",
+                        "on-tertiary-fixed": "#331200",
+                        "on-secondary-container": "#217128",
+                        "on-primary-fixed-variant": "#474646",
+                        "on-secondary-fixed-variant": "#005312",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#ebe7e7",
+                        "on-tertiary-fixed-variant": "#773200",
+                        "tertiary": "#000000",
+                        "secondary": "#1b6d24",
+                        "background": "#fcf9f8",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-tint": "#5f5e5e",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#a3f69c",
+                        "primary": "#000000",
+                        "outline-variant": "#c4c7c7",
+                        "on-background": "#1c1b1b",
+                        "tertiary-fixed-dim": "#ffb68f",
+                        "primary-fixed": "#e5e2e1",
+                        "on-surface-variant": "#444748",
+                        "tertiary-container": "#331200",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#f0edec",
+                        "on-primary": "#ffffff",
+                        "inverse-on-surface": "#f3f0ef",
+                        "inverse-primary": "#c8c6c5",
+                        "surface-container-highest": "#e5e2e1",
+                        "on-secondary-fixed": "#002204",
+                        "surface-bright": "#fcf9f8",
+                        "on-surface": "#1c1b1b",
+                        "tertiary-fixed": "#ffdbca",
+                        "surface": "#fcf9f8",
+                        "primary-container": "#1c1b1b",
+                        "secondary-container": "#a0f399",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#88d982",
+                        "on-primary-container": "#858383",
+                        "surface-variant": "#e5e2e1",
+                        "surface-dim": "#dcd9d9"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Work Sans"],
+                        "label": ["Work Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Work Sans', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Space Grotesk', sans-serif; }
+        .text-huge { font-size: clamp(3.5rem, 8vw, 5rem); line-height: 0.9; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- TopAppBar Shared Component -->
+<header class="bg-[#fcf9f8] dark:bg-[#121212] flex justify-between items-center px-6 py-4 w-full docked full-width top-0 z-50">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-black dark:text-white hover:bg-[#e5e2e1] dark:hover:bg-[#2c2c2c] transition-colors p-2 rounded-sm active:scale-[0.97]">
+            restaurant_menu
+        </button>
+<div class="flex flex-col">
+<span class="text-black dark:text-white font-headline font-bold tracking-tighter uppercase text-sm leading-tight">DOWNTOWN CENTRAL</span>
+<span class="text-[10px] font-label text-on-surface-variant font-bold uppercase tracking-[0.2em]">WAITER: TARIK</span>
+</div>
+</div>
+<h1 class="text-2xl font-black text-black dark:text-white tracking-tight font-headline hidden md:block">THE KINETIC EDITORIAL</h1>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-surface-container-highest rounded-full flex items-center justify-center overflow-hidden border border-outline-variant/15 active:scale-95 transition-transform cursor-pointer">
+<img alt="Waiter Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIK6aehL6alD1yVFhYvUoDER_0NYL_cgY4xOPB67ExADi6YFPf1aEmVZXz7R3MICeWQYzd-hQ_aPvL3bC7isCPLsxFLCg3sJb8uuZWfDW6s4OzALST43P7wKpAyDbbI5wvP2jrjCIen8EfdSwEh-t0VRm-lgtHR4gOI7CJWitivu5WEj78jYKf-jq-aXFTDE6HijuK4Q6dOlnN6aJeyZeWOC7NbyfyqWpi_R1n9isgyg4QUQsI2uLU0oWmX707Bpm0nf4AhFZH4tM"/>
+</div>
+</div>
+</header>
+<div class="bg-[#f6f3f2] dark:bg-[#1c1b1b] h-[2px] w-full"></div>
+<!-- Main Content Canvas -->
+<main class="flex-1 p-4 lg:p-6 pb-24 grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-[1600px] mx-auto w-full">
+<!-- Left: Active Tickets Section -->
+<section class="lg:col-span-8 flex flex-col gap-8">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="font-headline text-5xl font-black tracking-tight uppercase leading-none">Active Tables</h2>
+<p class="font-label text-[11px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mt-2">12 TABLES IN PLAY • 4 PENDING TICKETS</p>
+</div>
+<button class="bg-primary text-on-primary px-8 py-5 font-headline font-black text-xl flex items-center justify-center gap-3 hover:bg-on-primary-variant active:scale-[0.98] transition-all shadow-lg">
+<span class="material-symbols-outlined font-bold">add</span>
+                CREATE NEW ORDER
+            </button>
+</div>
+<!-- Table Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Ticket: Waiting for Food (Amber Alert) -->
+<div class="bg-surface-container-low p-5 flex flex-col justify-between h-52 relative border-l-[6px] border-[#d76100]">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-headline text-huge font-black tracking-tighter">24</span>
+<p class="font-label text-[10px] font-black uppercase tracking-widest text-on-surface-variant -mt-2">Table Number</p>
+</div>
+<div class="bg-[#ffdbca] text-[#773200] px-3 py-1 text-[10px] font-black uppercase tracking-widest">
+                        Waiting for Food
+                    </div>
+</div>
+<div class="flex justify-between items-end mt-4">
+<div class="space-y-1">
+<p class="text-xs font-bold font-headline uppercase tracking-tight">3 GUESTS • 18 MIN SEATED • 8 ITEMS</p>
+<div class="flex -space-x-2">
+<div class="w-7 h-7 bg-surface-container-highest rounded-full border-2 border-surface flex items-center justify-center text-[10px] font-bold">T</div>
+<div class="w-7 h-7 bg-surface-container-highest rounded-full border-2 border-surface flex items-center justify-center text-[10px] font-bold">M</div>
+<div class="w-7 h-7 bg-surface-container-highest rounded-full border-2 border-surface flex items-center justify-center text-[10px] font-bold">J</div>
+</div>
+</div>
+<button class="bg-surface-container-highest text-on-surface p-3 hover:bg-outline-variant transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Ticket: Order Ready (Green Success) -->
+<div class="bg-white p-5 flex flex-col justify-between h-52 relative border-l-[6px] border-secondary shadow-md">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-headline text-huge font-black tracking-tighter text-secondary">08</span>
+<p class="font-label text-[10px] font-black uppercase tracking-widest text-secondary -mt-2">READY TO SERVE</p>
+</div>
+<div class="bg-secondary text-on-secondary px-3 py-1 text-[10px] font-black uppercase tracking-widest">
+                        Order Ready
+                    </div>
+</div>
+<div class="flex justify-between items-end mt-4">
+<div class="space-y-2">
+<p class="text-xs font-bold font-headline uppercase tracking-tight">2 GUESTS • 42 MIN SEATED</p>
+<div class="bg-secondary-container text-on-secondary-container px-2 py-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm font-bold">local_fire_department</span>
+<span class="text-[10px] font-black uppercase tracking-tighter">HOT PASS: TICKET #402</span>
+</div>
+</div>
+<button class="bg-secondary text-white px-6 py-3 font-headline font-black text-sm hover:brightness-110 transition-all active:scale-95">
+                        SERVE NOW
+                    </button>
+</div>
+</div>
+<!-- Ticket: Ordering (Neutral Primary) -->
+<div class="bg-surface-container-low p-5 flex flex-col justify-between h-52 relative border-l-[6px] border-primary">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-headline text-huge font-black tracking-tighter">12</span>
+<p class="font-label text-[10px] font-black uppercase tracking-widest text-on-surface-variant -mt-2">Table Number</p>
+</div>
+<div class="bg-surface-container-highest text-on-surface px-3 py-1 text-[10px] font-black uppercase tracking-widest">
+                        Ordering
+                    </div>
+</div>
+<div class="flex justify-between items-end mt-4">
+<div class="space-y-1">
+<p class="text-xs font-bold font-headline uppercase tracking-tight">5 GUESTS • 2 MIN SEATED</p>
+</div>
+<button class="bg-primary text-on-primary px-6 py-3 font-headline font-black text-sm hover:bg-black/80 transition-all active:scale-95">
+                        ADD ITEMS
+                    </button>
+</div>
+</div>
+<!-- Ticket: Seated (Low Priority) -->
+<div class="bg-surface-container-low p-5 flex flex-col justify-between h-52 relative border-l-[6px] border-outline-variant/30">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-headline text-huge font-black tracking-tighter text-on-surface/40">31</span>
+<p class="font-label text-[10px] font-black uppercase tracking-widest text-on-surface-variant -mt-2">Table Number</p>
+</div>
+<div class="bg-surface-container-highest/50 text-on-surface/40 px-3 py-1 text-[10px] font-black uppercase tracking-widest">
+                        Seated
+                    </div>
+</div>
+<div class="flex justify-between items-end mt-4">
+<div class="space-y-1">
+<p class="text-xs font-bold font-headline uppercase tracking-tight">4 GUESTS • 12 MIN SEATED</p>
+</div>
+<button class="bg-surface-container-highest text-on-surface p-3 hover:bg-outline-variant transition-colors">
+<span class="material-symbols-outlined">restaurant</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Notifications / Alerts Section - Enhanced Contrast -->
+<div class="bg-[#ffdbca]/40 p-6 border border-[#ffdbca] relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-[#ffdbca]/20 rotate-45 translate-x-16 -translate-y-16"></div>
+<div class="flex items-center gap-3 mb-6 relative z-10">
+<span class="material-symbols-outlined text-[#773200] font-black">notifications_active</span>
+<h3 class="font-headline font-black text-xl uppercase tracking-widest text-[#331200]">Urgent Alerts</h3>
+</div>
+<div class="space-y-3 relative z-10">
+<div class="bg-white p-5 flex justify-between items-center shadow-sm border border-black/5 group cursor-pointer hover:border-black/20 transition-all">
+<div class="flex items-center gap-6">
+<span class="font-headline font-black text-3xl text-primary">#402</span>
+<div class="h-10 w-px bg-outline-variant/30"></div>
+<div>
+<p class="text-base font-black font-headline uppercase leading-tight">TABLE 08: DRINKS READY</p>
+<p class="text-[10px] uppercase text-on-surface-variant font-black tracking-widest mt-0.5">Main Bar • 2M AGO</p>
+</div>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-black p-2 transition-colors">close</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Right: Detailed Ticket View / Order Entry -->
+<aside class="lg:col-span-4 bg-white flex flex-col h-full min-h-[700px] border border-outline-variant/15 shadow-2xl lg:shadow-none">
+<!-- Ticket Header -->
+<div class="p-6 bg-surface-container-low border-b border-outline-variant/15">
+<div class="flex justify-between items-start mb-6">
+<div>
+<span class="font-headline text-[10px] font-black uppercase tracking-[0.3em] text-on-surface-variant">Current View</span>
+<h2 class="font-headline text-5xl font-black leading-none mt-1">TABLE 24</h2>
+</div>
+<button class="p-2 hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="flex gap-2">
+<span class="bg-primary text-on-primary text-[10px] font-black px-3 py-1 uppercase tracking-tighter">TICKET #882</span>
+<span class="bg-surface-container-highest text-on-surface text-[10px] font-black px-3 py-1 uppercase tracking-tighter">3 GUESTS</span>
+<span class="bg-surface-container-highest text-on-surface text-[10px] font-black px-3 py-1 uppercase tracking-tighter">POS 1-3</span>
+</div>
+</div>
+<!-- Itemized List -->
+<div class="flex-1 overflow-y-auto p-6 scrollbar-hide">
+<div class="space-y-8">
+<!-- Item 1 -->
+<div class="flex justify-between items-start group">
+<div class="flex gap-5">
+<span class="font-headline font-black text-2xl text-primary/40">01</span>
+<div>
+<h4 class="font-headline font-black text-xl leading-none uppercase">Aged Ribeye</h4>
+<p class="text-[11px] font-bold text-on-surface-variant mt-2 uppercase tracking-wide">Medium Rare • Truffle Butter</p>
+<span class="bg-[#ffdbca] text-[#773200] text-[10px] font-black px-2 py-0.5 mt-2 inline-block">SPECIAL REQ</span>
+</div>
+</div>
+<span class="font-headline font-black text-xl">$54.00</span>
+</div>
+<!-- Item 2 -->
+<div class="flex justify-between items-start group">
+<div class="flex gap-5">
+<span class="font-headline font-black text-2xl text-primary/40">02</span>
+<div>
+<h4 class="font-headline font-black text-xl leading-none uppercase">Hand-Cut Fries</h4>
+<p class="text-[11px] font-bold text-on-surface-variant mt-2 uppercase tracking-wide">Rosemary Salt</p>
+</div>
+</div>
+<span class="font-headline font-black text-xl">$18.00</span>
+</div>
+<!-- Item 3 -->
+<div class="flex justify-between items-start group">
+<div class="flex gap-5">
+<span class="font-headline font-black text-2xl text-primary/40">03</span>
+<div>
+<h4 class="font-headline font-black text-xl leading-none uppercase">Negroni Sbagliato</h4>
+<p class="text-[11px] font-bold text-on-surface-variant mt-2 uppercase tracking-wide">Classic Garnish</p>
+</div>
+</div>
+<span class="font-headline font-black text-xl">$42.00</span>
+</div>
+</div>
+<!-- Quick Actions -->
+<div class="mt-12 pt-8 border-t-2 border-dashed border-outline-variant/30">
+<h5 class="font-headline text-[10px] font-black uppercase tracking-[0.3em] mb-4 text-on-surface-variant">Rapid Response</h5>
+<div class="flex flex-wrap gap-2">
+<button class="bg-surface-container-low border border-outline-variant/30 px-4 py-3 text-[10px] font-black uppercase hover:bg-primary hover:text-on-primary hover:border-primary transition-all active:scale-95">Add Water</button>
+<button class="bg-surface-container-low border border-outline-variant/30 px-4 py-3 text-[10px] font-black uppercase hover:bg-primary hover:text-on-primary hover:border-primary transition-all active:scale-95">Bread Service</button>
+<button class="bg-surface-container-low border border-outline-variant/30 px-4 py-3 text-[10px] font-black uppercase hover:bg-primary hover:text-on-primary hover:border-primary transition-all active:scale-95">Check Request</button>
+</div>
+</div>
+</div>
+<!-- Ticket Footer -->
+<div class="p-6 bg-surface-container-low space-y-6">
+<div class="flex justify-between items-end">
+<span class="font-headline text-[11px] font-black uppercase tracking-[0.3em] text-on-surface-variant mb-1">Total Due</span>
+<span class="font-headline text-4xl font-black tracking-tighter leading-none">$114.00</span>
+</div>
+<!-- Animated Feedback Loop Button -->
+<button class="w-full bg-primary text-on-primary py-6 font-headline font-black text-2xl tracking-tighter uppercase flex justify-center items-center gap-4 hover:bg-black/90 active:translate-y-1 transition-all shadow-xl group" onclick="this.classList.add('bg-secondary'); this.innerHTML='ORDER SENT ✓'; setTimeout(() =&gt; { this.classList.remove('bg-secondary'); this.innerHTML='SEND TO KITCHEN &lt;span class=\'material-symbols-outlined\'&gt;send&lt;/span&gt;'; }, 3000)">
+                SEND TO KITCHEN
+                <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">send</span>
+</button>
+</div>
+</aside>
+</main>
+<!-- BottomNavBar Shared Component Implementation -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-stretch overflow-hidden bg-black dark:bg-[#000000] shadow-[0_-4px_20px_rgba(0,0,0,0.1)] h-20 md:hidden">
+<a class="flex flex-col items-center justify-center bg-[#1c1b1b] text-white rounded-none border-t-4 border-[#1b6d24] h-full w-full active:bg-[#1b6d24] transition-colors" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">Orders</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#e5e2e1]/70 h-full w-full hover:bg-[#1c1b1b] active:bg-[#1b6d24] transition-all" href="#">
+<span class="material-symbols-outlined">chef_hat</span>
+<span class="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">Kitchen</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#e5e2e1]/70 h-full w-full hover:bg-[#1c1b1b] active:bg-[#1b6d24] transition-all" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">Inventory</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#e5e2e1]/70 h-full w-full hover:bg-[#1c1b1b] active:bg-[#1b6d24] transition-all" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">Analytics</span>
+</a>
+</nav>
+<!-- Desktop Navigation Side Drawer -->
+<nav class="hidden lg:flex fixed inset-y-0 left-0 z-[60] flex flex-col pt-8 bg-[#fcf9f8] dark:bg-[#121212] w-20 items-center border-r border-outline-variant/15">
+<div class="mb-12 text-primary">
+<span class="material-symbols-outlined text-4xl font-bold">menu_book</span>
+</div>
+<div class="flex flex-col gap-10">
+<button class="text-primary border-r-4 border-primary pr-2"><span class="material-symbols-outlined font-black">receipt_long</span></button>
+<button class="text-on-surface-variant hover:text-primary transition-colors active:scale-95"><span class="material-symbols-outlined">grid_view</span></button>
+<button class="text-on-surface-variant hover:text-primary transition-colors active:scale-95"><span class="material-symbols-outlined">group</span></button>
+<button class="text-on-surface-variant hover:text-primary transition-colors active:scale-95 mt-auto mb-10"><span class="material-symbols-outlined">settings</span></button>
+</div>
+</nav>
+<script src="/js/dashboard-common.js"></script>
+<script src="/js/waiter-view.js"></script>
+</body></html>

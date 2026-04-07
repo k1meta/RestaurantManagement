@@ -13,7 +13,7 @@ function authenticate(req, res, next) {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_super_secret_jwt_key_change_this_in_production');
     req.user = decoded; // { id, name, email, role, location_id }
     next();
   } catch (err) {
