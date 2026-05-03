@@ -2,6 +2,14 @@
 backend/node_modules/
 frontend/node_modules/
 
+# Local environment files
+backend/.env
+backend/.env.local
+backend/.env.*.local
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
 # Build outputs
 frontend/build/
 frontend/.expo/

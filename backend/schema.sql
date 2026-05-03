@@ -5,7 +5,12 @@
 -- ============================================================
 
 -- Roles: owner | manager | waiter | kitchen
-CREATE TYPE user_role AS ENUM ('owner', 'manager', 'waiter', 'kitchen');
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
+    CREATE TYPE user_role AS ENUM ('owner', 'manager', 'waiter', 'kitchen');
+  END IF;
+END $$;
 
 -- Restaurant locations
 CREATE TABLE IF NOT EXISTS locations (
@@ -36,6 +41,14 @@ CREATE TABLE IF NOT EXISTS menu_items (
   created_at  TIMESTAMP DEFAULT NOW()
 );
 
+-- Canonical ingredient catalog
+CREATE TABLE IF NOT EXISTS ingredients (
+  id          SERIAL PRIMARY KEY,
+  name        VARCHAR(150) UNIQUE NOT NULL,
+  default_unit VARCHAR(30),
+  created_at  TIMESTAMP DEFAULT NOW()
+);
+
 -- Inventory ingredients per location
 CREATE TABLE IF NOT EXISTS inventory (
   id            SERIAL PRIMARY KEY,
@@ -45,6 +58,56 @@ CREATE TABLE IF NOT EXISTS inventory (
   unit          VARCHAR(30),                    -- e.g. 'kg', 'litre', 'pcs'
   updated_at    TIMESTAMP DEFAULT NOW(),
   UNIQUE (location_id, ingredient)
+);
+
+-- Backward-compatible migration path for normalized ingredient linkage
+ALTER TABLE inventory
+  ADD COLUMN IF NOT EXISTS ingredient_id INT REFERENCES ingredients(id);
+
+-- Ensure legacy free-text inventory rows are linked to ingredient catalog
+INSERT INTO ingredients (name, default_unit)
+SELECT DISTINCT TRIM(i.ingredient), NULLIF(TRIM(i.unit), '')
+FROM inventory i
+WHERE TRIM(i.ingredient) <> ''
+ON CONFLICT (name) DO NOTHING;
+
+UPDATE inventory i
+SET ingredient_id = ing.id
+FROM ingredients ing
+WHERE i.ingredient_id IS NULL
+  AND LOWER(TRIM(i.ingredient)) = LOWER(ing.name);
+
+-- New uniqueness model for normalized inventory
+CREATE UNIQUE INDEX IF NOT EXISTS inventory_location_ingredient_id_unique
+ON inventory (location_id, ingredient_id)
+WHERE ingredient_id IS NOT NULL;
+
+-- Stock thresholds (manager-defined; optional until set via UI or backfill)
+ALTER TABLE inventory
+  ADD COLUMN IF NOT EXISTS low_stock_threshold NUMERIC(10, 2),
+  ADD COLUMN IF NOT EXISTS full_stock_target NUMERIC(10, 2);
+
+UPDATE inventory
+SET full_stock_target = COALESCE(
+  full_stock_target,
+  GREATEST(50::numeric, ROUND(quantity * 2)::numeric)
+);
+
+UPDATE inventory
+SET low_stock_threshold = COALESCE(
+  low_stock_threshold,
+  ROUND(full_stock_target * 0.35)::numeric
+);
+
+-- Menu item ingredient requirements (mandatory for manager menu creation/update)
+CREATE TABLE IF NOT EXISTS menu_item_ingredients (
+  id                SERIAL PRIMARY KEY,
+  menu_item_id      INT NOT NULL REFERENCES menu_items(id) ON DELETE CASCADE,
+  ingredient_id     INT NOT NULL REFERENCES ingredients(id),
+  quantity_required NUMERIC(10, 2) NOT NULL CHECK (quantity_required > 0),
+  unit              VARCHAR(30),
+  created_at        TIMESTAMP DEFAULT NOW(),
+  UNIQUE (menu_item_id, ingredient_id)
 );
 
 -- Customer orders
@@ -94,12 +157,4 @@ INSERT INTO users (name, email, password_hash, role, location_id) VALUES
   ('Manager Sara', 'manager@restaurant.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'manager', 1),
   ('Waiter Tom',   'waiter@restaurant.com',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'waiter',  1),
   ('Chef Marco',   'kitchen@restaurant.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'kitchen', 1)
-ON CONFLICT DO NOTHING;
-
-INSERT INTO menu_items (name, category, price) VALUES
-  ('Margherita Pizza', 'food',    12.50),
-  ('Caesar Salad',     'food',     8.00),
-  ('Croissant',        'bakery',   3.50),
-  ('Espresso',         'drink',    2.50),
-  ('Orange Juice',     'drink',    4.00)
 ON CONFLICT DO NOTHING;

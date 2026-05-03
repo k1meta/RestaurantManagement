@@ -1,6 +1,7 @@
 const express = require('express');
 const pool = require('../config/db');
 const { authenticate, authorize } = require('../middleware/auth');
+const { parseAllowedUnit } = require('../constants/units');
 
 const router = express.Router();
 router.use(authenticate);
@@ -24,6 +25,90 @@ function parsePositiveInteger(value) {
   return parsed;
 }
 
+function normalizeIngredientRequirements(rawIngredients) {
+  if (!Array.isArray(rawIngredients) || rawIngredients.length === 0) {
+    return { error: 'ingredients must include at least one item' };
+  }
+
+  const byIngredientId = new Map();
+
+  for (const entry of rawIngredients) {
+    const ingredient_id = parsePositiveInteger(entry?.ingredient_id);
+    const quantity_required = Number(entry?.quantity_required);
+    const unitRes = parseAllowedUnit(entry?.unit);
+    if (!unitRes.ok) {
+      return { error: unitRes.error };
+    }
+    const unitVal = unitRes.value;
+
+    if (!ingredient_id) {
+      return { error: 'Each ingredient requires a valid ingredient_id' };
+    }
+
+    if (!Number.isFinite(quantity_required) || quantity_required <= 0) {
+      return { error: 'Each ingredient requires quantity_required > 0' };
+    }
+
+    if (!unitVal) {
+      return { error: 'Each ingredient requires a unit (Kg, g, pieces, L, or ml)' };
+    }
+
+    let current = byIngredientId.get(ingredient_id);
+    if (!current) {
+      current = { ingredient_id, quantity_required: 0, unit: unitVal };
+      byIngredientId.set(ingredient_id, current);
+    }
+
+    if (current.unit !== unitVal) {
+      return { error: 'Conflicting units for the same ingredient in requirements' };
+    }
+
+    current.quantity_required += quantity_required;
+  }
+
+  return { requirements: Array.from(byIngredientId.values()) };
+}
+
+async function fetchMenuWithIngredients(client, includeInactive) {
+  const menuQuery = includeInactive
+    ? 'SELECT * FROM menu_items ORDER BY category, name'
+    : 'SELECT * FROM menu_items WHERE active = TRUE ORDER BY category, name';
+  const menuResult = await client.query(menuQuery);
+  const menu = menuResult.rows;
+
+  if (!menu.length) return [];
+
+  const ids = menu.map((item) => item.id);
+  const ingredientResult = await client.query(
+    `SELECT mi.menu_item_id,
+            mi.ingredient_id,
+            mi.quantity_required,
+            COALESCE(mi.unit, ing.default_unit) AS unit,
+            ing.name AS ingredient_name
+     FROM menu_item_ingredients mi
+     JOIN ingredients ing ON ing.id = mi.ingredient_id
+     WHERE mi.menu_item_id = ANY($1::int[])
+     ORDER BY mi.menu_item_id, ing.name`,
+    [ids]
+  );
+
+  const byMenuId = new Map();
+  for (const row of ingredientResult.rows) {
+    if (!byMenuId.has(row.menu_item_id)) byMenuId.set(row.menu_item_id, []);
+    byMenuId.get(row.menu_item_id).push({
+      ingredient_id: row.ingredient_id,
+      ingredient_name: row.ingredient_name,
+      quantity_required: Number(row.quantity_required),
+      unit: row.unit || null,
+    });
+  }
+
+  return menu.map((item) => ({
+    ...item,
+    ingredients: byMenuId.get(item.id) || [],
+  }));
+}
+
 // ─── MENU ───────────────────────────────────────────────────────────────────
 
 // GET /api/menu  — all active menu items (any logged-in user)
@@ -32,13 +117,8 @@ router.get('/menu', async (req, res) => {
     const includeInactive =
       parseBoolean(req.query.include_inactive, false) &&
       ['manager', 'owner'].includes(req.user.role);
-
-    const query = includeInactive
-      ? 'SELECT * FROM menu_items ORDER BY category, name'
-      : 'SELECT * FROM menu_items WHERE active = TRUE ORDER BY category, name';
-
-    const result = await pool.query(query);
-    res.json({ menu: result.rows });
+    const menu = await fetchMenuWithIngredients(pool, includeInactive);
+    res.json({ menu });
   } catch (err) {
     console.error('Get menu error:', err);
     res.status(500).json({ error: 'Server error' });
@@ -64,18 +144,56 @@ router.post('/menu', authorize('manager', 'owner'), async (req, res) => {
     return res.status(400).json({ error: 'active must be a boolean when provided' });
   }
 
+  const normalizedRequirements = normalizeIngredientRequirements(req.body.ingredients);
+  if (normalizedRequirements.error) {
+    return res.status(400).json({ error: normalizedRequirements.error });
+  }
+
+  const requirements = normalizedRequirements.requirements;
+  const client = await pool.connect();
   try {
-    const result = await pool.query(
+    await client.query('BEGIN');
+
+    const ingredientIds = requirements.map((entry) => entry.ingredient_id);
+    const knownIngredients = await client.query(
+      'SELECT id FROM ingredients WHERE id = ANY($1::int[])',
+      [ingredientIds]
+    );
+
+    if (knownIngredients.rows.length !== ingredientIds.length) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ error: 'One or more ingredient_id values are invalid' });
+    }
+
+    const result = await client.query(
       `INSERT INTO menu_items (name, category, price, active)
        VALUES ($1, $2, $3, $4)
        RETURNING *`,
       [name, category || null, price, active]
     );
 
-    return res.status(201).json({ item: result.rows[0] });
+    const createdItem = result.rows[0];
+
+    for (const ingredient of requirements) {
+      await client.query(
+        `INSERT INTO menu_item_ingredients (menu_item_id, ingredient_id, quantity_required, unit)
+         VALUES ($1, $2, $3, $4)`,
+        [createdItem.id, ingredient.ingredient_id, ingredient.quantity_required, ingredient.unit || null]
+      );
+    }
+
+    const fullItem = (await fetchMenuWithIngredients(client, true)).find(
+      (item) => item.id === createdItem.id
+    );
+
+    await client.query('COMMIT');
+    return res.status(201).json({ item: fullItem || createdItem });
   } catch (err) {
+    await client.query('ROLLBACK');
     console.error('Create menu item error:', err);
     return res.status(500).json({ error: 'Server error' });
+  } finally {
+    client.release();
   }
 });
 
@@ -121,33 +239,78 @@ router.patch('/menu/:id', authorize('manager', 'owner'), async (req, res) => {
     updates.push(`active = $${params.length}`);
   }
 
-  if (!updates.length) {
+  const wantsIngredientUpdate = Object.prototype.hasOwnProperty.call(req.body, 'ingredients');
+
+  if (!updates.length && !wantsIngredientUpdate) {
     return res.status(400).json({ error: 'No fields to update' });
   }
 
-  params.push(itemId);
+  let requirements = null;
+  if (wantsIngredientUpdate) {
+    const normalizedRequirements = normalizeIngredientRequirements(req.body.ingredients);
+    if (normalizedRequirements.error) {
+      return res.status(400).json({ error: normalizedRequirements.error });
+    }
+    requirements = normalizedRequirements.requirements;
+  }
 
+  const client = await pool.connect();
   try {
-    const result = await pool.query(
-      `UPDATE menu_items
-       SET ${updates.join(', ')}
-       WHERE id = $${params.length}
-       RETURNING *`,
-      params
-    );
+    await client.query('BEGIN');
 
-    if (!result.rows.length) {
+    const existing = await client.query('SELECT id FROM menu_items WHERE id = $1 FOR UPDATE', [itemId]);
+    if (!existing.rows.length) {
+      await client.query('ROLLBACK');
       return res.status(404).json({ error: 'Item not found' });
     }
 
-    return res.json({ item: result.rows[0] });
+    let updatedItem = null;
+    if (updates.length) {
+      params.push(itemId);
+      const result = await client.query(
+        `UPDATE menu_items
+         SET ${updates.join(', ')}
+         WHERE id = $${params.length}
+         RETURNING *`,
+        params
+      );
+      updatedItem = result.rows[0] || null;
+    }
+
+    if (requirements) {
+      const ingredientIds = requirements.map((entry) => entry.ingredient_id);
+      const knownIngredients = await client.query(
+        'SELECT id FROM ingredients WHERE id = ANY($1::int[])',
+        [ingredientIds]
+      );
+      if (knownIngredients.rows.length !== ingredientIds.length) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ error: 'One or more ingredient_id values are invalid' });
+      }
+
+      await client.query('DELETE FROM menu_item_ingredients WHERE menu_item_id = $1', [itemId]);
+      for (const ingredient of requirements) {
+        await client.query(
+          `INSERT INTO menu_item_ingredients (menu_item_id, ingredient_id, quantity_required, unit)
+           VALUES ($1, $2, $3, $4)`,
+          [itemId, ingredient.ingredient_id, ingredient.quantity_required, ingredient.unit || null]
+        );
+      }
+    }
+
+    const fullItem = (await fetchMenuWithIngredients(client, true)).find((item) => item.id === itemId);
+    await client.query('COMMIT');
+    return res.json({ item: fullItem || updatedItem });
   } catch (err) {
+    await client.query('ROLLBACK');
     console.error('Update menu item error:', err);
     return res.status(500).json({ error: 'Server error' });
+  } finally {
+    client.release();
   }
 });
 
-// DELETE /api/menu/:id  — soft-delete by deactivating item (manager / owner only)
+// DELETE /api/menu/:id  — permanently remove menu item when not referenced by orders/sales (manager / owner only)
 router.delete('/menu/:id', authorize('manager', 'owner'), async (req, res) => {
   const itemId = parsePositiveInteger(req.params.id);
   if (!itemId) {
@@ -156,7 +319,7 @@ router.delete('/menu/:id', authorize('manager', 'owner'), async (req, res) => {
 
   try {
     const result = await pool.query(
-      'UPDATE menu_items SET active = FALSE WHERE id = $1 RETURNING *',
+      'DELETE FROM menu_items WHERE id = $1 RETURNING *',
       [itemId]
     );
 
@@ -164,9 +327,15 @@ router.delete('/menu/:id', authorize('manager', 'owner'), async (req, res) => {
       return res.status(404).json({ error: 'Item not found' });
     }
 
-    return res.json({ item: result.rows[0] });
+    return res.json({ item: result.rows[0], deleted: true });
   } catch (err) {
-    console.error('Deactivate menu item error:', err);
+    if (err.code === '23503') {
+      return res.status(409).json({
+        error:
+          'This menu item cannot be removed because it appears on existing orders or sales. Set availability to inactive instead.',
+      });
+    }
+    console.error('Delete menu item error:', err);
     return res.status(500).json({ error: 'Server error' });
   }
 });

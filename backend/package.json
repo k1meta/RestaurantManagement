@@ -5,7 +5,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "db:schema:apply": "node scripts/applySchema.js",
+    "db:schema:reset": "node scripts/resetSchema.js",
+    "db:setup": "npm run db:schema:apply"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

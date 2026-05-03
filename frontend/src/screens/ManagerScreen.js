@@ -3,7 +3,16 @@ import {
   View, Text, FlatList, TouchableOpacity, TextInput,
   StyleSheet, Alert, ActivityIndicator, Modal, ScrollView,
 } from 'react-native';
-import { getOrders, getInventory, upsertInventoryItem, deleteInventoryItem, getSales } from '../api/client';
+import { ALLOWED_UNITS, isAllowedUnit } from '../constants/units';
+import {
+  getOrders,
+  getInventory,
+  upsertInventoryItem,
+  deleteInventoryItem,
+  getSales,
+  getIngredients,
+  createIngredient,
+} from '../api/client';
 import { useAuth } from '../context/AuthContext';
 
 export default function ManagerScreen() {
@@ -11,15 +20,20 @@ export default function ManagerScreen() {
   const [tab,       setTab]       = useState('orders');   // 'orders' | 'inventory' | 'sales'
   const [orders,    setOrders]    = useState([]);
   const [inventory, setInventory] = useState([]);
+  const [ingredientsCatalog, setIngredientsCatalog] = useState([]);
   const [sales,     setSales]     = useState([]);
   const [period,    setPeriod]    = useState('monthly');
   const [loading,   setLoading]   = useState(false);
 
   // Add inventory modal state
   const [modalVisible, setModalVisible]   = useState(false);
-  const [ingredient,   setIngredient]     = useState('');
+  const [ingredientId, setIngredientId]   = useState('');
+  const [newIngredientName, setNewIngredientName] = useState('');
+  const [newIngredientUnit, setNewIngredientUnit] = useState('');
   const [quantity,     setQuantity]       = useState('');
   const [unit,         setUnit]           = useState('');
+  const [lowStockThreshold, setLowStockThreshold] = useState('');
+  const [fullStockTarget, setFullStockTarget] = useState('');
 
   useEffect(() => {
     if (tab === 'orders')    fetchOrders();
@@ -36,7 +50,11 @@ export default function ManagerScreen() {
 
   async function fetchInventory() {
     setLoading(true);
-    try { const r = await getInventory(); setInventory(r.data.inventory); }
+    try {
+      const [inventoryRes, ingredientsRes] = await Promise.all([getInventory(), getIngredients()]);
+      setInventory(inventoryRes.data.inventory);
+      setIngredientsCatalog(ingredientsRes.data.ingredients || []);
+    }
     catch { Alert.alert('Error', 'Could not load inventory'); }
     finally { setLoading(false); }
   }
@@ -49,14 +67,71 @@ export default function ManagerScreen() {
   }
 
   async function addOrUpdateItem() {
-    if (!ingredient || !quantity) {
-      Alert.alert('Error', 'Ingredient and quantity are required');
+    if (!quantity) {
+      Alert.alert('Error', 'Quantity is required');
       return;
     }
+    if (!ingredientId && !newIngredientName.trim()) {
+      Alert.alert('Error', 'Select an ingredient or provide a new ingredient name');
+      return;
+    }
+
+    const parseOpt = (raw) => {
+      const t = String(raw ?? '').trim();
+      if (!t) return undefined;
+      const n = Number(t);
+      if (!Number.isFinite(n) || n < 0) return NaN;
+      return n;
+    };
+    const lowN = parseOpt(lowStockThreshold);
+    const fullN = parseOpt(fullStockTarget);
+    if (Number.isNaN(lowN) || Number.isNaN(fullN)) {
+      Alert.alert('Error', 'Thresholds must be empty or non-negative numbers');
+      return;
+    }
+    if (lowN != null && fullN != null && lowN > fullN) {
+      Alert.alert('Error', 'Low stock threshold cannot exceed full stock target');
+      return;
+    }
+
+    const invUnit = String(unit || '').trim();
+    if (!isAllowedUnit(invUnit)) {
+      Alert.alert('Error', 'Select a stock unit (Kg, g, pieces, L, ml)');
+      return;
+    }
+
     try {
-      await upsertInventoryItem({ ingredient, quantity: parseFloat(quantity), unit });
+      let selectedIngredientId = ingredientId ? Number(ingredientId) : null;
+      const defUnit = String(newIngredientUnit || '').trim();
+      if (!selectedIngredientId) {
+        if (!isAllowedUnit(defUnit)) {
+          Alert.alert('Error', 'Select a default unit for the new ingredient');
+          return;
+        }
+        const createRes = await createIngredient({
+          name: newIngredientName.trim(),
+          default_unit: defUnit,
+        });
+        selectedIngredientId = createRes.data.ingredient.id;
+      }
+
+      const payload = {
+        ingredient_id: selectedIngredientId,
+        quantity: parseFloat(quantity),
+        unit: invUnit,
+      };
+      if (lowN !== undefined) payload.low_stock_threshold = lowN;
+      if (fullN !== undefined) payload.full_stock_target = fullN;
+
+      await upsertInventoryItem(payload);
       setModalVisible(false);
-      setIngredient(''); setQuantity(''); setUnit('');
+      setIngredientId('');
+      setNewIngredientName('');
+      setNewIngredientUnit('');
+      setQuantity('');
+      setUnit('');
+      setLowStockThreshold('');
+      setFullStockTarget('');
       fetchInventory();
     } catch { Alert.alert('Error', 'Could not save item'); }
   }
@@ -153,11 +228,49 @@ export default function ManagerScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modal}>
             <Text style={styles.modalTitle}>Add / Update Ingredient</Text>
-            <TextInput style={styles.input} placeholder="Ingredient name" placeholderTextColor="#666" value={ingredient} onChangeText={setIngredient} />
+            <Text style={styles.modalLabel}>Catalog ingredients available: {ingredientsCatalog.length}</Text>
+            <Text style={styles.modalLabel}>Existing ingredient id</Text>
+            <TextInput style={styles.input} placeholder="e.g. 1" placeholderTextColor="#666" value={ingredientId} onChangeText={setIngredientId} />
+            <Text style={styles.modalLabel}>Or new ingredient name</Text>
+            <TextInput style={styles.input} placeholder="Ingredient name" placeholderTextColor="#666" value={newIngredientName} onChangeText={setNewIngredientName} />
+            <Text style={styles.modalLabel}>New ingredient default unit</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.unitRow}>
+              {ALLOWED_UNITS.map((u) => (
+                <TouchableOpacity
+                  key={`newdef-${u}`}
+                  style={[styles.unitChip, newIngredientUnit === u && styles.unitChipActive]}
+                  onPress={() => setNewIngredientUnit(u)}
+                >
+                  <Text style={[styles.unitChipText, newIngredientUnit === u && styles.unitChipTextActive]}>{u}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <Text style={styles.modalLabel}>Quantity</Text>
             <TextInput style={styles.input} placeholder="Quantity" placeholderTextColor="#666" keyboardType="numeric" value={quantity} onChangeText={setQuantity} />
-            <TextInput style={styles.input} placeholder="Unit (kg, litre, pcs...)" placeholderTextColor="#666" value={unit} onChangeText={setUnit} />
+            <Text style={styles.modalLabel}>Stock unit</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.unitRow}>
+              {ALLOWED_UNITS.map((u) => (
+                <TouchableOpacity
+                  key={`inv-${u}`}
+                  style={[styles.unitChip, unit === u && styles.unitChipActive]}
+                  onPress={() => setUnit(u)}
+                >
+                  <Text style={[styles.unitChipText, unit === u && styles.unitChipTextActive]}>{u}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <Text style={styles.modalLabel}>Low stock threshold (optional)</Text>
+            <TextInput style={styles.input} placeholder="Below = low stock" placeholderTextColor="#666" keyboardType="decimal-pad" value={lowStockThreshold} onChangeText={setLowStockThreshold} />
+            <Text style={styles.modalLabel}>Full stock target (optional)</Text>
+            <TextInput style={styles.input} placeholder="Refill-to level" placeholderTextColor="#666" keyboardType="decimal-pad" value={fullStockTarget} onChangeText={setFullStockTarget} />
             <TouchableOpacity style={styles.saveBtn} onPress={addOrUpdateItem}><Text style={styles.saveBtnText}>Save</Text></TouchableOpacity>
-            <TouchableOpacity onPress={() => setModalVisible(false)}><Text style={styles.cancelText}>Cancel</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => {
+              setModalVisible(false);
+              setLowStockThreshold('');
+              setFullStockTarget('');
+              setUnit('');
+              setNewIngredientUnit('');
+            }}><Text style={styles.cancelText}>Cancel</Text></TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -189,8 +302,14 @@ const styles = StyleSheet.create({
   modalOverlay:{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
   modal:       { backgroundColor: '#16213e', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 24 },
   modalTitle:  { color: '#fff', fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
+  modalLabel:  { color: '#aaa', fontSize: 12, marginBottom: 6, marginTop: 2 },
   input:       { backgroundColor: '#1a1a2e', color: '#fff', borderRadius: 10, padding: 12, marginBottom: 10, fontSize: 14, borderWidth: 1, borderColor: '#0f3460' },
   saveBtn:     { backgroundColor: '#e94560', borderRadius: 10, padding: 14, alignItems: 'center', marginTop: 4 },
   saveBtnText: { color: '#fff', fontWeight: 'bold', fontSize: 15 },
   cancelText:  { color: '#aaa', textAlign: 'center', marginTop: 12, fontSize: 14 },
+  unitRow:     { flexGrow: 0, marginBottom: 10 },
+  unitChip:    { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, backgroundColor: '#1a1a2e', borderWidth: 1, borderColor: '#0f3460', marginRight: 8 },
+  unitChipActive: { backgroundColor: '#e94560', borderColor: '#e94560' },
+  unitChipText:{ color: '#aaa', fontSize: 13, fontWeight: '600' },
+  unitChipTextActive: { color: '#fff' },
 });

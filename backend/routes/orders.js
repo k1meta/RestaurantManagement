@@ -1,6 +1,7 @@
 const express = require('express');
 const pool = require('../config/db');
 const { authenticate, authorize } = require('../middleware/auth');
+const { convertUsageForDeduction } = require('../constants/unitConversion');
 
 const router = express.Router();
 router.use(authenticate); // All order routes require login
@@ -328,7 +329,7 @@ router.patch('/:id/status', async (req, res) => {
 
     const order = updateResult.rows[0];
 
-    // When an order is closed → record sales
+    // When an order is closed → record sales and deduct ingredient usage
     if (status === 'closed' && previousStatus !== 'closed') {
       await client.query(
         `INSERT INTO sales (location_id, menu_item_id, order_id, quantity, total_price)
@@ -349,6 +350,69 @@ router.patch('/:id/status', async (req, res) => {
          GROUP BY o.location_id, o.id, oi.menu_item_id`,
         [order.id]
       );
+
+      const usageResult = await client.query(
+        `SELECT mi.ingredient_id,
+                ing.name AS ingredient_name,
+                COALESCE(mi.unit, ing.default_unit) AS unit,
+                SUM(oi.quantity * mi.quantity_required)::numeric AS usage_qty
+         FROM order_items oi
+         JOIN menu_item_ingredients mi ON mi.menu_item_id = oi.menu_item_id
+         JOIN ingredients ing ON ing.id = mi.ingredient_id
+         WHERE oi.order_id = $1
+         GROUP BY mi.ingredient_id, ing.name, mi.unit, ing.default_unit
+         ORDER BY ing.name`,
+        [order.id]
+      );
+
+      for (const usage of usageResult.rows) {
+        const invResult = await client.query(
+          `SELECT i.id,
+                  i.quantity,
+                  COALESCE(i.unit, ing.default_unit) AS unit
+           FROM inventory i
+           LEFT JOIN ingredients ing ON ing.id = i.ingredient_id
+           WHERE i.location_id = $1
+             AND i.ingredient_id = $2
+           FOR UPDATE OF i`,
+          [order.location_id, usage.ingredient_id]
+        );
+
+        if (!invResult.rows.length) {
+          await client.query('ROLLBACK');
+          return res.status(409).json({
+            error: `Missing inventory record for ingredient ${usage.ingredient_name}`,
+          });
+        }
+
+        const invRow = invResult.rows[0];
+        const currentQty = Number(invRow.quantity);
+        const usageQty = Number(usage.usage_qty);
+        const usageUnit = usage.unit;
+        const inventoryUnit = invRow.unit;
+
+        const deduction = convertUsageForDeduction(
+          usageQty,
+          usageUnit,
+          currentQty,
+          inventoryUnit
+        );
+
+        if (!deduction.ok) {
+          await client.query('ROLLBACK');
+          return res.status(409).json({
+            error: `${deduction.error} Ingredient: ${usage.ingredient_name}.`,
+          });
+        }
+
+        await client.query(
+          `UPDATE inventory
+           SET quantity = $1,
+               updated_at = NOW()
+           WHERE id = $2`,
+          [deduction.nextQty, invRow.id]
+        );
+      }
     }
 
     await client.query('COMMIT');

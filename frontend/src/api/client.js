@@ -16,6 +16,13 @@ function getDefaultBaseUrl() {
 
 export const BASE_URL = getDefaultBaseUrl();
 
+if (!runtimeApiUrl && typeof console !== 'undefined') {
+  console.warn(
+    '[api] No EXPO_PUBLIC_API_URL/REACT_APP_API_URL set; using local default base URL:',
+    BASE_URL
+  );
+}
+
 const api = axios.create({
   baseURL: BASE_URL,
   timeout: 20000,
@@ -124,6 +131,7 @@ export const getMenu = (params = {}) => api.get('/api/menu', { params });
 export const createMenuItem = (payload) => api.post('/api/menu', payload);
 export const updateMenuItem = (id, payload) => api.patch(`/api/menu/${id}`, payload);
 export const deactivateMenuItem = (id) => api.delete(`/api/menu/${id}`);
+export const deleteMenuItem = (id) => api.delete(`/api/menu/${id}`);
 export const updateMenuPrice = (id, price) => api.patch(`/api/menu/${id}/price`, { price });
 export const updateMenuAvailability = (id, active) => api.patch(`/api/menu/${id}/active`, { active });
 export const applyGlobalPriceAdjustment = (payload) => api.post('/api/menu/global-price-adjustment', payload);
@@ -131,7 +139,11 @@ export const applyGlobalPriceAdjustment = (payload) => api.post('/api/menu/globa
 // ─── Inventory ───────────────────────────────────────────────────────────────
 export const getInventory = () => api.get('/api/inventory');
 export const upsertInventoryItem = (payload) => api.post('/api/inventory', payload);
+export const patchInventoryItem = (id, payload) => api.patch(`/api/inventory/${id}`, payload);
 export const deleteInventoryItem = (id) => api.delete(`/api/inventory/${id}`);
+export const getIngredients = () => api.get('/api/inventory/ingredients');
+export const createIngredient = (payload) => api.post('/api/inventory/ingredients', payload);
+export const deleteIngredient = (id) => api.delete(`/api/inventory/ingredients/${id}`);
 
 // ─── Sales ───────────────────────────────────────────────────────────────────
 export const getSales = (period = 'monthly', params = {}) =>
