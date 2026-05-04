@@ -386,49 +386,6 @@ router.patch('/menu/:id/active', authorize('manager', 'owner'), async (req, res)
   }
 });
 
-// POST /api/menu/global-price-adjustment — owner only
-// Body: { percentage, category?, include_inactive? }
-router.post('/menu/global-price-adjustment', authorize('owner'), async (req, res) => {
-  const percentage = Number(req.body.percentage);
-  const category = req.body.category ? String(req.body.category).trim() : null;
-  const includeInactive = parseBoolean(req.body.include_inactive, false);
-
-  if (!Number.isFinite(percentage) || percentage <= -100 || percentage > 500) {
-    return res.status(400).json({ error: 'percentage must be a number between -100 and 500' });
-  }
-
-  try {
-    const params = [percentage];
-    const conditions = [];
-
-    if (!includeInactive) {
-      conditions.push('active = TRUE');
-    }
-
-    if (category) {
-      params.push(category);
-      conditions.push(`category = $${params.length}`);
-    }
-
-    const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-    const result = await pool.query(
-      `UPDATE menu_items
-       SET price = ROUND((price * (1 + ($1 / 100.0)))::numeric, 2)
-       ${whereClause}
-       RETURNING id, name, category, price, active`,
-      params
-    );
-
-    res.json({
-      updated_count: result.rows.length,
-      items: result.rows,
-    });
-  } catch (err) {
-    console.error('Global price adjustment error:', err);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
 // ─── SALES ──────────────────────────────────────────────────────────────────
 
 // GET /api/sales?period=weekly|monthly|yearly

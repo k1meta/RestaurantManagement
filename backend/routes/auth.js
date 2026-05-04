@@ -8,6 +8,31 @@ const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/auth');
 const router = express.Router();
 const REGISTERABLE_ROLES = ['manager', 'waiter', 'kitchen'];
 
+// GET /api/auth/login-profiles
+// Public, password-safe list used to quick-fill login email.
+router.get('/login-profiles', async (_req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, name, email, role, location_id
+       FROM users
+       ORDER BY
+         CASE role
+           WHEN 'owner' THEN 1
+           WHEN 'manager' THEN 2
+           WHEN 'waiter' THEN 3
+           WHEN 'kitchen' THEN 4
+           ELSE 5
+         END,
+         name ASC`
+    );
+
+    res.json({ profiles: result.rows });
+  } catch (err) {
+    console.error('Get login profiles error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;

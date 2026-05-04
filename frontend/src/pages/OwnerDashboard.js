@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  applyGlobalPriceAdjustment,
   createLocation,
   createUser,
   deleteLocation,
@@ -71,14 +70,11 @@ export default function OwnerDashboard({ user, onLogout }) {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
 
-  const [globalAdjustment, setGlobalAdjustment] = useState('5');
-  const [adjusting, setAdjusting] = useState(false);
   const [selectedLocationId, setSelectedLocationId] = useState(null);
   const [emergencyMode, setEmergencyMode] = useState(false);
 
   const analyticsSectionRef = useRef(null);
   const locationsSectionRef = useRef(null);
-  const syncSectionRef = useRef(null);
 
   function scrollToSection(ref) {
     ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -469,33 +465,6 @@ export default function OwnerDashboard({ user, onLogout }) {
     }
 
     scrollToSection(locationsSectionRef);
-  }
-
-  async function runGlobalAdjustment() {
-    const percentage = Number(globalAdjustment);
-    if (!Number.isFinite(percentage) || percentage <= -100 || percentage > 500) {
-      setError('Global adjustment must be between -100 and 500');
-      return;
-    }
-
-    setAdjusting(true);
-    setError('');
-    setNotice('');
-
-    try {
-      const response = await applyGlobalPriceAdjustment({
-        percentage,
-        include_inactive: false,
-      });
-
-      const updatedCount = response.data.updated_count || 0;
-      setNotice(`Global sync complete. Updated ${updatedCount} active menu item(s).`);
-      await loadDashboard(false);
-    } catch (err) {
-      setError(err.response?.data?.error || 'Could not run global adjustment');
-    } finally {
-      setAdjusting(false);
-    }
   }
 
   if (loading) {
@@ -1114,98 +1083,6 @@ export default function OwnerDashboard({ user, onLogout }) {
           </div>
         </section>
 
-        <section ref={syncSectionRef} className="bg-tertiary text-on-primary p-12 border-t-[12px] border-secondary flex flex-col md:flex-row gap-16 relative overflow-hidden">
-          <div className="absolute right-0 top-0 w-96 h-96 bg-secondary/10 rounded-full blur-[100px] -mr-48 -mt-48"></div>
-          <div className="max-w-xl space-y-8 relative z-10">
-            <div className="inline-flex items-center gap-4 bg-secondary/20 px-4 py-2 border border-secondary/30">
-              <span className="material-symbols-outlined text-secondary">hub</span>
-              <span className="text-[10px] font-black uppercase tracking-[0.4em]">Multi-Node Command Center</span>
-            </div>
-            <h3 className="text-6xl font-black tracking-tighter uppercase font-headline leading-none">
-              Global Sync Command
-            </h3>
-            <p className="text-on-primary/60 font-medium leading-relaxed text-lg italic border-l-2 border-on-primary/20 pl-6">
-              Deploy price adjustments across the full fleet in one action.
-            </p>
-            {emergencyMode ? (
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] bg-error/20 border border-error/40 p-3 inline-block">
-                Emergency mode enabled
-              </p>
-            ) : null}
-
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input
-                type="number"
-                value={globalAdjustment}
-                onChange={(e) => setGlobalAdjustment(e.target.value)}
-                className="bg-white/10 border border-white/20 text-white px-4 py-4 font-black text-xl w-full sm:w-40 focus:outline-none focus:border-secondary"
-              />
-              <button
-                onClick={runGlobalAdjustment}
-                disabled={adjusting}
-                className="group w-full md:w-auto bg-secondary hover:bg-secondary-fixed text-white px-10 py-6 flex items-center justify-between gap-8 transition-all active:scale-95 shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <div className="flex flex-col items-start">
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] mb-1">Execute Protocol</span>
-                  <span className="text-2xl font-black uppercase tracking-tighter">
-                    {adjusting ? 'Syncing...' : 'Push Global Price Update'}
-                  </span>
-                </div>
-                <span className="material-symbols-outlined text-4xl group-hover:translate-x-2 transition-transform">bolt</span>
-              </button>
-            </div>
-          </div>
-
-          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
-            <button
-              type="button"
-              onClick={() => {
-                setGlobalAdjustment('5');
-                setNotice('Menu revision preset loaded (+5%).');
-              }}
-              className="text-left bg-white/5 backdrop-blur-md p-8 border border-white/10 flex flex-col justify-between"
-            >
-              <span className="material-symbols-outlined text-3xl opacity-70">menu_book</span>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mb-2">Sync Protocol</p>
-                <p className="text-2xl font-black font-headline uppercase">Menu Revisions</p>
-              </div>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setGlobalAdjustment('-10');
-                setNotice('Flash promotion preset loaded (-10%).');
-              }}
-              className="text-left bg-white/5 backdrop-blur-md p-8 border border-white/10 flex flex-col justify-between"
-            >
-              <span className="material-symbols-outlined text-3xl opacity-70">campaign</span>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mb-2">Broadcast</p>
-                <p className="text-2xl font-black font-headline uppercase">Flash Promotions</p>
-              </div>
-            </button>
-            <button
-              type="button"
-              onClick={() => runDiagnostics()}
-              className="text-left bg-white/5 backdrop-blur-md p-8 border border-white/10 flex flex-col justify-between"
-            >
-              <span className="material-symbols-outlined text-3xl opacity-70">inventory</span>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mb-2">Replenish</p>
-                <p className="text-2xl font-black font-headline uppercase">Bulk Order Auto-Sync</p>
-              </div>
-            </button>
-            <button
-              type="button"
-              onClick={activateEmergencyMode}
-              className="bg-error/20 hover:bg-error/30 text-error p-8 border border-error/30 flex flex-col justify-center items-center text-center gap-4 transition-all cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-4xl animate-pulse">dangerous</span>
-              <p className="text-sm font-black uppercase tracking-[0.3em]">Emergency Lockdown</p>
-            </button>
-          </div>
-        </section>
       </main>
 
       <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-stretch overflow-hidden bg-[#000000] h-20 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] md:hidden">
@@ -1224,14 +1101,6 @@ export default function OwnerDashboard({ user, onLogout }) {
         >
           <span className="material-symbols-outlined">location_on</span>
           <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">Locations</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => scrollToSection(syncSectionRef)}
-          className="flex flex-col items-center justify-center text-[#e5e2e1]/70 h-full w-full hover:bg-[#1c1b1b] active:bg-[#1b6d24] transition-all"
-        >
-          <span className="material-symbols-outlined">restaurant</span>
-          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">Global Menu</span>
         </button>
         <button onClick={onLogout} className="flex flex-col items-center justify-center text-[#e5e2e1]/70 h-full w-full hover:bg-[#1c1b1b] active:bg-[#1b6d24] transition-all">
           <span className="material-symbols-outlined">logout</span>

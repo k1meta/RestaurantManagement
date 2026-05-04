@@ -1,15 +1,50 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
   StyleSheet, ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../context/AuthContext';
+import { getLoginProfiles } from '../api/client';
+
+const LAST_LOGIN_EMAIL_KEY = 'lastLoginEmail';
 
 export default function LoginScreen() {
   const { login } = useAuth();
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
   const [loading,  setLoading]  = useState(false);
+  const [profiles, setProfiles] = useState([]);
+  const [profilesLoading, setProfilesLoading] = useState(true);
+  const [profilesError, setProfilesError] = useState('');
+
+  useEffect(() => {
+    let active = true;
+
+    (async () => {
+      try {
+        const savedEmail = await AsyncStorage.getItem(LAST_LOGIN_EMAIL_KEY);
+        if (active && savedEmail) {
+          setEmail(savedEmail);
+        }
+
+        const response = await getLoginProfiles();
+        if (active) {
+          setProfiles(response.data?.profiles || []);
+        }
+      } catch (_err) {
+        if (active) {
+          setProfilesError('Could not load quick-fill profiles. Manual login still works.');
+        }
+      } finally {
+        if (active) setProfilesLoading(false);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   async function handleLogin() {
     if (!email.trim() || !password) {
@@ -19,6 +54,7 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await login(email.trim(), password);
+      await AsyncStorage.setItem(LAST_LOGIN_EMAIL_KEY, email.trim());
       // Navigation handled automatically by App.js (user state changes)
     } catch (err) {
       const msg = err.response?.data?.error || 'Login failed. Check your credentials.';
@@ -66,18 +102,25 @@ export default function LoginScreen() {
         }
       </TouchableOpacity>
 
-      {/* Quick-fill demo accounts */}
-      <Text style={styles.demoTitle}>Demo accounts (password: password123)</Text>
-      {[
-        { label: 'Owner',   email: 'owner@restaurant.com'   },
-        { label: 'Manager', email: 'manager@restaurant.com' },
-        { label: 'Waiter',  email: 'waiter@restaurant.com'  },
-        { label: 'Kitchen', email: 'kitchen@restaurant.com' },
-      ].map(({ label, email: e }) => (
-        <TouchableOpacity key={label} onPress={() => { setEmail(e); setPassword('password123'); }}>
-          <Text style={styles.demoLink}>Fill as {label}</Text>
-        </TouchableOpacity>
-      ))}
+      <Text style={styles.demoTitle}>Staff quick-fill (email only)</Text>
+      {profilesError ? <Text style={styles.errorText}>{profilesError}</Text> : null}
+      {profilesLoading ? (
+        <Text style={styles.loadingProfiles}>Loading profiles...</Text>
+      ) : (
+        profiles.map((profile) => (
+          <TouchableOpacity
+            key={profile.id}
+            onPress={() => {
+              setEmail(profile.email);
+              setPassword('');
+            }}
+          >
+            <Text style={styles.demoLink}>
+              Fill as {profile.name} ({profile.role})
+            </Text>
+          </TouchableOpacity>
+        ))
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -92,4 +135,6 @@ const styles = StyleSheet.create({
   buttonText:    { color: '#fff', fontWeight: 'bold', fontSize: 16 },
   demoTitle:     { color: '#666', textAlign: 'center', marginTop: 32, marginBottom: 8, fontSize: 12 },
   demoLink:      { color: '#e94560', textAlign: 'center', marginVertical: 2, fontSize: 13 },
+  loadingProfiles: { color: '#888', textAlign: 'center', marginVertical: 4, fontSize: 12 },
+  errorText:     { color: '#ff7f7f', textAlign: 'center', marginVertical: 4, fontSize: 12 },
 });

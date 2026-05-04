@@ -1,17 +1,41 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { getLoginProfiles } from '../api/client';
 
-const DEMO_CREDENTIALS = [
-  { name: 'Owner Ali', email: 'owner@restaurant.com', password: 'password123', role: 'owner' },
-  { name: 'Manager Sara', email: 'manager@restaurant.com', password: 'password123', role: 'manager' },
-  { name: 'Waiter Tom', email: 'waiter@restaurant.com', password: 'password123', role: 'waiter' },
-  { name: 'Chef Marco', email: 'kitchen@restaurant.com', password: 'password123', role: 'kitchen' },
-];
+const LAST_LOGIN_EMAIL_KEY = 'lastLoginEmail';
 
 export default function LoginPage({ onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [profilesLoading, setProfilesLoading] = useState(true);
+  const [profilesError, setProfilesError] = useState('');
+  const [profiles, setProfiles] = useState([]);
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem(LAST_LOGIN_EMAIL_KEY);
+    if (savedEmail) {
+      setEmail(savedEmail);
+    }
+
+    let active = true;
+    (async () => {
+      try {
+        const response = await getLoginProfiles();
+        if (!active) return;
+        setProfiles(response.data?.profiles || []);
+      } catch (_err) {
+        if (!active) return;
+        setProfilesError('Could not load quick-fill profiles. You can still log in manually.');
+      } finally {
+        if (active) setProfilesLoading(false);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,12 +47,14 @@ export default function LoginPage({ onLogin }) {
 
     if (!result.success) {
       setError(result.error);
+    } else {
+      localStorage.setItem(LAST_LOGIN_EMAIL_KEY, email.trim());
     }
   };
 
-  const fillCredentials = (cred) => {
-    setEmail(cred.email);
-    setPassword(cred.password);
+  const fillCredentials = (profile) => {
+    setEmail(profile.email);
+    setPassword('');
   };
 
   return (
@@ -92,30 +118,41 @@ export default function LoginPage({ onLogin }) {
           </form>
         </div>
 
-        {/* Right: Demo Credentials */}
+        {/* Right: Login Profiles */}
         <div className="bg-surface-container-low p-8 border border-outline-variant/20">
-          <h3 className="font-headline text-2xl font-black mb-2 uppercase">Demo Profiles</h3>
+          <h3 className="font-headline text-2xl font-black mb-2 uppercase">Staff Profiles</h3>
           <p className="text-on-surface-variant text-xs font-bold uppercase tracking-[0.2em] mb-6">
-            Click any to auto-fill credentials
+            Click any to auto-fill email
           </p>
 
+          {profilesError ? (
+            <div className="bg-error-container text-on-error-container p-3 text-sm font-500 mb-4">
+              {profilesError}
+            </div>
+          ) : null}
+
           <div className="space-y-3">
-            {DEMO_CREDENTIALS.map((cred, idx) => (
-              <button
-                key={idx}
-                onClick={() => fillCredentials(cred)}
-                className="w-full text-left p-4 bg-surface-container-lowest border border-outline-variant/20 hover:border-primary hover:bg-surface-container-highest transition-colors group"
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-headline font-bold">{cred.name}</h4>
-                  <span className="text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary px-2 py-1 group-hover:bg-primary group-hover:text-on-primary transition-colors">
-                    {cred.role}
-                  </span>
-                </div>
-                <p className="text-xs text-on-surface-variant font-mono">{cred.email}</p>
-                <p className="text-xs text-on-surface-variant mt-1">Pass: {cred.password}</p>
-              </button>
-            ))}
+            {profilesLoading ? (
+              <div className="text-xs text-on-surface-variant font-bold uppercase tracking-widest">
+                Loading profiles...
+              </div>
+            ) : (
+              profiles.map((profile) => (
+                <button
+                  key={profile.id}
+                  onClick={() => fillCredentials(profile)}
+                  className="w-full text-left p-4 bg-surface-container-lowest border border-outline-variant/20 hover:border-primary hover:bg-surface-container-highest transition-colors group"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-headline font-bold">{profile.name}</h4>
+                    <span className="text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary px-2 py-1 group-hover:bg-primary group-hover:text-on-primary transition-colors">
+                      {profile.role}
+                    </span>
+                  </div>
+                  <p className="text-xs text-on-surface-variant font-mono">{profile.email}</p>
+                </button>
+              ))
+            )}
           </div>
         </div>
       </div>

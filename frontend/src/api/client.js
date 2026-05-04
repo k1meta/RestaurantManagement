@@ -119,6 +119,7 @@ api.interceptors.response.use(
 // ─── Auth ────────────────────────────────────────────────────────────────────
 export const login = (email, password) => api.post('/api/auth/login', { email, password });
 export const getMe = () => api.get('/api/auth/me');
+export const getLoginProfiles = () => api.get('/api/auth/login-profiles');
 
 // ─── Orders ──────────────────────────────────────────────────────────────────
 export const getOrders = (params = {}) => api.get('/api/orders', { params });
@@ -134,7 +135,6 @@ export const deactivateMenuItem = (id) => api.delete(`/api/menu/${id}`);
 export const deleteMenuItem = (id) => api.delete(`/api/menu/${id}`);
 export const updateMenuPrice = (id, price) => api.patch(`/api/menu/${id}/price`, { price });
 export const updateMenuAvailability = (id, active) => api.patch(`/api/menu/${id}/active`, { active });
-export const applyGlobalPriceAdjustment = (payload) => api.post('/api/menu/global-price-adjustment', payload);
 
 // ─── Inventory ───────────────────────────────────────────────────────────────
 export const getInventory = () => api.get('/api/inventory');
