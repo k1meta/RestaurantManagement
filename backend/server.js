@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const express     = require('express');
 const cors        = require('cors');
+const { ensureSeedData } = require('./config/db');
 
 const authRoutes        = require('./routes/auth');
 const orderRoutes       = require('./routes/orders');
@@ -40,6 +41,16 @@ app.use((err, req, res, next) => {
 });
 
 // ─── Start ───────────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`🍽️  Restaurant API running on http://localhost:${PORT}`);
-});
+async function start() {
+  try {
+    await ensureSeedData();
+    app.listen(PORT, () => {
+      console.log(`🍽️  Restaurant API running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('❌ Failed to initialize Firestore:', error.message);
+    process.exit(1);
+  }
+}
+
+start();

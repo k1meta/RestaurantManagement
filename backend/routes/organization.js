@@ -1,7 +1,8 @@
 const express = require('express');
 const bcryptjs = require('bcryptjs');
-const pool = require('../config/db');
 const { authenticate, authorize } = require('../middleware/auth');
+const { db, nextSequence } = require('../config/db');
+const { byNameAsc, listCollection, getById } = require('../utils/firestoreStore');
 
 const router = express.Router();
 const ALL_ROLES = ['owner', 'manager', 'waiter', 'kitchen'];
@@ -16,20 +17,30 @@ function parsePositiveInteger(value) {
 }
 
 async function locationExists(locationId) {
-  const result = await pool.query('SELECT id FROM locations WHERE id = $1', [locationId]);
-  return result.rows.length > 0;
+  const location = await getById('locations', locationId);
+  return Boolean(location);
+}
+
+async function findUserByEmail(email, excludeId = null) {
+  const normalized = String(email).trim().toLowerCase();
+  const snap = await db.collection('users').where('email_lc', '==', normalized).get();
+  const users = snap.docs.map((doc) => doc.data());
+  if (excludeId == null) {
+    return users[0] || null;
+  }
+  return users.find((entry) => Number(entry.id) !== Number(excludeId)) || null;
 }
 
 // GET /api/locations
 router.get('/locations', async (req, res) => {
   try {
     if (req.user.role === 'owner') {
-      const result = await pool.query('SELECT * FROM locations ORDER BY name');
-      return res.json({ locations: result.rows });
+      const locations = (await listCollection('locations')).sort(byNameAsc);
+      return res.json({ locations });
     }
 
-    const result = await pool.query('SELECT * FROM locations WHERE id = $1', [req.user.location_id]);
-    return res.json({ locations: result.rows });
+    const location = await getById('locations', req.user.location_id);
+    return res.json({ locations: location ? [location] : [] });
   } catch (err) {
     console.error('Get locations error:', err);
     return res.status(500).json({ error: 'Server error' });
@@ -46,12 +57,15 @@ router.post('/locations', authorize('owner'), async (req, res) => {
   }
 
   try {
-    const result = await pool.query(
-      'INSERT INTO locations (name, address) VALUES ($1, $2) RETURNING *',
-      [name, address || null]
-    );
-
-    return res.status(201).json({ location: result.rows[0] });
+    const id = await nextSequence('locations');
+    const location = {
+      id,
+      name,
+      address: address || null,
+      created_at: new Date().toISOString(),
+    };
+    await db.collection('locations').doc(String(id)).set(location);
+    return res.status(201).json({ location });
   } catch (err) {
     console.error('Create location error:', err);
     return res.status(500).json({ error: 'Server error' });
@@ -65,44 +79,34 @@ router.patch('/locations/:id', authorize('owner'), async (req, res) => {
     return res.status(400).json({ error: 'Invalid location id' });
   }
 
-  const updates = [];
-  const params = [];
-
+  const updates = {};
   if (Object.prototype.hasOwnProperty.call(req.body, 'name')) {
     const name = String(req.body.name || '').trim();
     if (!name) {
       return res.status(400).json({ error: 'Location name cannot be empty' });
     }
-    params.push(name);
-    updates.push(`name = $${params.length}`);
+    updates.name = name;
   }
 
   if (Object.prototype.hasOwnProperty.call(req.body, 'address')) {
     const address = req.body.address ? String(req.body.address).trim() : null;
-    params.push(address || null);
-    updates.push(`address = $${params.length}`);
+    updates.address = address || null;
   }
 
-  if (!updates.length) {
+  if (Object.keys(updates).length === 0) {
     return res.status(400).json({ error: 'No fields to update' });
   }
 
-  params.push(locationId);
-
   try {
-    const result = await pool.query(
-      `UPDATE locations
-       SET ${updates.join(', ')}
-       WHERE id = $${params.length}
-       RETURNING *`,
-      params
-    );
-
-    if (!result.rows.length) {
+    const ref = db.collection('locations').doc(String(locationId));
+    const snap = await ref.get();
+    if (!snap.exists) {
       return res.status(404).json({ error: 'Location not found' });
     }
 
-    return res.json({ location: result.rows[0] });
+    await ref.set(updates, { merge: true });
+    const updated = (await ref.get()).data();
+    return res.json({ location: updated });
   } catch (err) {
     console.error('Update location error:', err);
     return res.status(500).json({ error: 'Server error' });
@@ -117,16 +121,20 @@ router.delete('/locations/:id', authorize('owner'), async (req, res) => {
   }
 
   try {
-    const usage = await pool.query(
-      `SELECT
-          (SELECT COUNT(*)::int FROM users WHERE location_id = $1) AS users_count,
-          (SELECT COUNT(*)::int FROM inventory WHERE location_id = $1) AS inventory_count,
-          (SELECT COUNT(*)::int FROM orders WHERE location_id = $1) AS orders_count,
-          (SELECT COUNT(*)::int FROM sales WHERE location_id = $1) AS sales_count`,
-      [locationId]
-    );
+    const [users, inventory, orders, sales] = await Promise.all([
+      listCollection('users'),
+      listCollection('inventory'),
+      listCollection('orders'),
+      listCollection('sales'),
+    ]);
 
-    const stats = usage.rows[0];
+    const stats = {
+      users_count: users.filter((u) => Number(u.location_id) === locationId).length,
+      inventory_count: inventory.filter((i) => Number(i.location_id) === locationId).length,
+      orders_count: orders.filter((o) => Number(o.location_id) === locationId).length,
+      sales_count: sales.filter((s) => Number(s.location_id) === locationId).length,
+    };
+
     const inUse =
       Number(stats.users_count) > 0 ||
       Number(stats.inventory_count) > 0 ||
@@ -140,11 +148,12 @@ router.delete('/locations/:id', authorize('owner'), async (req, res) => {
       });
     }
 
-    const result = await pool.query('DELETE FROM locations WHERE id = $1 RETURNING id', [locationId]);
-    if (!result.rows.length) {
+    const deleted = await db.collection('locations').doc(String(locationId)).get();
+    if (!deleted.exists) {
       return res.status(404).json({ error: 'Location not found' });
     }
 
+    await db.collection('locations').doc(String(locationId)).delete();
     return res.json({ success: true });
   } catch (err) {
     console.error('Delete location error:', err);
@@ -153,37 +162,35 @@ router.delete('/locations/:id', authorize('owner'), async (req, res) => {
 });
 
 // GET /api/users?location_id=<id>
-// manager: can only see users in their own location
-// owner: can see all, or filter by location
 router.get('/users', authorize('manager', 'owner'), async (req, res) => {
   try {
-    const params = [];
-    let whereClause = '';
+    let users = await listCollection('users');
+    const locations = await listCollection('locations');
+    const locationNameById = new Map(locations.map((l) => [Number(l.id), l.name]));
 
     if (req.user.role === 'manager') {
-      params.push(req.user.location_id);
-      whereClause = `WHERE u.location_id = $${params.length}`;
+      users = users.filter((u) => Number(u.location_id) === Number(req.user.location_id));
     } else if (req.query.location_id) {
       const locationId = parsePositiveInteger(req.query.location_id);
       if (!locationId) {
         return res.status(400).json({ error: 'location_id must be a positive integer' });
       }
-
-      params.push(locationId);
-      whereClause = `WHERE u.location_id = $${params.length}`;
+      users = users.filter((u) => Number(u.location_id) === locationId);
     }
 
-    const result = await pool.query(
-      `SELECT u.id, u.name, u.email, u.role, u.location_id, u.created_at,
-              l.name AS location_name
-       FROM users u
-       LEFT JOIN locations l ON u.location_id = l.id
-       ${whereClause}
-       ORDER BY u.name`,
-      params
-    );
+    users.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
 
-    return res.json({ users: result.rows });
+    return res.json({
+      users: users.map((u) => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+        location_id: u.location_id ?? null,
+        created_at: u.created_at || null,
+        location_name: u.location_id ? locationNameById.get(Number(u.location_id)) || null : null,
+      })),
+    });
   } catch (err) {
     console.error('Get users error:', err);
     return res.status(500).json({ error: 'Server error' });
@@ -210,7 +217,6 @@ router.post('/users', authorize('manager', 'owner'), async (req, res) => {
   }
 
   let locationId = null;
-
   if (req.user.role === 'manager') {
     if (!MANAGER_ASSIGNABLE_ROLES.includes(role)) {
       return res.status(403).json({ error: `Managers can only create: ${MANAGER_ASSIGNABLE_ROLES.join(', ')}` });
@@ -228,20 +234,36 @@ router.post('/users', authorize('manager', 'owner'), async (req, res) => {
       return res.status(404).json({ error: 'Location not found' });
     }
 
-    const existing = await pool.query('SELECT id FROM users WHERE LOWER(email) = LOWER($1)', [email]);
-    if (existing.rows.length) {
+    const existing = await findUserByEmail(email);
+    if (existing) {
       return res.status(409).json({ error: 'Email already registered' });
     }
 
+    const id = await nextSequence('users');
     const passwordHash = await bcryptjs.hash(password, 10);
-    const result = await pool.query(
-      `INSERT INTO users (name, email, password_hash, role, location_id)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, name, email, role, location_id, created_at`,
-      [name, email, passwordHash, role, locationId]
-    );
+    const user = {
+      id,
+      name,
+      email: email.toLowerCase(),
+      email_lc: email.toLowerCase(),
+      password_hash: passwordHash,
+      role,
+      location_id: role === 'owner' ? null : locationId,
+      created_at: new Date().toISOString(),
+    };
 
-    return res.status(201).json({ user: result.rows[0] });
+    await db.collection('users').doc(String(id)).set(user);
+
+    return res.status(201).json({
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        location_id: user.location_id,
+        created_at: user.created_at,
+      },
+    });
   } catch (err) {
     console.error('Create user error:', err);
     return res.status(500).json({ error: 'Server error' });
@@ -256,34 +278,24 @@ router.patch('/users/:id', authorize('manager', 'owner'), async (req, res) => {
   }
 
   try {
-    const found = await pool.query(
-      'SELECT id, name, email, role, location_id FROM users WHERE id = $1',
-      [userId]
-    );
-
-    if (!found.rows.length) {
+    const target = await getById('users', userId);
+    if (!target) {
       return res.status(404).json({ error: 'User not found' });
     }
-
-    const target = found.rows[0];
 
     if (req.user.role === 'manager') {
       if (target.role === 'owner') {
         return res.status(403).json({ error: 'Managers cannot modify owners' });
       }
-
       if (Number(target.location_id) !== Number(req.user.location_id)) {
         return res.status(403).json({ error: 'Managers can only modify users in their own location' });
       }
-
       if (target.role === 'manager' && Number(target.id) !== Number(req.user.id)) {
         return res.status(403).json({ error: 'Managers cannot modify other managers' });
       }
-
       if (Object.prototype.hasOwnProperty.call(req.body, 'location_id')) {
         return res.status(403).json({ error: 'Managers cannot change user location' });
       }
-
       if (
         Object.prototype.hasOwnProperty.call(req.body, 'role') &&
         !MANAGER_ASSIGNABLE_ROLES.includes(String(req.body.role || '').toLowerCase())
@@ -301,7 +313,7 @@ router.patch('/users/:id', authorize('manager', 'owner'), async (req, res) => {
       nextRole = requestedRole;
     }
 
-    let nextLocation = target.location_id;
+    let nextLocation = target.location_id ?? null;
     if (Object.prototype.hasOwnProperty.call(req.body, 'location_id')) {
       if (req.body.location_id === null || req.body.location_id === '') {
         nextLocation = null;
@@ -328,44 +340,33 @@ router.patch('/users/:id', authorize('manager', 'owner'), async (req, res) => {
       return res.status(404).json({ error: 'Location not found' });
     }
 
-    const updates = [];
-    const params = [];
-
+    const updates = {};
     if (Object.prototype.hasOwnProperty.call(req.body, 'name')) {
       const nextName = String(req.body.name || '').trim();
       if (!nextName) {
         return res.status(400).json({ error: 'name cannot be empty' });
       }
-      params.push(nextName);
-      updates.push(`name = $${params.length}`);
+      updates.name = nextName;
     }
 
     if (Object.prototype.hasOwnProperty.call(req.body, 'email')) {
-      const nextEmail = String(req.body.email || '').trim();
+      const nextEmail = String(req.body.email || '').trim().toLowerCase();
       if (!nextEmail) {
         return res.status(400).json({ error: 'email cannot be empty' });
       }
-
-      const emailCheck = await pool.query(
-        'SELECT id FROM users WHERE LOWER(email) = LOWER($1) AND id <> $2',
-        [nextEmail, userId]
-      );
-      if (emailCheck.rows.length) {
+      const emailCheck = await findUserByEmail(nextEmail, userId);
+      if (emailCheck) {
         return res.status(409).json({ error: 'Email already in use by another user' });
       }
-
-      params.push(nextEmail);
-      updates.push(`email = $${params.length}`);
+      updates.email = nextEmail;
+      updates.email_lc = nextEmail;
     }
 
-    if (Object.prototype.hasOwnProperty.call(req.body, 'role') && nextRole !== target.role) {
-      params.push(nextRole);
-      updates.push(`role = $${params.length}`);
+    if (nextRole !== target.role) {
+      updates.role = nextRole;
     }
-
     if (nextLocation !== target.location_id) {
-      params.push(nextLocation);
-      updates.push(`location_id = $${params.length}`);
+      updates.location_id = nextLocation;
     }
 
     if (Object.prototype.hasOwnProperty.call(req.body, 'password')) {
@@ -373,26 +374,27 @@ router.patch('/users/:id', authorize('manager', 'owner'), async (req, res) => {
       if (nextPassword.length < 6) {
         return res.status(400).json({ error: 'password must be at least 6 characters' });
       }
-      const nextHash = await bcryptjs.hash(nextPassword, 10);
-      params.push(nextHash);
-      updates.push(`password_hash = $${params.length}`);
+      updates.password_hash = await bcryptjs.hash(nextPassword, 10);
     }
 
-    if (!updates.length) {
+    if (Object.keys(updates).length === 0) {
       return res.status(400).json({ error: 'No changes submitted' });
     }
 
-    params.push(userId);
+    const ref = db.collection('users').doc(String(userId));
+    await ref.set(updates, { merge: true });
+    const updated = (await ref.get()).data();
 
-    const result = await pool.query(
-      `UPDATE users
-       SET ${updates.join(', ')}
-       WHERE id = $${params.length}
-       RETURNING id, name, email, role, location_id, created_at`,
-      params
-    );
-
-    return res.json({ user: result.rows[0] });
+    return res.json({
+      user: {
+        id: updated.id,
+        name: updated.name,
+        email: updated.email,
+        role: updated.role,
+        location_id: updated.location_id ?? null,
+        created_at: updated.created_at || null,
+      },
+    });
   } catch (err) {
     console.error('Update user error:', err);
     return res.status(500).json({ error: 'Server error' });
@@ -411,38 +413,36 @@ router.delete('/users/:id', authorize('manager', 'owner'), async (req, res) => {
   }
 
   try {
-    const found = await pool.query('SELECT id, role, location_id FROM users WHERE id = $1', [userId]);
-    if (!found.rows.length) {
+    const target = await getById('users', userId);
+    if (!target) {
       return res.status(404).json({ error: 'User not found' });
     }
-
-    const target = found.rows[0];
 
     if (req.user.role === 'manager') {
       if (Number(target.location_id) !== Number(req.user.location_id)) {
         return res.status(403).json({ error: 'Managers can only delete users in their own location' });
       }
-
       if (!MANAGER_ASSIGNABLE_ROLES.includes(target.role)) {
         return res.status(403).json({ error: `Managers can only delete: ${MANAGER_ASSIGNABLE_ROLES.join(', ')}` });
       }
     }
 
     if (target.role === 'owner') {
-      const ownerCount = await pool.query('SELECT COUNT(*)::int AS count FROM users WHERE role = $1', ['owner']);
-      if (Number(ownerCount.rows[0].count) <= 1) {
+      const users = await listCollection('users');
+      const ownerCount = users.filter((u) => u.role === 'owner').length;
+      if (ownerCount <= 1) {
         return res.status(400).json({ error: 'Cannot delete the last owner account' });
       }
     }
 
-    const waiterOrders = await pool.query('SELECT COUNT(*)::int AS count FROM orders WHERE waiter_id = $1', [userId]);
-    if (Number(waiterOrders.rows[0].count) > 0) {
+    const orders = await listCollection('orders');
+    if (orders.some((o) => Number(o.waiter_id) === userId)) {
       return res.status(409).json({
         error: 'User cannot be deleted because they are referenced by existing orders',
       });
     }
 
-    await pool.query('DELETE FROM users WHERE id = $1', [userId]);
+    await db.collection('users').doc(String(userId)).delete();
     return res.json({ success: true });
   } catch (err) {
     console.error('Delete user error:', err);

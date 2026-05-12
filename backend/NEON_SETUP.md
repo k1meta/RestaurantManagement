@@ -1,56 +1,39 @@
-# Neon Setup and Team Workflow
+# Firebase Firestore Setup
 
-This backend supports two Postgres connection modes:
+Backend now uses **Firebase Firestore** through the Firebase Admin SDK.
 
-- Preferred: `DATABASE_URL` (Neon)
-- Fallback: local `DB_*` variables
+## 1) One-time setup
 
-## 1) One-time setup (each developer)
-
-1. Create a Neon project and copy your connection string.
-2. Create `backend/.env` from `backend/.env.example`.
-3. Set:
-   - `DATABASE_URL=...` (Neon pooled connection string)
+1. Create `backend/.env` from `backend/.env.example`.
+2. Set:
+   - `FIREBASE_PROJECT_ID=...`
    - `JWT_SECRET=...`
-4. Apply schema and seed data:
+3. Provide admin credentials using one option:
+   - `FIREBASE_SERVICE_ACCOUNT_JSON=...`
+   - or `FIREBASE_SERVICE_ACCOUNT_PATH=...`
+   - or `GOOGLE_APPLICATION_CREDENTIALS=...`
+4. Seed demo records:
 
 ```bash
-npm run db:setup
+npm run db:seed
 ```
 
-## 2) Shared branch model (two-developer setup)
+## 2) Daily commands
 
-- Shared integration branch: `main`
-- Personal branches: `dev-alice`, `dev-bob`
-
-Recommended flow:
-
-1. Both developers point local backend to their personal Neon DB branch.
-2. Test schema/data changes in personal branch first.
-3. When validated, apply the same SQL change to shared `main` branch.
-4. Teammate pulls changes and runs:
+- Seed baseline records when starting fresh:
 
 ```bash
-npm run db:schema:apply
+npm run db:seed
 ```
 
-## 3) Daily commands
-
-- Apply schema/seed to current DB:
+- Reset Firestore collections (destructive):
 
 ```bash
-npm run db:schema:apply
+npm run db:reset
+npm run db:seed
 ```
 
-- Reset DB (dangerous) then re-apply:
+## 3) Safety notes
 
-```bash
-npm run db:schema:reset
-npm run db:schema:apply
-```
-
-## 4) Safety notes
-
-- Never commit `backend/.env`.
-- Keep `DB_SSLMODE` unset for Neon. Use `DB_SSLMODE=disable` only for local non-SSL Postgres.
-- Treat `db:schema:reset` as destructive; only run on personal branches unless coordinated.
+- Never commit `backend/.env` or service account credentials.
+- `db:reset` permanently deletes all app collections listed in `scripts/resetFirestore.js`.

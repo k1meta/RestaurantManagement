@@ -1,7 +1,8 @@
 const express = require('express');
-const pool    = require('../config/db');
 const { authenticate, authorize } = require('../middleware/auth');
 const { parseAllowedUnit } = require('../constants/units');
+const { db, nextSequence } = require('../config/db');
+const { listCollection, getById, byNameAsc } = require('../utils/firestoreStore');
 
 const router = express.Router();
 router.use(authenticate);
@@ -20,90 +21,71 @@ function parseOptionalNonNegativeThreshold(raw, fieldLabel, allowNullExplicit = 
 }
 
 function validateThresholdPair(low, full) {
-  if (
-    low != null &&
-    full != null &&
-    Number(low) > Number(full)
-  ) {
+  if (low != null && full != null && Number(low) > Number(full)) {
     return 'low_stock_threshold cannot exceed full_stock_target';
   }
   return null;
 }
 
-// GET /api/inventory  — manager sees their location; owner sees all
+async function ingredientNameByIdMap() {
+  const ingredients = await listCollection('ingredients');
+  return new Map(ingredients.map((ing) => [Number(ing.id), ing]));
+}
+
+function attachInventoryLocationName(inventory, locations, ingredientMap) {
+  const locationName = new Map(locations.map((l) => [Number(l.id), l.name]));
+  return inventory.map((item) => {
+    const ingredient = ingredientMap.get(Number(item.ingredient_id));
+    return {
+      ...item,
+      ingredient: ingredient?.name || item.ingredient || null,
+      unit: item.unit || ingredient?.default_unit || null,
+      location_name: locationName.get(Number(item.location_id)) || null,
+    };
+  });
+}
+
+// GET /api/inventory
 router.get('/', async (req, res) => {
   try {
-    let result;
-    if (req.user.role === 'owner') {
-      result = await pool.query(
-        `SELECT i.id,
-                i.location_id,
-                i.ingredient_id,
-                COALESCE(ing.name, i.ingredient) AS ingredient,
-                i.quantity,
-                COALESCE(i.unit, ing.default_unit) AS unit,
-                i.low_stock_threshold,
-                i.full_stock_target,
-                i.updated_at,
-                l.name AS location_name
-         FROM inventory i
-         JOIN locations l ON i.location_id = l.id
-         LEFT JOIN ingredients ing ON i.ingredient_id = ing.id
-         ORDER BY l.name, COALESCE(ing.name, i.ingredient)`
-      );
-    } else {
-      result = await pool.query(
-        `SELECT i.id,
-                i.location_id,
-                i.ingredient_id,
-                COALESCE(ing.name, i.ingredient) AS ingredient,
-                i.quantity,
-                COALESCE(i.unit, ing.default_unit) AS unit,
-                i.low_stock_threshold,
-                i.full_stock_target,
-                i.updated_at,
-                l.name AS location_name
-         FROM inventory i
-         JOIN locations l ON i.location_id = l.id
-         LEFT JOIN ingredients ing ON i.ingredient_id = ing.id
-         WHERE i.location_id = $1
-         ORDER BY COALESCE(ing.name, i.ingredient)`,
-        [req.user.location_id]
-      );
+    let inventory = await listCollection('inventory');
+    const locations = await listCollection('locations');
+    const ingredientMap = await ingredientNameByIdMap();
+
+    if (req.user.role !== 'owner') {
+      inventory = inventory.filter((item) => Number(item.location_id) === Number(req.user.location_id));
     }
-    res.json({ inventory: result.rows });
+
+    const rows = attachInventoryLocationName(inventory, locations, ingredientMap).sort((a, b) =>
+      String(a.location_name || '')
+        .localeCompare(String(b.location_name || '')) ||
+      String(a.ingredient || '').localeCompare(String(b.ingredient || ''))
+    );
+
+    return res.json({ inventory: rows });
   } catch (err) {
     console.error('Get inventory error:', err);
-    res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: 'Server error' });
   }
 });
 
-// POST /api/inventory  — add or update an ingredient (manager / owner only)
-// Body: { ingredient_id?, ingredient?, quantity, unit? }
+// POST /api/inventory
 router.post('/', authorize('manager', 'owner'), async (req, res) => {
   const { ingredient, quantity, unit, location_id } = req.body;
   const ingredientId = req.body.ingredient_id == null ? null : Number(req.body.ingredient_id);
 
   const lowParsed = parseOptionalNonNegativeThreshold(req.body, 'low_stock_threshold');
-  if (lowParsed && lowParsed.error) {
-    return res.status(400).json({ error: lowParsed.error });
-  }
+  if (lowParsed && lowParsed.error) return res.status(400).json({ error: lowParsed.error });
   const fullParsed = parseOptionalNonNegativeThreshold(req.body, 'full_stock_target');
-  if (fullParsed && fullParsed.error) {
-    return res.status(400).json({ error: fullParsed.error });
-  }
+  if (fullParsed && fullParsed.error) return res.status(400).json({ error: fullParsed.error });
 
   const nextLow = lowParsed === undefined ? undefined : lowParsed.value;
   const nextFull = fullParsed === undefined ? undefined : fullParsed.value;
   const pairErr = validateThresholdPair(nextLow, nextFull);
-  if (pairErr) {
-    return res.status(400).json({ error: pairErr });
-  }
+  if (pairErr) return res.status(400).json({ error: pairErr });
 
-  // Owner can specify a location; manager defaults to their own
-  const targetLocation = req.user.role === 'owner' && location_id != null
-    ? Number(location_id)
-    : req.user.location_id;
+  const targetLocation =
+    req.user.role === 'owner' && location_id != null ? Number(location_id) : Number(req.user.location_id);
 
   if (!Number.isInteger(targetLocation) || targetLocation <= 0) {
     return res.status(400).json({ error: 'Valid location_id is required' });
@@ -118,151 +100,130 @@ router.post('/', authorize('manager', 'owner'), async (req, res) => {
   }
 
   const unitParsed = parseAllowedUnit(unit);
-  if (!unitParsed.ok) {
-    return res.status(400).json({ error: unitParsed.error });
-  }
+  if (!unitParsed.ok) return res.status(400).json({ error: unitParsed.error });
   const normalizedUnit = unitParsed.value;
 
-  const client = await pool.connect();
   try {
-    await client.query('BEGIN');
+    const location = await getById('locations', targetLocation);
+    if (!location) {
+      return res.status(400).json({ error: 'Invalid location_id' });
+    }
 
     let resolvedIngredientId = ingredientId;
     let resolvedIngredientName = null;
 
     if (resolvedIngredientId) {
-      const ingResult = await client.query('SELECT id, name FROM ingredients WHERE id = $1', [resolvedIngredientId]);
-      if (!ingResult.rows.length) {
-        await client.query('ROLLBACK');
+      const existingIngredient = await getById('ingredients', resolvedIngredientId);
+      if (!existingIngredient) {
         return res.status(400).json({ error: 'Invalid ingredient_id' });
       }
-      resolvedIngredientName = ingResult.rows[0].name;
+      resolvedIngredientName = existingIngredient.name;
     } else {
       const rawName = String(ingredient || '').trim();
-      const created = await client.query(
-        `INSERT INTO ingredients (name, default_unit)
-         VALUES ($1, $2)
-         ON CONFLICT (name) DO UPDATE SET default_unit = COALESCE(EXCLUDED.default_unit, ingredients.default_unit)
-         RETURNING id, name`,
-        [rawName, normalizedUnit]
-      );
-      resolvedIngredientId = created.rows[0].id;
-      resolvedIngredientName = created.rows[0].name;
+      const allIngredients = await listCollection('ingredients');
+      const existing = allIngredients.find((entry) => String(entry.name || '').toLowerCase() === rawName.toLowerCase());
+      if (existing) {
+        resolvedIngredientId = Number(existing.id);
+        resolvedIngredientName = existing.name;
+        if (normalizedUnit && !existing.default_unit) {
+          await db.collection('ingredients').doc(String(existing.id)).set({ default_unit: normalizedUnit }, { merge: true });
+        }
+      } else {
+        resolvedIngredientId = await nextSequence('ingredients');
+        resolvedIngredientName = rawName;
+        await db.collection('ingredients').doc(String(resolvedIngredientId)).set({
+          id: resolvedIngredientId,
+          name: rawName,
+          default_unit: normalizedUnit || null,
+          created_at: new Date().toISOString(),
+        });
+      }
     }
 
-    const updateFragments = [
-      'quantity = $3',
-      'unit = $4',
-      'ingredient = $5',
-      'updated_at = NOW()',
-    ];
-    const updateParams = [targetLocation, resolvedIngredientId, Number(quantity), normalizedUnit, resolvedIngredientName];
-    let idx = 6;
-
-    if (nextLow !== undefined) {
-      updateFragments.push(`low_stock_threshold = $${idx}`);
-      updateParams.push(nextLow);
-      idx += 1;
-    }
-    if (nextFull !== undefined) {
-      updateFragments.push(`full_stock_target = $${idx}`);
-      updateParams.push(nextFull);
-      idx += 1;
-    }
-
-    let result = await client.query(
-      `UPDATE inventory
-       SET ${updateFragments.join(', ')}
-       WHERE location_id = $1
-         AND ingredient_id = $2
-       RETURNING id, location_id, ingredient_id, ingredient, quantity, unit,
-                 low_stock_threshold, full_stock_target, updated_at`,
-      updateParams
+    const inventory = await listCollection('inventory');
+    const existingInventory = inventory.find(
+      (row) =>
+        Number(row.location_id) === Number(targetLocation) &&
+        Number(row.ingredient_id) === Number(resolvedIngredientId)
     );
 
-    if (!result.rows.length) {
-      const insertCols = ['location_id', 'ingredient_id', 'ingredient', 'quantity', 'unit'];
-      const insertVals = ['$1', '$2', '$3', '$4', '$5'];
-      const insertParamsIns = [targetLocation, resolvedIngredientId, resolvedIngredientName, Number(quantity), normalizedUnit];
-      let insIdx = 6;
+    const payload = {
+      location_id: targetLocation,
+      ingredient_id: resolvedIngredientId,
+      ingredient: resolvedIngredientName,
+      quantity: Number(quantity),
+      unit: normalizedUnit,
+      updated_at: new Date().toISOString(),
+    };
 
-      if (nextLow !== undefined) {
-        insertCols.push('low_stock_threshold');
-        insertVals.push(`$${insIdx}`);
-        insertParamsIns.push(nextLow);
-        insIdx += 1;
-      }
-      if (nextFull !== undefined) {
-        insertCols.push('full_stock_target');
-        insertVals.push(`$${insIdx}`);
-        insertParamsIns.push(nextFull);
-      }
+    if (nextLow !== undefined) payload.low_stock_threshold = nextLow;
+    if (nextFull !== undefined) payload.full_stock_target = nextFull;
 
-      result = await client.query(
-        `INSERT INTO inventory (${insertCols.join(', ')})
-         VALUES (${insertVals.join(', ')})
-         RETURNING id, location_id, ingredient_id, ingredient, quantity, unit,
-                   low_stock_threshold, full_stock_target, updated_at`,
-        insertParamsIns
-      );
+    let id = null;
+    if (existingInventory) {
+      id = Number(existingInventory.id);
+      await db.collection('inventory').doc(String(id)).set(payload, { merge: true });
+    } else {
+      id = await nextSequence('inventory');
+      await db.collection('inventory').doc(String(id)).set({ id, ...payload });
     }
 
-    await client.query('COMMIT');
-    res.status(201).json({ item: result.rows[0] });
+    const item = (await getById('inventory', id));
+    return res.status(201).json({ item });
   } catch (err) {
-    await client.query('ROLLBACK');
     console.error('Upsert inventory error:', err);
-    res.status(500).json({ error: 'Server error' });
-  } finally {
-    client.release();
+    return res.status(500).json({ error: 'Server error' });
   }
 });
 
-// GET /api/inventory/ingredients — ingredient catalog for menu/inventory forms
+// GET /api/inventory/ingredients
 router.get('/ingredients', async (_req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT id, name, default_unit
-       FROM ingredients
-       ORDER BY name`
-    );
-    res.json({ ingredients: result.rows });
+    const ingredients = (await listCollection('ingredients')).sort(byNameAsc);
+    return res.json({ ingredients });
   } catch (err) {
     console.error('Get ingredient catalog error:', err);
-    res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: 'Server error' });
   }
 });
 
-// POST /api/inventory/ingredients — create ingredient catalog entry
+// POST /api/inventory/ingredients
 router.post('/ingredients', authorize('manager', 'owner'), async (req, res) => {
   const name = String(req.body.name || '').trim();
-
-  if (!name) {
-    return res.status(400).json({ error: 'name is required' });
-  }
+  if (!name) return res.status(400).json({ error: 'name is required' });
 
   const defaultParsed = parseAllowedUnit(req.body.default_unit);
-  if (!defaultParsed.ok) {
-    return res.status(400).json({ error: defaultParsed.error });
-  }
+  if (!defaultParsed.ok) return res.status(400).json({ error: defaultParsed.error });
   const defaultUnit = defaultParsed.value;
 
   try {
-    const result = await pool.query(
-      `INSERT INTO ingredients (name, default_unit)
-       VALUES ($1, $2)
-       ON CONFLICT (name) DO UPDATE SET default_unit = COALESCE(EXCLUDED.default_unit, ingredients.default_unit)
-       RETURNING id, name, default_unit`,
-      [name, defaultUnit]
-    );
-    res.status(201).json({ ingredient: result.rows[0] });
+    const allIngredients = await listCollection('ingredients');
+    const existing = allIngredients.find((entry) => String(entry.name || '').toLowerCase() === name.toLowerCase());
+    if (existing) {
+      const updated = {
+        ...existing,
+        default_unit: existing.default_unit || defaultUnit || null,
+      };
+      await db.collection('ingredients').doc(String(existing.id)).set(updated, { merge: true });
+      return res.status(201).json({ ingredient: updated });
+    }
+
+    const id = await nextSequence('ingredients');
+    const ingredient = {
+      id,
+      name,
+      default_unit: defaultUnit || null,
+      created_at: new Date().toISOString(),
+    };
+    await db.collection('ingredients').doc(String(id)).set(ingredient);
+    return res.status(201).json({ ingredient });
   } catch (err) {
     console.error('Create ingredient error:', err);
-    res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: 'Server error' });
   }
 });
 
-// DELETE /api/inventory/ingredients/:id — remove ingredient if unreferenced
+// DELETE /api/inventory/ingredients/:id
 router.delete('/ingredients/:id', authorize('manager', 'owner'), async (req, res) => {
   const ingredientId = Number(req.params.id);
   if (!Number.isInteger(ingredientId) || ingredientId <= 0) {
@@ -270,39 +231,32 @@ router.delete('/ingredients/:id', authorize('manager', 'owner'), async (req, res
   }
 
   try {
-    const inMenuUse = await pool.query(
-      'SELECT 1 FROM menu_item_ingredients WHERE ingredient_id = $1 LIMIT 1',
-      [ingredientId]
-    );
-    if (inMenuUse.rows.length) {
+    const [menuIngredients, inventory] = await Promise.all([
+      listCollection('menu_item_ingredients'),
+      listCollection('inventory'),
+    ]);
+
+    if (menuIngredients.some((row) => Number(row.ingredient_id) === ingredientId)) {
       return res.status(409).json({ error: 'Cannot delete ingredient used by menu items' });
     }
 
-    const inInventoryUse = await pool.query(
-      'SELECT 1 FROM inventory WHERE ingredient_id = $1 LIMIT 1',
-      [ingredientId]
-    );
-    if (inInventoryUse.rows.length) {
+    if (inventory.some((row) => Number(row.ingredient_id) === ingredientId)) {
       return res.status(409).json({ error: 'Cannot delete ingredient with active inventory records' });
     }
 
-    const result = await pool.query(
-      'DELETE FROM ingredients WHERE id = $1 RETURNING id, name',
-      [ingredientId]
-    );
+    const ref = db.collection('ingredients').doc(String(ingredientId));
+    const snap = await ref.get();
+    if (!snap.exists) return res.status(404).json({ error: 'Ingredient not found' });
 
-    if (!result.rows.length) {
-      return res.status(404).json({ error: 'Ingredient not found' });
-    }
-
-    res.json({ message: 'Ingredient removed' });
+    await ref.delete();
+    return res.json({ message: 'Ingredient removed' });
   } catch (err) {
     console.error('Delete ingredient catalog item error:', err);
-    res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: 'Server error' });
   }
 });
 
-// PATCH /api/inventory/:id — partial update (quantity / unit / thresholds)
+// PATCH /api/inventory/:id
 router.patch('/:id', authorize('manager', 'owner'), async (req, res) => {
   const rowId = Number(req.params.id);
   if (!Number.isInteger(rowId) || rowId <= 0) {
@@ -310,13 +264,9 @@ router.patch('/:id', authorize('manager', 'owner'), async (req, res) => {
   }
 
   const lowParsed = parseOptionalNonNegativeThreshold(req.body, 'low_stock_threshold');
-  if (lowParsed && lowParsed.error) {
-    return res.status(400).json({ error: lowParsed.error });
-  }
+  if (lowParsed && lowParsed.error) return res.status(400).json({ error: lowParsed.error });
   const fullParsed = parseOptionalNonNegativeThreshold(req.body, 'full_stock_target');
-  if (fullParsed && fullParsed.error) {
-    return res.status(400).json({ error: fullParsed.error });
-  }
+  if (fullParsed && fullParsed.error) return res.status(400).json({ error: fullParsed.error });
 
   const quantityProvided = Object.prototype.hasOwnProperty.call(req.body, 'quantity');
   let nextQty = undefined;
@@ -331,11 +281,9 @@ router.patch('/:id', authorize('manager', 'owner'), async (req, res) => {
   const unitProvided = Object.prototype.hasOwnProperty.call(req.body, 'unit');
   let nextUnit = undefined;
   if (unitProvided) {
-    const uParsed = parseAllowedUnit(req.body.unit);
-    if (!uParsed.ok) {
-      return res.status(400).json({ error: uParsed.error });
-    }
-    nextUnit = uParsed.value;
+    const unitParsed = parseAllowedUnit(req.body.unit);
+    if (!unitParsed.ok) return res.status(400).json({ error: unitParsed.error });
+    nextUnit = unitParsed.value;
   }
 
   const nextLow = lowParsed === undefined ? undefined : lowParsed.value;
@@ -346,17 +294,8 @@ router.patch('/:id', authorize('manager', 'owner'), async (req, res) => {
   }
 
   try {
-    const existing = await pool.query(
-      `SELECT id, location_id, quantity, low_stock_threshold, full_stock_target
-       FROM inventory WHERE id = $1`,
-      [rowId]
-    );
-
-    if (!existing.rows.length) {
-      return res.status(404).json({ error: 'Inventory item not found' });
-    }
-
-    const row = existing.rows[0];
+    const row = await getById('inventory', rowId);
+    if (!row) return res.status(404).json({ error: 'Inventory item not found' });
     if (req.user.role !== 'owner' && Number(row.location_id) !== Number(req.user.location_id)) {
       return res.status(403).json({ error: 'Access denied for this inventory item' });
     }
@@ -364,54 +303,31 @@ router.patch('/:id', authorize('manager', 'owner'), async (req, res) => {
     const effectiveLow = nextLow !== undefined ? nextLow : row.low_stock_threshold;
     const effectiveFull = nextFull !== undefined ? nextFull : row.full_stock_target;
     const pairErr = validateThresholdPair(effectiveLow, effectiveFull);
-    if (pairErr) {
-      return res.status(400).json({ error: pairErr });
-    }
+    if (pairErr) return res.status(400).json({ error: pairErr });
 
-    const updates = [];
-    const params = [];
-    if (quantityProvided) {
-      params.push(nextQty);
-      updates.push(`quantity = $${params.length}`);
-    }
-    if (nextLow !== undefined) {
-      params.push(nextLow);
-      updates.push(`low_stock_threshold = $${params.length}`);
-    }
-    if (nextFull !== undefined) {
-      params.push(nextFull);
-      updates.push(`full_stock_target = $${params.length}`);
-    }
-    if (nextUnit !== undefined) {
-      params.push(nextUnit);
-      updates.push(`unit = $${params.length}`);
-    }
-    updates.push('updated_at = NOW()');
-    params.push(rowId);
+    const updates = { updated_at: new Date().toISOString() };
+    if (quantityProvided) updates.quantity = nextQty;
+    if (nextLow !== undefined) updates.low_stock_threshold = nextLow;
+    if (nextFull !== undefined) updates.full_stock_target = nextFull;
+    if (nextUnit !== undefined) updates.unit = nextUnit;
 
-    const result = await pool.query(
-      `UPDATE inventory SET ${updates.join(', ')}
-       WHERE id = $${params.length}
-       RETURNING id, location_id, ingredient_id, ingredient, quantity, unit,
-                 low_stock_threshold, full_stock_target, updated_at`,
-      params
-    );
-
-    res.json({ item: result.rows[0] });
+    await db.collection('inventory').doc(String(rowId)).set(updates, { merge: true });
+    const item = await getById('inventory', rowId);
+    return res.json({ item });
   } catch (err) {
     console.error('Patch inventory error:', err);
-    res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: 'Server error' });
   }
 });
 
-// DELETE /api/inventory/:id  — manager / owner only
+// DELETE /api/inventory/:id
 router.delete('/:id', authorize('manager', 'owner'), async (req, res) => {
   try {
-    await pool.query('DELETE FROM inventory WHERE id = $1', [req.params.id]);
-    res.json({ message: 'Item removed' });
+    await db.collection('inventory').doc(String(req.params.id)).delete();
+    return res.json({ message: 'Item removed' });
   } catch (err) {
     console.error('Delete inventory error:', err);
-    res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: 'Server error' });
   }
 });
 
