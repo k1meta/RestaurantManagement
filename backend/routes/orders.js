@@ -1,7 +1,7 @@
 const express = require('express');
 const { authenticate, authorize } = require('../middleware/auth');
 const { convertUsageForDeduction } = require('../constants/unitConversion');
-const { db, nextSequence } = require('../config/db');
+const { db } = require('../config/db');
 const { listCollection, getById } = require('../utils/firestoreStore');
 
 const router = express.Router();
@@ -31,6 +31,16 @@ function httpError(status, message) {
   const err = new Error(message);
   err.status = status;
   return err;
+}
+
+function counterRef(name) {
+  return db.collection('counters').doc(name);
+}
+
+function counterValue(snapshot) {
+  if (!snapshot.exists) return 0;
+  const value = Number(snapshot.data().value || 0);
+  return Number.isFinite(value) && value >= 0 ? value : 0;
 }
 
 async function attachItemsToOrders(orders) {
@@ -195,17 +205,27 @@ router.post('/', authorize('waiter', 'manager', 'owner'), async (req, res) => {
         throw httpError(500, `Location ${targetLocation} does not exist`);
       }
 
+      const menuRefs = normalizedItems.map((item) =>
+        db.collection('menu_items').doc(String(item.menu_item_id))
+      );
+      const menuSnaps = await Promise.all(menuRefs.map((ref) => tx.get(ref)));
       const menuById = new Map();
-      for (const item of normalizedItems) {
-        const menuRef = db.collection('menu_items').doc(String(item.menu_item_id));
-        const menuSnap = await tx.get(menuRef);
+      for (let idx = 0; idx < normalizedItems.length; idx += 1) {
+        const item = normalizedItems[idx];
+        const menuSnap = menuSnaps[idx];
         if (!menuSnap.exists || menuSnap.data().active === false) {
           throw httpError(500, `Menu item(s) not found or inactive: ${item.menu_item_id}`);
         }
         menuById.set(item.menu_item_id, menuSnap.data());
       }
 
-      const orderId = await nextSequence('orders', tx);
+      const [orderCounterSnap, orderItemsCounterSnap] = await Promise.all([
+        tx.get(counterRef('orders')),
+        tx.get(counterRef('order_items')),
+      ]);
+      const orderId = counterValue(orderCounterSnap) + 1;
+      const startingOrderItemId = counterValue(orderItemsCounterSnap);
+
       const now = new Date().toISOString();
       tx.set(db.collection('orders').doc(String(orderId)), {
         id: orderId,
@@ -218,8 +238,8 @@ router.post('/', authorize('waiter', 'manager', 'owner'), async (req, res) => {
         closed_at: null,
       });
 
-      for (const item of normalizedItems) {
-        const itemId = await nextSequence('order_items', tx);
+      normalizedItems.forEach((item, index) => {
+        const itemId = startingOrderItemId + index + 1;
         tx.set(db.collection('order_items').doc(String(itemId)), {
           id: itemId,
           order_id: orderId,
@@ -227,7 +247,14 @@ router.post('/', authorize('waiter', 'manager', 'owner'), async (req, res) => {
           quantity: item.quantity,
           unit_price: Number(menuById.get(item.menu_item_id).price),
         });
-      }
+      });
+
+      tx.set(counterRef('orders'), { value: orderId }, { merge: true });
+      tx.set(
+        counterRef('order_items'),
+        { value: startingOrderItemId + normalizedItems.length },
+        { merge: true }
+      );
 
       return orderId;
     });
@@ -284,7 +311,10 @@ router.patch('/:id/status', async (req, res) => {
       if (status === 'closed' && !currentOrder.closed_at) {
         updatePayload.closed_at = new Date().toISOString();
       }
-      tx.set(orderRef, updatePayload, { merge: true });
+
+      const inventoryUpdates = [];
+      const salesRowsToInsert = [];
+      let salesCounterNext = null;
 
       if (status === 'closed' && previousStatus !== 'closed') {
         const orderItemsSnap = await tx.get(
@@ -312,16 +342,18 @@ router.patch('/:id/status', async (req, res) => {
 
         for (const [menuItemId, agg] of groupedSales.entries()) {
           if (existingSalesMenuIds.has(menuItemId)) continue;
-          const saleId = await nextSequence('sales', tx);
-          tx.set(db.collection('sales').doc(String(saleId)), {
-            id: saleId,
+          salesRowsToInsert.push({
             location_id: currentOrder.location_id,
             menu_item_id: menuItemId,
             order_id: orderId,
             quantity: agg.quantity,
             total_price: agg.total_price,
-            sold_at: new Date().toISOString(),
           });
+        }
+
+        if (salesRowsToInsert.length > 0) {
+          const salesCounterSnap = await tx.get(counterRef('sales'));
+          salesCounterNext = counterValue(salesCounterSnap);
         }
 
         const ingredientLinksSnap = await tx.get(db.collection('menu_item_ingredients'));
@@ -392,16 +424,41 @@ router.patch('/:id/status', async (req, res) => {
             );
           }
 
-          tx.set(
-            invRow._docRef,
-            {
-              quantity: deduction.nextQty,
-              updated_at: new Date().toISOString(),
-            },
-            { merge: true }
-          );
+          inventoryUpdates.push({
+            ref: invRow._docRef,
+            quantity: deduction.nextQty,
+          });
         }
       }
+
+      tx.set(orderRef, updatePayload, { merge: true });
+
+      if (salesRowsToInsert.length > 0) {
+        salesRowsToInsert.forEach((saleRow, index) => {
+          const saleId = Number(salesCounterNext) + index + 1;
+          tx.set(db.collection('sales').doc(String(saleId)), {
+            id: saleId,
+            ...saleRow,
+            sold_at: new Date().toISOString(),
+          });
+        });
+        tx.set(
+          counterRef('sales'),
+          { value: Number(salesCounterNext) + salesRowsToInsert.length },
+          { merge: true }
+        );
+      }
+
+      inventoryUpdates.forEach((entry) => {
+        tx.set(
+          entry.ref,
+          {
+            quantity: entry.quantity,
+            updated_at: new Date().toISOString(),
+          },
+          { merge: true }
+        );
+      });
 
       return {
         ...currentOrder,
