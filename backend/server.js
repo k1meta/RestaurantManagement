@@ -41,16 +41,21 @@ app.use((err, req, res, next) => {
 });
 
 // ─── Start ───────────────────────────────────────────────────────────────────
-async function start() {
-  try {
-    await ensureSeedData();
-    app.listen(PORT, () => {
-      console.log(`🍽️  Restaurant API running on http://localhost:${PORT}`);
-    });
-  } catch (error) {
-    console.error('❌ Failed to initialize Firestore:', error.message);
-    process.exit(1);
-  }
-}
+// Export app for serverless environments (Cloud Functions) and start when run directly
+module.exports = app;
 
-start();
+if (require.main === module) {
+  async function start() {
+    try {
+      await ensureSeedData();
+      app.listen(PORT, () => {
+        console.log(`🍽️  Restaurant API running on http://localhost:${PORT}`);
+      });
+    } catch (error) {
+      console.error('❌ Failed to initialize Firestore:', error.message);
+      process.exit(1);
+    }
+  }
+
+  start();
+}
