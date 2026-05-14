@@ -3,17 +3,27 @@ const admin = require('firebase-admin');
 require('dotenv').config();
 
 function getCredential() {
+  // Try Base64-encoded JSON (Render-safe)
+  const base64Json = process.env.FIREBASE_SERVICE_ACCOUNT_JSON_B64;
+  if (base64Json) {
+    const decoded = Buffer.from(base64Json, 'base64').toString('utf8');
+    return admin.credential.cert(JSON.parse(decoded));
+  }
+
+  // Try direct JSON (local dev)
   const rawJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
   if (rawJson) {
     return admin.credential.cert(JSON.parse(rawJson));
   }
 
+  // Try file path
   const jsonPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH;
   if (jsonPath) {
     const file = fs.readFileSync(jsonPath, 'utf8');
     return admin.credential.cert(JSON.parse(file));
   }
 
+  // Fall back to application default
   return admin.credential.applicationDefault();
 }
 
