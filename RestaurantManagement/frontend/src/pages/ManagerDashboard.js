@@ -898,20 +898,52 @@ export default function ManagerDashboard({ user, onLogout }) {
         ) : null}
 
         <div className="lg:col-span-4 flex flex-col gap-6">
-          <section className="bg-[#ffdad6] p-6 rounded-lg relative overflow-hidden border-2 border-error ring-4 ring-error/10">
+          <section
+            className={
+              lowStock.length
+                ? 'bg-[#ffdad6] p-6 rounded-lg relative overflow-hidden border-2 border-error ring-4 ring-error/10'
+                : 'bg-surface-container-low p-6 rounded-lg relative overflow-hidden border border-outline-variant/20'
+            }
+          >
             <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-2 bg-error text-white px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest">
+              <div
+                className={
+                  lowStock.length
+                    ? 'flex items-center gap-2 bg-error text-white px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest'
+                    : 'flex items-center gap-2 bg-secondary/10 text-secondary px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest'
+                }
+              >
                 <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  priority_high
+                  {lowStock.length ? 'priority_high' : 'check_circle'}
                 </span>
-                Critical
+                {lowStock.length ? 'Critical' : 'Stable'}
               </div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-on-error-container">Immediate Attention</span>
+              <span
+                className={
+                  lowStock.length
+                    ? 'text-[10px] font-bold uppercase tracking-widest text-on-error-container'
+                    : 'text-[10px] font-bold uppercase tracking-widest text-on-surface-variant'
+                }
+              >
+                {lowStock.length ? 'Immediate Attention' : 'Stock Levels OK'}
+              </span>
             </div>
-            <h3 className="font-headline text-2xl font-black text-on-error-container leading-none mb-3 uppercase tracking-tighter">
+            <h3
+              className={
+                lowStock.length
+                  ? 'font-headline text-2xl font-black text-on-error-container leading-none mb-3 uppercase tracking-tighter'
+                  : 'font-headline text-2xl font-black text-on-surface leading-none mb-3 uppercase tracking-tighter'
+              }
+            >
               {lowStock.length ? 'Refill Low Inventory' : 'Service Momentum Stable'}
             </h3>
-            <p className="text-sm text-on-error-container/80 mb-6 leading-relaxed">
+            <p
+              className={
+                lowStock.length
+                  ? 'text-sm text-on-error-container/80 mb-6 leading-relaxed'
+                  : 'text-sm text-on-surface-variant mb-6 leading-relaxed'
+              }
+            >
               {lowStock.length
                 ? `${lowStock.length} ingredient(s) are below healthy stock level. Prioritize refills before dinner rush.`
                 : 'No critical stock issues detected in this location.'}
@@ -920,7 +952,11 @@ export default function ManagerDashboard({ user, onLogout }) {
               type="button"
               onClick={refillAllLow}
               disabled={!lowStock.length || refillingAll}
-              className="w-full bg-error text-white py-4 font-headline font-black uppercase tracking-[0.2em] hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-error/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              className={
+                lowStock.length
+                  ? 'w-full bg-error text-white py-4 font-headline font-black uppercase tracking-[0.2em] hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-error/20 disabled:opacity-50 disabled:cursor-not-allowed'
+                  : 'w-full bg-surface-container-highest text-on-surface py-4 font-headline font-black uppercase tracking-[0.2em] border border-outline-variant/30 disabled:opacity-60 disabled:cursor-not-allowed'
+              }
             >
               {refillingAll
                 ? 'Refilling...'
