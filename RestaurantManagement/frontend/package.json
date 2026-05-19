@@ -1,0 +1,67 @@
+{
+  "name": "restaurant-management-frontend",
+  "version": "1.0.0",
+  "description": "Restaurant Management App - Frontend",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "cross-env PORT=3001 react-scripts start",
+    "start:web": "cross-env PORT=3001 react-scripts start",
+    "start:react": "cross-env PORT=3001 react-scripts start",
+    "dev": "cross-env PORT=3001 react-scripts start",
+    "build": "react-scripts build",
+    "build:web": "react-scripts build",
+    "test": "react-scripts test",
+    "mobile:prepare": "node scripts/ensure-mobile-watch-paths.js",
+    "start:mobile": "npm run mobile:prepare && expo start --clear",
+    "start:mobile:android": "npm run mobile:prepare && expo start --clear --android",
+    "start:mobile:ios": "npm run mobile:prepare && expo start --clear --ios",
+    "start:mobile:web": "npm run mobile:prepare && expo start --web",
+    "start:mobile:ci": "npm run mobile:prepare && cross-env CI=1 expo start --clear",
+    "build:android": "eas build -p android",
+    "build:ios": "eas build -p ios",
+    "submit:android": "eas submit -p android",
+    "submit:ios": "eas submit -p ios"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~55.0.11",
+    "@react-native-async-storage/async-storage": "3.0.2",
+    "@react-navigation/native": "^7.2.4",
+    "@react-navigation/native-stack": "^7.15.0",
+    "axios": "^1.16.0",
+    "expo": "^55.0.24",
+    "expo-status-bar": "~55.0.6",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "react-native": "0.85.3",
+    "react-native-gesture-handler": "~2.29.0",
+    "react-native-safe-area-context": "5.7.0",
+    "react-native-screens": "4.25.0",
+    "react-native-web": "~0.21.2"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "eas-cli": "^18.12.2",
+    "electron": "latest",
+    "electron-builder": "latest",
+    "react-scripts": "5.0.1",
+    "wait-on": "^9.0.10"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

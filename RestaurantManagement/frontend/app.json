@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "Restaurant Management",
+    "slug": "restaurant-management",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "restaurantmanagement",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.restaurantmanagement.app"
+    },
+    "android": {
+      "package": "com.restaurantmanagement.app"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [],
+    "extra": {
+      "eas": {
+        "projectId": "46efc861-8f92-4988-bc91-541d9753ee25"
+      }
+    },
+    "owner": "tariktt"
+  }
+}
