@@ -45,7 +45,7 @@ async function start() {
   try {
     await ensureSeedData();
     app.listen(PORT, () => {
-      console.log(`🍽️  Restaurant API running on http://localhost:${PORT}`);
+      console.log(`🍽️  Restaurant API listening on port ${PORT}`);
     });
   } catch (error) {
     console.error('❌ Failed to initialize Firestore:', error.message);

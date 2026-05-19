@@ -2,16 +2,43 @@ const fs = require('fs');
 const admin = require('firebase-admin');
 require('dotenv').config();
 
+function parseJsonCredential(rawValue, sourceName) {
+  try {
+    return JSON.parse(rawValue);
+  } catch (error) {
+    throw new Error(`Invalid ${sourceName}: ${error.message}`);
+  }
+}
+
+function parseBase64Credential(rawValue, sourceName) {
+  const decoded = Buffer.from(String(rawValue).trim(), 'base64').toString('utf8');
+  return parseJsonCredential(decoded, sourceName);
+}
+
 function getCredential() {
+  const base64Json = process.env.FIREBASE_SERVICE_ACCOUNT_JSON_B64;
+  if (base64Json) {
+    const parsed = parseBase64Credential(
+      base64Json,
+      'FIREBASE_SERVICE_ACCOUNT_JSON_B64 (base64-encoded service account JSON)',
+    );
+    return admin.credential.cert(parsed);
+  }
+
   const rawJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
   if (rawJson) {
-    return admin.credential.cert(JSON.parse(rawJson));
+    const trimmed = String(rawJson).trim();
+    const parsed = trimmed.startsWith('{')
+      ? parseJsonCredential(trimmed, 'FIREBASE_SERVICE_ACCOUNT_JSON')
+      : parseBase64Credential(trimmed, 'FIREBASE_SERVICE_ACCOUNT_JSON (detected as base64)');
+    return admin.credential.cert(parsed);
   }
 
   const jsonPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH;
   if (jsonPath) {
     const file = fs.readFileSync(jsonPath, 'utf8');
-    return admin.credential.cert(JSON.parse(file));
+    const parsed = parseJsonCredential(file, `FIREBASE_SERVICE_ACCOUNT_PATH (${jsonPath})`);
+    return admin.credential.cert(parsed);
   }
 
   return admin.credential.applicationDefault();

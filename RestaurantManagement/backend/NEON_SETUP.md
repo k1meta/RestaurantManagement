@@ -10,6 +10,7 @@ Backend now uses **Firebase Firestore** through the Firebase Admin SDK.
    - `JWT_SECRET=...`
 3. Provide admin credentials using one option:
    - `FIREBASE_SERVICE_ACCOUNT_JSON=...`
+   - `FIREBASE_SERVICE_ACCOUNT_JSON_B64=...` (recommended on Render)
    - or `FIREBASE_SERVICE_ACCOUNT_PATH=...`
    - or `GOOGLE_APPLICATION_CREDENTIALS=...`
 4. Seed demo records:
