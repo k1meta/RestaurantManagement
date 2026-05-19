@@ -1,16 +1,27 @@
 import axios from 'axios';
 
 const isReactNative = typeof navigator !== 'undefined' && navigator.product === 'ReactNative';
+const DEFAULT_RENDER_URL = 'https://restaurantmanagement-zx62.onrender.com';
+const isBrowser = typeof window !== 'undefined' && typeof window.location !== 'undefined';
 
 const runtimeApiUrl =
   (typeof process !== 'undefined' && process?.env?.EXPO_PUBLIC_API_URL) ||
   (typeof process !== 'undefined' && process?.env?.REACT_APP_API_URL) ||
   '';
 
+function isLocalHost(hostname) {
+  return hostname === 'localhost' || hostname === '127.0.0.1';
+}
+
 function getDefaultBaseUrl() {
   if (runtimeApiUrl) return runtimeApiUrl;
-  // Android emulator loopback for mobile local development.
-  if (isReactNative) return 'http://10.0.2.2:3000';
+  if (isReactNative) return DEFAULT_RENDER_URL;
+  if (isBrowser && process?.env?.NODE_ENV === 'production') {
+    const hostname = window.location.hostname;
+    if (hostname && !isLocalHost(hostname)) {
+      return DEFAULT_RENDER_URL;
+    }
+  }
   return 'http://localhost:3000';
 }
 

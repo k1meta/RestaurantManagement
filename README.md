@@ -34,6 +34,8 @@ Copy-Item .\RestaurantManagement\backend\.env.example .\RestaurantManagement\bac
   - or `FIREBASE_SERVICE_ACCOUNT_PATH`
   - or `GOOGLE_APPLICATION_CREDENTIALS`
 
+For Render web deploys, set `REACT_APP_API_URL` (or `EXPO_PUBLIC_API_URL`) so the frontend points at the hosted backend.
+
 3. Install backend dependencies.
 
 ```powershell
@@ -80,10 +82,31 @@ cd .\RestaurantManagement\frontend
 npm run start
 ```
 
-## 5) Useful backend commands
+## 5) Run on phone (Expo)
+
+1. Create frontend env file (API points to live backend by default):
+
+```powershell
+Copy-Item .\RestaurantManagement\frontend\.env.example .\RestaurantManagement\frontend\.env
+```
+
+2. Start app in Expo Go:
+
+```powershell
+cd .\RestaurantManagement\frontend
+npm run start:mobile
+```
+
+3. Build installable Android APK (EAS cloud build):
+
+```powershell
+cd .\RestaurantManagement\frontend
+npm run build:android:apk
+```
+
+## 6) Useful backend commands
 
 ```powershell
 npm --prefix .\RestaurantManagement\backend run db:seed   # seed baseline data
 npm --prefix .\RestaurantManagement\backend run db:reset  # reset Firestore collections (destructive)
 ```
-
