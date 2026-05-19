@@ -4,10 +4,23 @@ const isReactNative = typeof navigator !== 'undefined' && navigator.product === 
 const DEFAULT_RENDER_URL = 'https://restaurantmanagement-zx62.onrender.com';
 const isBrowser = typeof window !== 'undefined' && typeof window.location !== 'undefined';
 
-const runtimeApiUrl =
-  (typeof process !== 'undefined' && process?.env?.EXPO_PUBLIC_API_URL) ||
-  (typeof process !== 'undefined' && process?.env?.REACT_APP_API_URL) ||
-  '';
+let runtimeApiUrl = '';
+// Try build-time envs, but guard against ReferenceError in browser runtime
+try {
+  if (typeof process !== 'undefined' && process && process.env && process.env.EXPO_PUBLIC_API_URL) {
+    runtimeApiUrl = process.env.EXPO_PUBLIC_API_URL;
+  } else if (typeof process !== 'undefined' && process && process.env && process.env.REACT_APP_API_URL) {
+    runtimeApiUrl = process.env.REACT_APP_API_URL;
+  }
+} catch (e) {
+  // process not defined at runtime; ignore
+}
+
+// Try window globals as fallback (useful in some hosting setups)
+if (!runtimeApiUrl && typeof window !== 'undefined') {
+  runtimeApiUrl =
+    (window.__REACT_APP_API_URL__ || window.__EXPO_PUBLIC_API_URL__ || window.EXPO_PUBLIC_API_URL || window.REACT_APP_API_URL) || '';
+}
 
 function isLocalHost(hostname) {
   return hostname === 'localhost' || hostname === '127.0.0.1';
@@ -16,13 +29,13 @@ function isLocalHost(hostname) {
 function getDefaultBaseUrl() {
   if (runtimeApiUrl) return runtimeApiUrl;
   if (isReactNative) return DEFAULT_RENDER_URL;
-  if (isBrowser && process?.env?.NODE_ENV === 'production') {
-    const hostname = window.location.hostname;
+  if (isBrowser) {
+    const hostname = window.location && window.location.hostname;
     if (hostname && !isLocalHost(hostname)) {
       return DEFAULT_RENDER_URL;
     }
   }
-  return 'http://localhost:3000';
+  return DEFAULT_RENDER_URL;
 }
 
 export const BASE_URL = getDefaultBaseUrl();
