@@ -25,6 +25,18 @@ app.use('/api',           menuSalesRoutes);  // /api/menu and /api/sales
 app.use('/api',           organizationRoutes); // /api/locations and /api/users
 
 // ─── Health check ───────────────────────────────────────────────────────────
+app.get('/', (req, res) => {
+  res.json({
+    service: 'restaurant-management-backend',
+    status: 'ok',
+    docs: {
+      health: '/health',
+      login: '/api/auth/login',
+      profiles: '/api/auth/login-profiles',
+    },
+  });
+});
+
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
