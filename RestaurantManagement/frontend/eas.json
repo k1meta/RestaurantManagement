@@ -11,7 +11,8 @@
       },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://restaurantmanagement-zx62.onrender.com"
-      }
+      },
+      "channel": "development"
     },
     "preview": {
       "distribution": "internal",
@@ -19,20 +20,24 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://restaurantmanagement-zx62.onrender.com"
-      }
+        "EXPO_PUBLIC_API_URL": "https://restaurantmanagement-zx62.onrender.com",
+        "NPM_CONFIG_OMIT": "dev"
+      },
+      "channel": "preview"
     },
     "production": {
       "env": {
         "EXPO_PUBLIC_API_URL": "https://restaurantmanagement-zx62.onrender.com"
-      }
+      },
+      "channel": "production"
     },
     "production-apk": {
       "extends": "production",
       "distribution": "internal",
       "android": {
         "buildType": "apk"
-      }
+      },
+      "channel": "production-apk"
     }
   },
   "submit": {

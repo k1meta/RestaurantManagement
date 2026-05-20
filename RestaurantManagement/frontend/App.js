@@ -5,21 +5,22 @@ import { ActivityIndicator, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { useFonts, SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
+import { WorkSans_400Regular, WorkSans_600SemiBold } from '@expo-google-fonts/work-sans';
 
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import AppErrorBoundary from './src/components/AppErrorBoundary';
+import { colors } from './src/theme/kinetic';
 
-// Screens
-import LoginScreen    from './src/screens/LoginScreen';
-import WaiterScreen   from './src/screens/WaiterScreen';
+import LoginScreen from './src/screens/LoginScreen';
+import WaiterScreen from './src/screens/WaiterScreen';
 import NewOrderScreen from './src/screens/NewOrderScreen';
-import KitchenScreen  from './src/screens/KitchenScreen';
-import ManagerScreen  from './src/screens/ManagerScreen';
-import OwnerScreen    from './src/screens/OwnerScreen';
+import KitchenScreen from './src/screens/KitchenScreen';
+import ManagerScreen from './src/screens/ManagerScreen';
+import OwnerScreen from './src/screens/OwnerScreen';
 
 const Stack = createNativeStackNavigator();
 
-// ─── Unauthenticated navigator ───────────────────────────────────────────────
 function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -28,34 +29,43 @@ function AuthStack() {
   );
 }
 
-// ─── Waiter navigator (includes New Order sub-screen) ───────────────────────
 function WaiterStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="WaiterHome" component={WaiterScreen} />
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: colors.surface },
+        headerTintColor: colors.primary,
+        headerTitleStyle: {
+          fontFamily: 'SpaceGrotesk_700Bold',
+          fontWeight: '700',
+          textTransform: 'uppercase',
+          letterSpacing: -0.3,
+        },
+        headerShadowVisible: false,
+        contentStyle: { backgroundColor: colors.surface },
+      }}
+    >
+      <Stack.Screen name="WaiterHome" component={WaiterScreen} options={{ headerShown: false }} />
       <Stack.Screen
         name="NewOrder"
         component={NewOrderScreen}
         options={{
           headerShown: true,
-          headerTitle: 'New Order',
-          headerStyle:      { backgroundColor: '#16213e' },
-          headerTintColor:  '#fff',
-          headerTitleStyle: { fontWeight: 'bold' },
+          title: 'New Order',
+          headerBackTitle: 'Back',
         }}
       />
     </Stack.Navigator>
   );
 }
 
-// ─── Role router — picks the right navigator based on the logged-in role ─────
 function RoleRouter() {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', backgroundColor: '#1a1a2e' }}>
-        <ActivityIndicator color="#e94560" size="large" />
+      <View style={{ flex: 1, justifyContent: 'center', backgroundColor: colors.surface }}>
+        <ActivityIndicator color={colors.primary} size="large" />
       </View>
     );
   }
@@ -63,28 +73,46 @@ function RoleRouter() {
   if (!user) return <AuthStack />;
 
   switch (user.role) {
-    case 'waiter':  return <WaiterStack />;
-    case 'kitchen': return (
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Kitchen" component={KitchenScreen} />
-      </Stack.Navigator>
-    );
-    case 'manager': return (
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Manager" component={ManagerScreen} />
-      </Stack.Navigator>
-    );
-    case 'owner': return (
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Owner" component={OwnerScreen} />
-      </Stack.Navigator>
-    );
-    default: return <AuthStack />;
+    case 'waiter':
+      return <WaiterStack />;
+    case 'kitchen':
+      return (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Kitchen" component={KitchenScreen} />
+        </Stack.Navigator>
+      );
+    case 'manager':
+      return (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Manager" component={ManagerScreen} />
+        </Stack.Navigator>
+      );
+    case 'owner':
+      return (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Owner" component={OwnerScreen} />
+        </Stack.Navigator>
+      );
+    default:
+      return <AuthStack />;
   }
 }
 
-// ─── Root app ────────────────────────────────────────────────────────────────
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    SpaceGrotesk_700Bold,
+    WorkSans_400Regular,
+    WorkSans_600SemiBold,
+  });
+
+  if (!fontsLoaded) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', backgroundColor: colors.surface }}>
+        <ActivityIndicator color={colors.primary} size="large" />
+      </View>
+    );
+  }
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
@@ -92,7 +120,7 @@ export default function App() {
           <AuthProvider>
             <NavigationContainer>
               <RoleRouter />
-              <StatusBar style="light" />
+              <StatusBar style="dark" />
             </NavigationContainer>
           </AuthProvider>
         </AppErrorBoundary>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Restaurant Management - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-surface": "#1c1b1b",
+              "background": "#fcf9f8",
+              "secondary": "#1b6d24",
+              "surface-bright": "#fcf9f8",
+              "on-secondary-fixed-variant": "#005312",
+              "on-secondary-fixed": "#002204",
+              "on-error-container": "#93000a",
+              "surface-container": "#f0edec",
+              "on-secondary-container": "#217128",
+              "inverse-primary": "#c8c6c5",
+              "surface-variant": "#e5e2e1",
+              "secondary-fixed-dim": "#88d982",
+              "primary-fixed-dim": "#c8c6c5",
+              "on-primary-fixed": "#1c1b1b",
+              "inverse-surface": "#313030",
+              "surface-container-low": "#f6f3f2",
+              "primary-container": "#1c1b1b",
+              "tertiary-container": "#331200",
+              "on-tertiary-fixed-variant": "#773200",
+              "on-surface-variant": "#444748",
+              "primary": "#000000",
+              "on-tertiary-container": "#d76100",
+              "surface": "#fcf9f8",
+              "outline-variant": "#c4c7c7",
+              "on-secondary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "on-error": "#ffffff",
+              "inverse-on-surface": "#f3f0ef",
+              "on-tertiary": "#ffffff",
+              "surface-container-high": "#ebe7e7",
+              "outline": "#747878",
+              "secondary-fixed": "#a3f69c",
+              "error": "#ba1a1a",
+              "surface-tint": "#5f5e5e",
+              "on-primary-fixed-variant": "#474646",
+              "error-container": "#ffdad6",
+              "on-primary": "#ffffff",
+              "surface-dim": "#dcd9d9",
+              "tertiary-fixed": "#ffdbca",
+              "secondary-container": "#a0f399",
+              "tertiary": "#000000",
+              "surface-container-highest": "#e5e2e1",
+              "tertiary-fixed-dim": "#ffb68f",
+              "on-tertiary-fixed": "#331200",
+              "on-primary-container": "#858383",
+              "on-background": "#1c1b1b",
+              "primary-fixed": "#e5e2e1"
+            },
+            borderRadius: {
+              "DEFAULT": "0.125rem",
+              "lg": "0.25rem",
+              "xl": "0.5rem",
+              "full": "0.75rem"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk", "sans-serif"],
+              "display": ["Space Grotesk", "sans-serif"],
+              "body": ["Work Sans", "sans-serif"],
+              "label": ["Work Sans", "sans-serif"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="h-full bg-surface text-on-surface font-body antialiased flex flex-col items-center justify-center p-6 md:p-12">
+<main class="w-full max-w-md flex flex-col gap-10">
+<!-- Header Section -->
+<header class="flex flex-col gap-2">
+<h1 class="font-display text-4xl font-bold tracking-tighter uppercase leading-tight text-primary">
+                Restaurant<br/>Management
+            </h1>
+<p class="font-body text-on-surface-variant font-medium text-sm uppercase tracking-widest">
+                The Kinetic Editorial
+            </p>
+</header>
+<!-- Login Form -->
+<form class="flex flex-col gap-6" onsubmit="event.preventDefault();">
+<div class="flex flex-col gap-5">
+<!-- Email Input -->
+<div class="relative">
+<label class="sr-only" for="email">Email Address</label>
+<input class="w-full bg-surface-container-high text-on-surface font-body p-4 rounded focus:bg-surface-container-highest focus:ring-2 focus:ring-primary focus:outline-none placeholder-on-surface-variant border-none transition-colors" id="email" name="email" placeholder="Email Address" required="" type="email"/>
+</div>
+<!-- Password Input -->
+<div class="relative">
+<label class="sr-only" for="password">Password</label>
+<input class="w-full bg-surface-container-high text-on-surface font-body p-4 rounded focus:bg-surface-container-highest focus:ring-2 focus:ring-primary focus:outline-none placeholder-on-surface-variant border-none transition-colors" id="password" name="password" placeholder="PIN / Password" required="" type="password"/>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary font-headline font-bold text-lg p-4 rounded hover:bg-primary-container active:scale-95 transition-all duration-75 uppercase tracking-wide" type="submit">
+                Sign In
+            </button>
+</form>
+<!-- Quick Staff Login -->
+<section class="flex flex-col gap-4 pt-6 mt-2 border-t-[1px] border-outline-variant/15">
+<h2 class="font-label text-sm uppercase font-semibold text-on-surface-variant tracking-wider">
+                Quick Staff Login
+            </h2>
+<div class="flex flex-col gap-3">
+<!-- Staff Profile Card 1 -->
+<button class="flex items-center gap-4 p-4 bg-surface-container-low hover:bg-surface-container-highest rounded active:scale-95 transition-all duration-75 text-left w-full group">
+<div class="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center shrink-0 overflow-hidden group-hover:bg-primary transition-colors">
+<img alt="Julian D." class="w-full h-full object-cover" data-alt="A close-up portrait of a professional chef in a stark white chef's coat, standing in a brightly lit modern commercial kitchen. The lighting is high-key and crisp, emphasizing a pristine, sterile environment with subtle stainless steel reflections. The mood is intense and focused, utilizing a high-contrast palette of bright whites, deep charcoal shadows, and minimal warm accents. This image perfectly aligns with a high-end, clean light-mode UI aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAE323UzJ_yfomTZlYsDI5ltUqP8_5io2vJyaFAyHkwpue2SSnnNcjwISKjEv0EANrBTiJZGWEM49cdPiKlRPz3DobR4T1kVMxZFA9Dbi6UV7MzEn2lk9494snOV83rrnOTbVZaEolr9Nyu-ZCg8w4yshPx35Zepf16VEiW0WJPQuta4Re3Tu9Yv-SOFGtztZ6_4T_oZMwS81a_9WGreTa6DxRnHf4jnu-02pSTionSm899wT_IEeMWjTYZfu4XR6LGu7JWDvnsZM0"/>
+</div>
+<div class="flex flex-col">
+<span class="font-headline font-bold text-lg text-primary">Julian D.</span>
+<span class="font-body text-sm text-on-surface-variant">Head Chef</span>
+</div>
+<span class="material-symbols-outlined ml-auto text-on-surface-variant group-hover:text-primary transition-colors">chevron_right</span>
+</button>
+<!-- Staff Profile Card 2 -->
+<button class="flex items-center gap-4 p-4 bg-surface-container-low hover:bg-surface-container-highest rounded active:scale-95 transition-all duration-75 text-left w-full group">
+<div class="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center shrink-0 overflow-hidden group-hover:bg-primary transition-colors">
+<img alt="Marta L." class="w-full h-full object-cover" data-alt="A portrait of a confident female restaurant floor lead in a dark charcoal uniform, standing in a brightly illuminated dining area. The background is a slightly blurred, modern minimalist restaurant interior with white walls and dark furniture. The lighting is bright and even, creating a clean, high-contrast look that highlights professional efficiency. The color palette focuses on crisp whites, deep blacks, and natural skin tones, fitting seamlessly into a stark light-mode design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOHhx6YxKRJSRmWb6-UBaDdovBvDLgGBJ_pqTC4JCUfZQaF7rR3lBgkPGGsCiVdf-8TsoA4OkBPIX7iO9Ke-rKVkxQomUuhTPs5dWXhnnldoEuM0kZh98zSIem-_OvKkRJ3N0MCcf87AdxPPEbt213Xbe_y9ZYrHFizNL08GiNwxOOjvG_s2-AMQUvc2ggGlnXD2xeJ-pPI89MsIJ4WHzpoxIQ5QODJmHGYtUczc26x5Gz0QIMJiysakEmFOyfPM9j7a5E4rzoWuU"/>
+</div>
+<div class="flex flex-col">
+<span class="font-headline font-bold text-lg text-primary">Marta L.</span>
+<span class="font-body text-sm text-on-surface-variant">Floor Lead</span>
+</div>
+<span class="material-symbols-outlined ml-auto text-on-surface-variant group-hover:text-primary transition-colors">chevron_right</span>
+</button>
+</div>
+</section>
+</main>
+</body></html>
