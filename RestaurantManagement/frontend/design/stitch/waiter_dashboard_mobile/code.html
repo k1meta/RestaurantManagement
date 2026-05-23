@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Waiter Dashboard - KINETIC</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&amp;family=Work+Sans:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-high": "#ebe7e7",
+                      "on-tertiary-fixed": "#331200",
+                      "on-error": "#ffffff",
+                      "surface-container-highest": "#e5e2e1",
+                      "on-secondary-fixed-variant": "#005312",
+                      "error": "#ba1a1a",
+                      "tertiary-fixed-dim": "#ffb68f",
+                      "primary-fixed-dim": "#c8c6c5",
+                      "on-error-container": "#93000a",
+                      "on-primary-fixed": "#1c1b1b",
+                      "secondary": "#1b6d24",
+                      "on-secondary-container": "#217128",
+                      "primary-container": "#1c1b1b",
+                      "surface-container": "#f0edec",
+                      "inverse-on-surface": "#f3f0ef",
+                      "tertiary-fixed": "#ffdbca",
+                      "on-secondary": "#ffffff",
+                      "inverse-primary": "#c8c6c5",
+                      "on-secondary-fixed": "#002204",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary-container": "#331200",
+                      "on-tertiary": "#ffffff",
+                      "primary-fixed": "#e5e2e1",
+                      "surface-variant": "#e5e2e1",
+                      "on-tertiary-container": "#d76100",
+                      "primary": "#000000",
+                      "outline-variant": "#c4c7c7",
+                      "inverse-surface": "#313030",
+                      "error-container": "#ffdad6",
+                      "background": "#fcf9f8",
+                      "on-background": "#1c1b1b",
+                      "surface-tint": "#5f5e5e",
+                      "on-primary-fixed-variant": "#474646",
+                      "surface-bright": "#fcf9f8",
+                      "secondary-container": "#a0f399",
+                      "outline": "#747878",
+                      "on-primary-container": "#858383",
+                      "secondary-fixed": "#a3f69c",
+                      "surface-dim": "#dcd9d9",
+                      "surface-container-low": "#f6f3f2",
+                      "surface": "#fcf9f8",
+                      "on-tertiary-fixed-variant": "#773200",
+                      "on-primary": "#ffffff",
+                      "tertiary": "#000000",
+                      "secondary-fixed-dim": "#88d982",
+                      "on-surface": "#1c1b1b",
+                      "on-surface-variant": "#444748"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {},
+              "fontFamily": {
+                      "headline": [
+                              "Space Grotesk"
+                      ],
+                      "display": [
+                              "Space Grotesk"
+                      ],
+                      "body": [
+                              "Work Sans"
+                      ],
+                      "label": [
+                              "Work Sans"
+                      ]
+              },
+              "fontSize": {}
+      },
+          },
+        }
+      </script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; }
+        .font-headline, .font-display { font-family: 'Space Grotesk', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+      </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-24 md:pb-0 flex flex-col md:flex-row">
+<!-- Mobile Top App Bar (Hidden on md) -->
+<header class="md:hidden sticky top-0 z-40 bg-surface dark:bg-surface flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-4">
+<!-- Avatar -->
+<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBh687ttFKrdGRhcKLbpJ5p9A51DUVVeeT_JzPVrhnKuKtcdyZ-ZKNfgHk6jvGf9H4xzueTGK1goYh6R-407NrdcHpC74xvp1MhAa_YtVO17cdEwTwsew4SZayOdTSduoWmB_u0tAHBQjKynAjFWmWEg8epeyplq4QZ6JHC1bkqQwUfeRndXI6uCwwAaiPAqHrRiUcW7IWNec1H8K-OMXkjHaMJOLzh04EC1wao6PHoAYVtHkwRm9bFGqR5OLGscFsVFIs_BdgYRK0"/>
+</div>
+<h1 class="font-headline font-black text-2xl tracking-tighter text-primary dark:text-primary-fixed uppercase">KINETIC</h1>
+</div>
+<button class="text-primary dark:text-primary-fixed hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors p-2 rounded-full active:opacity-80 transition-all">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</header>
+<!-- Side Nav (Hidden on mobile) -->
+<aside class="hidden md:flex flex-col w-64 bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container h-screen sticky top-0 p-6">
+<div class="mb-12">
+<h1 class="font-headline font-black text-3xl tracking-tighter text-primary dark:text-on-primary-container uppercase">KINETIC</h1>
+<p class="font-label text-xs uppercase tracking-widest opacity-70 mt-1">Downtown Central</p>
+</div>
+<nav class="flex-1 flex flex-col gap-4">
+<a class="flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-lg px-4 py-3 font-label font-bold uppercase tracking-widest text-[12px] transition-opacity hover:opacity-100 active:scale-95 duration-100" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+                Orders
+            </a>
+<a class="flex items-center gap-3 text-surface-container-highest opacity-70 px-4 py-3 font-label font-bold uppercase tracking-widest text-[12px] transition-opacity hover:opacity-100 active:scale-95 duration-100" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+                Table Map
+            </a>
+<a class="flex items-center gap-3 text-surface-container-highest opacity-70 px-4 py-3 font-label font-bold uppercase tracking-widest text-[12px] transition-opacity hover:opacity-100 active:scale-95 duration-100" href="#">
+<span class="material-symbols-outlined">notifications</span>
+                Alerts
+            </a>
+<a class="flex items-center gap-3 text-surface-container-highest opacity-70 px-4 py-3 font-label font-bold uppercase tracking-widest text-[12px] transition-opacity hover:opacity-100 active:scale-95 duration-100" href="#">
+<span class="material-symbols-outlined">restaurant_menu</span>
+                Menu
+            </a>
+</nav>
+<div class="mt-auto flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5gEZL4XdOaiqQotjaTDyGfSyIdw8u50C6QNMvHoisYjkTw36p6adgqLAzcjVe8OWBRNzWJsZSBHESuyFwBPHfvfTtVoooErEqObAdm6PzB6BK7mGf0Iot1kNBM1pJHJnt6TFQzLddVg0ZqzuJwJRsahA7VsV2MjYctGYhBVfYy6xGXidu3abzAhECmBmgMp8YVrKet27n5oyD482q_j0HfanfuuGIEG23ieEW0dDoJ9yxPa_yxhdVe93o4hf2XyYKuke6mFOV4C0"/>
+</div>
+<div>
+<p class="font-label text-sm font-bold">Chef Marco</p>
+<p class="font-label text-xs opacity-70">Station 1</p>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col p-4 md:p-8 overflow-y-auto">
+<!-- Header Info -->
+<div class="mb-8 hidden md:block">
+<h2 class="font-headline font-bold text-4xl uppercase tracking-tighter text-primary">Active Shift</h2>
+<p class="font-label text-on-surface-variant uppercase tracking-widest text-sm mt-1">Downtown Central • Line 1</p>
+</div>
+<!-- Top Metrics -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+<div class="bg-surface-container-low p-5 flex flex-col gap-2">
+<span class="font-label uppercase tracking-widest text-xs text-on-surface-variant">Active Tickets</span>
+<span class="font-headline font-black text-3xl text-primary">14</span>
+</div>
+<div class="bg-secondary p-5 flex flex-col gap-2 text-on-primary">
+<span class="font-label uppercase tracking-widest text-xs opacity-80">Ready to Serve</span>
+<span class="font-headline font-black text-3xl">03</span>
+</div>
+<div class="bg-surface-container-low p-5 flex flex-col gap-2">
+<span class="font-label uppercase tracking-widest text-xs text-on-surface-variant">Avg Wait Time</span>
+<span class="font-headline font-black text-3xl text-primary">12m</span>
+</div>
+<div class="bg-tertiary-fixed p-5 flex flex-col gap-2 text-on-tertiary-container">
+<span class="font-label uppercase tracking-widest text-xs opacity-80">Pending Bar</span>
+<span class="font-headline font-black text-3xl">05</span>
+</div>
+</section>
+<!-- Ready to Serve List (Horizontal Scroll) -->
+<section class="mb-10">
+<h3 class="font-headline font-bold text-xl uppercase tracking-tighter mb-4 text-primary">Priority Pickups</h3>
+<div class="flex overflow-x-auto gap-4 pb-4 -mx-4 px-4 md:mx-0 md:px-0 hide-scrollbar">
+<!-- Pickup Card 1 -->
+<div class="min-w-[280px] bg-surface-container-highest p-5 flex flex-col border-l-4 border-secondary relative group">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="font-headline font-black text-2xl text-primary block leading-none">T-12</span>
+<span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Dining Room</span>
+</div>
+<span class="bg-secondary-container text-on-secondary-container px-2 py-1 text-xs font-bold font-label uppercase tracking-wider rounded-sm">READY</span>
+</div>
+<ul class="font-body text-sm text-on-surface space-y-1 mb-6 flex-1">
+<li>2x Ribeye Steak (MR)</li>
+<li>1x House Salad</li>
+<li>1x Truffle Fries</li>
+</ul>
+<button class="w-full bg-primary text-on-primary font-label font-bold uppercase tracking-widest py-3 rounded text-sm hover:bg-surface-tint transition-colors">
+                        SERVE
+                    </button>
+</div>
+<!-- Pickup Card 2 -->
+<div class="min-w-[280px] bg-surface-container-highest p-5 flex flex-col border-l-4 border-secondary relative">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="font-headline font-black text-2xl text-primary block leading-none">B-04</span>
+<span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Bar Area</span>
+</div>
+<span class="bg-secondary-container text-on-secondary-container px-2 py-1 text-xs font-bold font-label uppercase tracking-wider rounded-sm">READY</span>
+</div>
+<ul class="font-body text-sm text-on-surface space-y-1 mb-6 flex-1">
+<li>3x Craft IPA</li>
+<li>1x Spicy Wings</li>
+</ul>
+<button class="w-full bg-primary text-on-primary font-label font-bold uppercase tracking-widest py-3 rounded text-sm hover:bg-surface-tint transition-colors">
+                        SERVE
+                    </button>
+</div>
+<!-- Pickup Card 3 -->
+<div class="min-w-[280px] bg-surface-container-highest p-5 flex flex-col border-l-4 border-secondary relative">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="font-headline font-black text-2xl text-primary block leading-none">T-08</span>
+<span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Patio</span>
+</div>
+<span class="bg-secondary-container text-on-secondary-container px-2 py-1 text-xs font-bold font-label uppercase tracking-wider rounded-sm">READY</span>
+</div>
+<ul class="font-body text-sm text-on-surface space-y-1 mb-6 flex-1">
+<li>1x Vegan Burger</li>
+<li>1x Sweet Potato Fries</li>
+</ul>
+<button class="w-full bg-primary text-on-primary font-label font-bold uppercase tracking-widest py-3 rounded text-sm hover:bg-surface-tint transition-colors">
+                        SERVE
+                    </button>
+</div>
+</div>
+</section>
+<!-- Active Tables Grid -->
+<section class="flex-1">
+<div class="flex justify-between items-end mb-6">
+<h3 class="font-headline font-bold text-xl uppercase tracking-tighter text-primary">Floor Map Overview</h3>
+<span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Sorted by Wait Time</span>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
+<!-- Table Card - Alert -->
+<div class="bg-surface-container-low p-4 flex flex-col border-l-4 border-tertiary-fixed cursor-pointer hover:bg-surface-container-highest transition-colors">
+<div class="flex justify-between items-start mb-6">
+<span class="font-headline font-black text-4xl text-primary leading-none">05</span>
+<span class="font-label font-bold text-tertiary-container text-sm">18m</span>
+</div>
+<div class="mt-auto">
+<p class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-1">Status</p>
+<p class="font-headline font-bold text-tertiary-container text-sm">PENDING KITCHEN</p>
+<p class="font-body text-xs text-on-surface-variant mt-2">4 Items • $124</p>
+</div>
+</div>
+<!-- Table Card - Preparing -->
+<div class="bg-surface-container-low p-4 flex flex-col border-l-4 border-primary cursor-pointer hover:bg-surface-container-highest transition-colors">
+<div class="flex justify-between items-start mb-6">
+<span class="font-headline font-black text-4xl text-primary leading-none">12</span>
+<span class="font-label font-bold text-primary text-sm">8m</span>
+</div>
+<div class="mt-auto">
+<p class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-1">Status</p>
+<p class="font-headline font-bold text-primary text-sm">PREPARING</p>
+<p class="font-body text-xs text-on-surface-variant mt-2">6 Items • $85</p>
+</div>
+</div>
+<!-- Table Card - Preparing -->
+<div class="bg-surface-container-low p-4 flex flex-col border-l-4 border-primary cursor-pointer hover:bg-surface-container-highest transition-colors">
+<div class="flex justify-between items-start mb-6">
+<span class="font-headline font-black text-4xl text-primary leading-none">B2</span>
+<span class="font-label font-bold text-primary text-sm">5m</span>
+</div>
+<div class="mt-auto">
+<p class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-1">Status</p>
+<p class="font-headline font-bold text-primary text-sm">PREPARING BAR</p>
+<p class="font-body text-xs text-on-surface-variant mt-2">2 Items • $32</p>
+</div>
+</div>
+<!-- Table Card - Empty -->
+<div class="bg-surface-container-lowest p-4 flex flex-col border border-outline-variant/30 cursor-pointer hover:bg-surface-container-low transition-colors justify-center items-center h-[160px]">
+<span class="material-symbols-outlined text-outline text-3xl mb-2">add</span>
+<span class="font-label text-xs uppercase tracking-widest text-outline">Seat Table</span>
+</div>
+<!-- Table Card - Empty -->
+<div class="bg-surface-container-lowest p-4 flex flex-col border border-outline-variant/30 cursor-pointer hover:bg-surface-container-low transition-colors justify-center items-center h-[160px]">
+<span class="font-headline font-bold text-2xl text-outline mb-2">09</span>
+<span class="font-label text-xs uppercase tracking-widest text-outline">Open</span>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB for New Order -->
+<button class="fixed bottom-24 right-6 md:bottom-8 md:right-8 w-16 h-16 bg-primary text-on-primary rounded-full shadow-[0_20px_40px_rgba(28,27,27,0.2)] flex items-center justify-center hover:scale-105 active:scale-95 transition-transform z-40 bg-gradient-to-br from-primary to-primary-container">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">add</span>
+</button>
+<!-- Mobile Bottom Nav Bar (Hidden on md) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 bg-primary dark:bg-primary-container h-20">
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-lg px-6 py-2 transition-opacity hover:opacity-100 active:scale-95 duration-100" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-label font-bold uppercase tracking-widest text-[10px] mt-1">Orders</span>
+</a>
+<a class="flex flex-col items-center justify-center text-surface-container-highest opacity-70 px-6 py-2 transition-opacity hover:opacity-100 active:scale-95 duration-100" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-label font-bold uppercase tracking-widest text-[10px] mt-1">Table Map</span>
+</a>
+<a class="flex flex-col items-center justify-center text-surface-container-highest opacity-70 px-6 py-2 transition-opacity hover:opacity-100 active:scale-95 duration-100" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-label font-bold uppercase tracking-widest text-[10px] mt-1">Alerts</span>
+</a>
+<a class="flex flex-col items-center justify-center text-surface-container-highest opacity-70 px-6 py-2 transition-opacity hover:opacity-100 active:scale-95 duration-100" href="#">
+<span class="material-symbols-outlined">restaurant_menu</span>
+<span class="font-label font-bold uppercase tracking-widest text-[10px] mt-1">Menu</span>
+</a>
+</nav>
+<style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>

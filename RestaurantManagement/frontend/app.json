@@ -10,7 +10,7 @@
       "android",
       "web"
     ],
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.restaurantmanagement.app"
@@ -24,9 +24,15 @@
     "plugins": [],
     "extra": {
       "eas": {
-        "projectId": "46efc861-8f92-4988-bc91-541d9753ee25"
+        "projectId": "22a37ed8-1718-4c0d-9a2b-1c32b7ff17c9"
       }
     },
-    "owner": "tariktt"
+    "owner": "k1meta",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/22a37ed8-1718-4c0d-9a2b-1c32b7ff17c9"
+    }
   }
 }

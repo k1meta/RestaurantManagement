@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Manager Hub - Mise en Place</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Work+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#1c1b1b",
+                        "on-background": "#1c1b1b",
+                        "tertiary-fixed-dim": "#ffb68f",
+                        "surface-variant": "#e5e2e1",
+                        "secondary-container": "#a0f399",
+                        "surface-container": "#f0edec",
+                        "surface": "#fcf9f8",
+                        "inverse-on-surface": "#f3f0ef",
+                        "tertiary-container": "#331200",
+                        "secondary-fixed-dim": "#88d982",
+                        "secondary-fixed": "#a3f69c",
+                        "primary-container": "#1c1b1b",
+                        "surface-tint": "#5f5e5e",
+                        "on-tertiary-fixed-variant": "#773200",
+                        "secondary": "#1b6d24",
+                        "inverse-primary": "#c8c6c5",
+                        "primary-fixed": "#e5e2e1",
+                        "primary": "#000000",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#858383",
+                        "background": "#fcf9f8",
+                        "on-secondary-fixed": "#002204",
+                        "outline-variant": "#c4c7c7",
+                        "inverse-surface": "#313030",
+                        "tertiary": "#000000",
+                        "on-secondary-fixed-variant": "#005312",
+                        "on-tertiary-container": "#d76100",
+                        "on-surface-variant": "#444748",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#fcf9f8",
+                        "surface-container-highest": "#e5e2e1",
+                        "on-error": "#ffffff",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "surface-container-low": "#f6f3f2",
+                        "tertiary-fixed": "#ffdbca",
+                        "on-primary-fixed": "#1c1b1b",
+                        "on-tertiary-fixed": "#331200",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#dcd9d9",
+                        "on-primary-fixed-variant": "#474646",
+                        "surface-container-high": "#ebe7e7",
+                        "outline": "#747878",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#217128"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Space Grotesk", "sans-serif"],
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "body": ["Work Sans", "sans-serif"],
+                        "label": ["Work Sans", "sans-serif"]
+                    },
+                    "fontSize": {}
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body antialiased pb-24 md:hidden">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-dim text-primary dark:text-primary-fixed font-headline font-bold text-headline-sm tracking-tight fixed top-0 w-full z-50 bg-surface-container-low dark:bg-surface-container-highest flat no shadows flex justify-between items-center px-5 h-16 w-full shadow-sm">
+<button class="material-symbols-outlined text-primary dark:text-primary-fixed hover:bg-surface-container-highest transition-colors active:scale-95 transition-transform p-2 rounded">menu</button>
+<h1 class="font-headline font-black text-xl tracking-tighter text-primary dark:text-primary-fixed uppercase">MISE EN PLACE</h1>
+<button class="material-symbols-outlined text-primary dark:text-primary-fixed hover:bg-surface-container-highest transition-colors active:scale-95 transition-transform p-2 rounded">account_circle</button>
+</header>
+<main class="pt-20 px-5 space-y-8">
+<!-- Alerts Section -->
+<section class="space-y-4">
+<h2 class="font-headline text-lg font-bold text-primary uppercase border-b-2 border-primary pb-1">Critical</h2>
+<div class="bg-tertiary-fixed text-on-tertiary-fixed-variant p-4 rounded-DEFAULT space-y-2 border border-tertiary-container/20">
+<div class="flex items-start justify-between">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">warning</span>
+<h3 class="font-headline font-semibold">Low Inventory Alert</h3>
+</div>
+<span class="font-label text-xs uppercase font-bold tracking-wider">Refill Immediate</span>
+</div>
+<p class="font-body text-sm">Wagyu Striploin (8 oz) is at critical level (12%). Replenish before dinner service.</p>
+<button class="mt-2 bg-primary text-on-primary font-headline text-sm py-2 px-4 rounded-DEFAULT w-full active:scale-95 transition-transform">Restock Request</button>
+</div>
+</section>
+<!-- Staff on Shift Section -->
+<section class="space-y-4">
+<h2 class="font-headline text-lg font-bold text-primary uppercase border-b-2 border-primary pb-1">Staff on Shift</h2>
+<div class="bg-surface-container-low p-4 rounded-DEFAULT space-y-4">
+<div class="flex items-center justify-between border-b border-outline-variant/30 pb-3 last:border-0 last:pb-0">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center font-headline font-bold text-primary">M</div>
+<div>
+<h4 class="font-headline font-semibold text-primary">Marcus</h4>
+<p class="font-label text-xs text-on-surface-variant uppercase">Head Chef</p>
+</div>
+</div>
+<span class="inline-flex items-center px-2 py-1 rounded-sm text-xs font-medium bg-secondary text-on-secondary font-label uppercase">On Line</span>
+</div>
+<div class="flex items-center justify-between border-b border-outline-variant/30 pb-3 last:border-0 last:pb-0">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center font-headline font-bold text-primary">E</div>
+<div>
+<h4 class="font-headline font-semibold text-primary">Elena</h4>
+<p class="font-label text-xs text-on-surface-variant uppercase">Sous Chef</p>
+</div>
+</div>
+<span class="inline-flex items-center px-2 py-1 rounded-sm text-xs font-medium bg-secondary text-on-secondary font-label uppercase">Prep</span>
+</div>
+<div class="flex items-center justify-between border-b border-outline-variant/30 pb-3 last:border-0 last:pb-0">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center font-headline font-bold text-primary">J</div>
+<div>
+<h4 class="font-headline font-semibold text-primary">Julian</h4>
+<p class="font-label text-xs text-on-surface-variant uppercase">Expediter</p>
+</div>
+</div>
+<span class="inline-flex items-center px-2 py-1 rounded-sm text-xs font-medium bg-secondary text-on-secondary font-label uppercase">Pass</span>
+</div>
+</div>
+</section>
+<!-- Inventory List Section -->
+<section class="space-y-4">
+<div class="flex justify-between items-end border-b-2 border-primary pb-1">
+<h2 class="font-headline text-lg font-bold text-primary uppercase">Inventory Count</h2>
+<button class="text-primary font-label text-xs font-bold uppercase tracking-wider active:scale-95 transition-transform flex items-center"><span class="material-symbols-outlined text-sm mr-1">history</span>Logs</button>
+</div>
+<div class="space-y-4">
+<div class="bg-surface-container-low p-4 rounded-DEFAULT">
+<div class="flex justify-between items-center mb-2">
+<h4 class="font-headline font-semibold text-primary">Wagyu Striploin (8 oz)</h4>
+<span class="font-label text-sm font-bold text-error">12%</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-2">
+<div class="bg-error h-2 rounded-full" style="width: 12%"></div>
+</div>
+<p class="font-label text-xs text-on-surface-variant mt-2 text-right">3 Units Remaining</p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-DEFAULT">
+<div class="flex justify-between items-center mb-2">
+<h4 class="font-headline font-semibold text-primary">San Marzano Pulp</h4>
+<span class="font-label text-sm font-bold text-secondary">84%</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-2">
+<div class="bg-secondary h-2 rounded-full" style="width: 84%"></div>
+</div>
+<p class="font-label text-xs text-on-surface-variant mt-2 text-right">18 Cans Remaining</p>
+</div>
+</div>
+</section>
+<!-- Menu Hub Section -->
+<section class="space-y-4 pb-4">
+<h2 class="font-headline text-lg font-bold text-primary uppercase border-b-2 border-primary pb-1">Menu Hub</h2>
+<div class="grid grid-cols-1 gap-4">
+<div class="bg-surface-container-highest p-4 rounded-DEFAULT border-l-4 border-secondary flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start">
+<h4 class="font-headline font-bold text-primary text-lg">Black Garlic Tartare</h4>
+<span class="font-headline font-medium text-on-surface-variant">$28</span>
+</div>
+<p class="font-body text-sm text-on-surface-variant mt-1 line-clamp-2">Aged beef, cured egg yolk, capers, sourdough crostini.</p>
+</div>
+<div class="flex justify-between items-center mt-4">
+<span class="inline-flex items-center px-2 py-1 rounded-sm text-xs font-medium bg-secondary-container text-on-secondary-container font-label uppercase">Available</span>
+<button class="material-symbols-outlined text-primary active:scale-95 transition-transform">edit</button>
+</div>
+</div>
+<div class="bg-surface-container-highest p-4 rounded-DEFAULT border-l-4 border-tertiary-fixed flex flex-col justify-between opacity-75">
+<div>
+<div class="flex justify-between items-start">
+<h4 class="font-headline font-bold text-primary text-lg">Seared Scallops</h4>
+<span class="font-headline font-medium text-on-surface-variant">$34</span>
+</div>
+<p class="font-body text-sm text-on-surface-variant mt-1 line-clamp-2">Parsnip purée, pancetta crisp, brown butter.</p>
+</div>
+<div class="flex justify-between items-center mt-4">
+<span class="inline-flex items-center px-2 py-1 rounded-sm text-xs font-medium bg-tertiary-fixed text-on-tertiary-fixed-variant font-label uppercase">86'd</span>
+<button class="material-symbols-outlined text-primary active:scale-95 transition-transform">edit</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container font-label font-medium text-xs uppercase tracking-widest fixed bottom-0 w-full z-50 h-20 bg-primary flat no shadows flex justify-around items-center w-full px-2 pb-2">
+<button class="flex flex-col items-center justify-center bg-surface-container-highest text-primary rounded-lg px-4 py-1 hover:opacity-100 active:bg-secondary-container transition-all">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">groups</span>
+<span>Shift</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-primary-container opacity-70 hover:opacity-100 active:bg-secondary-container transition-all px-4 py-1">
+<span class="material-symbols-outlined mb-1">priority_high</span>
+<span>Refills</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-primary-container opacity-70 hover:opacity-100 active:bg-secondary-container transition-all px-4 py-1">
+<span class="material-symbols-outlined mb-1">inventory_2</span>
+<span>Count</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-primary-container opacity-70 hover:opacity-100 active:bg-secondary-container transition-all px-4 py-1">
+<span class="material-symbols-outlined mb-1">restaurant_menu</span>
+<span>Menu</span>
+</button>
+</nav>
+</body></html>

@@ -1,0 +1,5 @@
+design/
+build/
+dist/
+node_modules/
+RestaurantManagement.local-backup/
