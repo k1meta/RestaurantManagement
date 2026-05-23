@@ -475,7 +475,7 @@ export default function OwnerDashboard({ user, onLogout }) {
             restaurant_menu
           </button>
           <h1 className="text-[#000000] dark:text-white font-['Space_Grotesk'] font-black text-2xl tracking-tight uppercase">
-            The Kinetic Editorial
+            Bread & Co
           </h1>
         </div>
         <div className="flex items-center gap-6">
@@ -798,7 +798,7 @@ export default function OwnerDashboard({ user, onLogout }) {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-2 items-end">
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-2 items-end">
               <input
                 type="text"
                 placeholder="Name"
@@ -829,19 +829,19 @@ export default function OwnerDashboard({ user, onLogout }) {
                     setNewUserLocationId('');
                   }
                 }}
-                className="md:col-span-1 px-3 py-2 bg-white border border-outline-variant/30"
+                className="md:col-span-1 px-3 py-2 pr-8 bg-white border border-outline-variant/30"
               >
                 <option value="owner">Owner</option>
                 <option value="manager">Manager</option>
                 <option value="waiter">Waiter</option>
                 <option value="kitchen">Kitchen</option>
               </select>
-              <div className="md:col-span-1 flex gap-2">
+              <div className="md:col-span-2 flex gap-2">
                 <select
                   value={newUserLocationId}
                   onChange={(e) => setNewUserLocationId(e.target.value)}
                   disabled={newUserRole === 'owner'}
-                  className="flex-1 px-2 py-2 bg-white border border-outline-variant/30 disabled:opacity-50"
+                  className="flex-1 px-2 py-2 pr-8 bg-white border border-outline-variant/30 disabled:opacity-50"
                 >
                   <option value="">Location</option>
                   {locations.map((location) => (
@@ -921,7 +921,7 @@ export default function OwnerDashboard({ user, onLogout }) {
                             },
                           }))
                         }
-                        className="px-3 py-2 bg-surface-container-low border border-outline-variant/30"
+                        className="px-3 py-2 pr-8 bg-surface-container-low border border-outline-variant/30"
                       >
                         <option value="owner">Owner</option>
                         <option value="manager">Manager</option>
@@ -941,7 +941,7 @@ export default function OwnerDashboard({ user, onLogout }) {
                           }))
                         }
                         disabled={draft.role === 'owner'}
-                        className="px-3 py-2 bg-surface-container-low border border-outline-variant/30 disabled:opacity-50"
+                        className="px-3 py-2 pr-8 bg-surface-container-low border border-outline-variant/30 disabled:opacity-50"
                       >
                         <option value="">Location</option>
                         {locations.map((location) => (

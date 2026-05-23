@@ -89,7 +89,7 @@ export default function LoginScreen() {
             <Text style={styles.title}>
               Restaurant{'\n'}Management
             </Text>
-            <Text style={styles.subtitle}>The Kinetic Editorial</Text>
+            <Text style={styles.subtitle}>Bread & Co</Text>
           </View>
 
           <View style={styles.form}>

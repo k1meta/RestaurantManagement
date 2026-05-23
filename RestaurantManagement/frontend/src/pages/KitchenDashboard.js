@@ -145,7 +145,7 @@ export default function KitchenDashboard({ user, onLogout }) {
           <span className="material-symbols-outlined text-2xl">restaurant_menu</span>
           <div className="flex flex-col">
             <h1 className="font-headline font-bold text-lg uppercase tracking-tight">
-              The Kinetic Editorial <span className="mx-1 opacity-30">/</span> Kitchen
+              Bread & Co <span className="mx-1 opacity-30">/</span> Kitchen
             </h1>
             <span className="text-[10px] font-headline font-bold uppercase tracking-[0.2em] text-on-surface-variant">
               Station A • Main Line • {user.name}

@@ -1,4 +1,4 @@
-/** Kinetic Editorial design tokens (from Google Stitch / DESIGN.md) */
+/** Bread & Co design tokens (from Google Stitch / DESIGN.md) */
 export const colors = {
   primary: '#000000',
   onPrimary: '#ffffff',

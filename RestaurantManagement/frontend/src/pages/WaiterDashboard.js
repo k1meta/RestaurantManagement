@@ -182,7 +182,7 @@ export default function WaiterDashboard({ user, onLogout }) {
             </span>
           </div>
         </div>
-        <h1 className="text-2xl font-black font-headline hidden md:block">The Kinetic Editorial</h1>
+        <h1 className="text-2xl font-black font-headline hidden md:block">Bread & Co</h1>
         <div className="flex items-center gap-4">
           <button
             onClick={() => loadData(false)}
