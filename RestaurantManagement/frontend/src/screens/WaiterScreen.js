@@ -14,6 +14,9 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { getOrders, updateOrderStatus } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import WaiterBottomNav from '../components/kinetic/WaiterBottomNav';
+import KineticHeader from '../components/kinetic/KineticHeader';
+import MetricTile from '../components/kinetic/MetricTile';
+import KineticSectionTitle from '../components/kinetic/KineticSectionTitle';
 import {
   colors,
   fonts,
@@ -22,47 +25,6 @@ import {
   tableLabel,
   statusDisplay,
 } from '../theme/kinetic';
-
-function initials(name) {
-  return String(name || '?')
-    .split(/\s+/)
-    .map((p) => p[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-}
-
-function MetricTile({ label, value, variant = 'default' }) {
-  const isReady = variant === 'ready';
-  const isAlert = variant === 'alert';
-  return (
-    <View
-      style={[
-        styles.metricTile,
-        isReady && styles.metricReady,
-        isAlert && styles.metricAlert,
-      ]}
-    >
-      <Text
-        style={[
-          styles.metricLabel,
-          (isReady || isAlert) && styles.metricLabelOnDark,
-        ]}
-      >
-        {label}
-      </Text>
-      <Text
-        style={[
-          styles.metricValue,
-          isReady && styles.metricValueOnDark,
-          isAlert && styles.metricValueAlert,
-        ]}
-      >
-        {value}
-      </Text>
-    </View>
-  );
-}
 
 function ReadyPickupCard({ order, onServe }) {
   const items = order.items || [];
@@ -201,13 +163,6 @@ export default function WaiterScreen({ navigation }) {
     }
   }
 
-  function openMenu() {
-    Alert.alert('Account', undefined, [
-      { text: 'Log out', style: 'destructive', onPress: logout },
-      { text: 'Cancel', style: 'cancel' },
-    ]);
-  }
-
   if (loading) {
     return (
       <View style={styles.loadingWrap}>
@@ -218,20 +173,12 @@ export default function WaiterScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{initials(user?.name)}</Text>
-          </View>
-          <View>
-            <Text style={styles.brand}>KINETIC</Text>
-            <Text style={styles.headerSub}>{user?.name || 'Waiter'}</Text>
-          </View>
-        </View>
-        <TouchableOpacity onPress={openMenu} style={styles.menuBtn} hitSlop={12}>
-          <MaterialIcons name="menu" size={24} color={colors.primary} />
-        </TouchableOpacity>
-      </View>
+      <KineticHeader
+        brand="KINETIC"
+        subtitle={user?.name || 'Waiter'}
+        userName={user?.name}
+        onLogout={logout}
+      />
 
       <ScrollView
         style={styles.scroll}
@@ -265,7 +212,7 @@ export default function WaiterScreen({ navigation }) {
 
         {readyOrders.length > 0 ? (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Priority Pickups</Text>
+            <KineticSectionTitle title="Priority Pickups" />
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -279,10 +226,7 @@ export default function WaiterScreen({ navigation }) {
         ) : null}
 
         <View style={styles.section}>
-          <View style={styles.sectionRow}>
-            <Text style={styles.sectionTitle}>Floor Map Overview</Text>
-            <Text style={styles.sectionHint}>Sorted by wait time</Text>
-          </View>
+          <KineticSectionTitle title="Floor Map Overview" hint="By wait time" />
           <View style={styles.floorGrid}>
             {floorOrders.map((order) => (
               <FloorTableCard
@@ -317,46 +261,6 @@ export default function WaiterScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.surface },
   loadingWrap: { flex: 1, justifyContent: 'center', backgroundColor: colors.surface },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    backgroundColor: colors.surface,
-  },
-  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.surfaceContainerHigh,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    fontFamily: fonts.label,
-    fontSize: 12,
-    fontWeight: '700',
-    color: colors.onSurface,
-  },
-  brand: {
-    fontFamily: fonts.headlineBlack,
-    fontSize: 22,
-    fontWeight: '900',
-    letterSpacing: -0.5,
-    color: colors.primary,
-    textTransform: 'uppercase',
-  },
-  headerSub: {
-    fontFamily: fonts.body,
-    fontSize: 11,
-    color: colors.onSurfaceVariant,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginTop: 2,
-  },
-  menuBtn: { padding: 8 },
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: 16, paddingBottom: 120 },
   shiftHeader: { marginTop: 8, marginBottom: 16 },
@@ -377,53 +281,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   metricsRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
-  metricTile: {
-    flex: 1,
-    backgroundColor: colors.surfaceContainerLow,
-    padding: 16,
-    borderRadius: radius.sm,
-    gap: 6,
-  },
-  metricReady: { backgroundColor: colors.secondary },
-  metricAlert: { backgroundColor: colors.tertiaryFixed },
-  metricLabel: {
-    fontFamily: fonts.label,
-    fontSize: 10,
-    textTransform: 'uppercase',
-    letterSpacing: 1.2,
-    color: colors.onSurfaceVariant,
-  },
-  metricLabelOnDark: { color: colors.onSecondary, opacity: 0.9 },
-  metricValue: {
-    fontFamily: fonts.headlineBlack,
-    fontSize: 28,
-    fontWeight: '900',
-    color: colors.primary,
-  },
-  metricValueOnDark: { color: colors.onPrimary },
-  metricValueAlert: { color: colors.onTertiaryContainer },
   section: { marginTop: 20 },
-  sectionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontFamily: fonts.headline,
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.primary,
-    textTransform: 'uppercase',
-    letterSpacing: -0.3,
-  },
-  sectionHint: {
-    fontFamily: fonts.label,
-    fontSize: 10,
-    color: colors.onSurfaceVariant,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
   pickupList: { gap: 12, paddingRight: 8 },
   pickupCard: {
     width: 280,

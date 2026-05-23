@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { getMenu, createOrder } from '../api/client';
+import KineticHeader from '../components/kinetic/KineticHeader';
 import { colors, fonts, radius } from '../theme/kinetic';
 
 export default function NewOrderScreen({ navigation }) {
@@ -83,9 +84,18 @@ export default function NewOrderScreen({ navigation }) {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <KineticHeader
+        brand="KINETIC"
+        subtitle="New ticket"
+        showAvatar={false}
+        rightElement={
+          <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={12}>
+            <MaterialIcons name="close" size={24} color={colors.primary} />
+          </TouchableOpacity>
+        }
+      />
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-        <Text style={styles.pageLabel}>New ticket</Text>
         <Text style={styles.title}>Build Order</Text>
 
         <Text style={styles.fieldLabel}>Table</Text>
@@ -172,14 +182,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.surface },
   loadingWrap: { flex: 1, justifyContent: 'center', backgroundColor: colors.surface },
   scroll: { padding: 16, paddingBottom: 120 },
-  pageLabel: {
-    fontFamily: fonts.label,
-    fontSize: 11,
-    color: colors.onSurfaceVariant,
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    marginTop: 8,
-  },
   title: {
     fontFamily: fonts.headlineBlack,
     fontSize: 28,

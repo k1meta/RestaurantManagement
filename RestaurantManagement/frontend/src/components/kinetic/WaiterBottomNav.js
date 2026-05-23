@@ -34,7 +34,7 @@ export default function WaiterBottomNav({ active = 'orders', onNewOrder }) {
             <MaterialIcons
               name={tab.icon}
               size={22}
-              color={isActive ? colors.onSecondaryContainer : colors.surfaceContainerHighest}
+              color={isActive ? colors.onPrimary : colors.onSurfaceVariant}
             />
             <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>{tab.label}</Text>
           </TouchableOpacity>
@@ -49,11 +49,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    backgroundColor: colors.primary,
+    backgroundColor: colors.surfaceContainerLow,
     paddingTop: 10,
-    paddingBottom: 8,
+    paddingBottom: 10,
     paddingHorizontal: 8,
     minHeight: 72,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(28, 27, 27, 0.06)',
   },
   tab: {
     alignItems: 'center',
@@ -64,9 +66,14 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   tabActive: {
-    backgroundColor: colors.secondaryContainer,
+    backgroundColor: colors.primary,
     opacity: 1,
     borderRadius: radius.lg,
+    shadowColor: colors.onSurface,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
   },
   tabLabel: {
     fontFamily: fonts.label,
@@ -75,9 +82,10 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginTop: 4,
-    color: colors.surfaceContainerHighest,
+    color: colors.onSurfaceVariant,
   },
   tabLabelActive: {
-    color: colors.onSecondaryContainer,
+    color: colors.onPrimary,
+    fontWeight: '700',
   },
 });

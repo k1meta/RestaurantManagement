@@ -23,7 +23,12 @@ export const colors = {
   error: '#ba1a1a',
   errorContainer: '#ffdad6',
   onErrorContainer: '#93000a',
+  tertiaryFixedDim: '#ffb68f',
+  onTertiaryFixedVariant: '#773200',
+  onSecondaryFixedVariant: '#005312',
 };
+
+export const TARGET_PREP_MINUTES = 15;
 
 export const radius = {
   sm: 2,

@@ -13,6 +13,8 @@
     "test": "react-scripts test",
     "mobile:prepare": "node scripts/ensure-mobile-watch-paths.js",
     "mobile:doctor": "npx expo-doctor",
+    "mobile:install-expo-go": "node scripts/install-expo-go-android.js",
+    "mobile:install-expo-go:apk": "node scripts/install-expo-go-android.js --apk-only",
     "start:mobile": "npm run mobile:prepare && npx expo start --clear",
     "start:mobile:android": "npm run mobile:prepare && npx expo start --clear --android",
     "start:mobile:ios": "npm run mobile:prepare && npx expo start --clear --ios",
