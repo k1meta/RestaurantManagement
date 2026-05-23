@@ -132,14 +132,12 @@ function AvailabilitySwitch({ checked, onToggle, disabled = false }) {
       aria-checked={checked}
       disabled={disabled}
       onClick={() => onToggle(!checked)}
-      className={`inline-flex h-8 w-14 items-center rounded-full p-1 transition-colors ${
-        checked ? 'bg-secondary' : 'bg-surface-container-highest'
-      } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+      className={`relative inline-flex h-8 w-14 shrink-0 items-center rounded-full p-1 transition-colors ${checked ? 'bg-secondary' : 'bg-surface-container-highest'
+        } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
     >
       <span
-        className={`h-6 w-6 rounded-full bg-white shadow-sm transition-transform ${
-          checked ? 'translate-x-6' : 'translate-x-0'
-        }`}
+        className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-sm transition-transform ${checked ? 'translate-x-6' : 'translate-x-0'
+          }`}
       />
     </button>
   );
@@ -865,7 +863,7 @@ export default function ManagerDashboard({ user, onLogout }) {
             <span className="font-black">{initials(user.name)}</span>
           </div>
           <h1 className="font-['Space_Grotesk'] font-black text-2xl tracking-tight text-[#000000] dark:text-white uppercase tracking-tighter">
-            The Kinetic Editorial
+            Bread & Co
           </h1>
         </div>
         <div className="flex items-center gap-4">
@@ -1013,7 +1011,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                           }))
                         }
                         disabled={!canManage || updatingStaffId === member.id}
-                        className="px-2 py-1 bg-surface-container-high border border-outline-variant/30 text-xs font-bold uppercase"
+                        className="px-2 py-1 pr-6 bg-surface-container-high border border-outline-variant/30 text-xs font-bold uppercase"
                       >
                         {roleDraft !== 'waiter' && roleDraft !== 'kitchen' ? (
                           <option value={roleDraft}>{roleDraft}</option>
@@ -1079,7 +1077,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                   <select
                     value={newStaffRole}
                     onChange={(e) => setNewStaffRole(e.target.value)}
-                    className="flex-1 px-3 py-2 text-sm bg-white border border-outline-variant/30"
+                    className="flex-1 px-3 py-2 pr-8 text-sm bg-white border border-outline-variant/30"
                   >
                     <option value="waiter">Waiter</option>
                     <option value="kitchen">Kitchen</option>
@@ -1140,13 +1138,12 @@ export default function ManagerDashboard({ user, onLogout }) {
                 inventoryView.map((item) => (
                   <div
                     key={item.id}
-                    className={`bg-surface-container-lowest p-5 flex flex-col gap-4 border-l-4 shadow-sm ${
-                      item.status === 'critical'
-                        ? 'border-error'
-                        : item.status === 'warning'
-                          ? 'border-[#d76100]'
-                          : 'border-secondary'
-                    }`}
+                    className={`bg-surface-container-lowest p-5 flex flex-col gap-4 border-l-4 shadow-sm ${item.status === 'critical'
+                      ? 'border-error'
+                      : item.status === 'warning'
+                        ? 'border-[#d76100]'
+                        : 'border-secondary'
+                      }`}
                   >
                     <div className="flex justify-between items-start">
                       <div>
@@ -1156,13 +1153,12 @@ export default function ManagerDashboard({ user, onLogout }) {
                         </p>
                       </div>
                       <span
-                        className={`font-black text-[10px] uppercase tracking-widest px-2 py-1 rounded ${
-                          item.status === 'critical'
-                            ? 'text-error bg-error/10'
-                            : item.status === 'warning'
-                              ? 'text-[#773200] bg-[#ffdbca]'
-                              : 'text-secondary'
-                        }`}
+                        className={`font-black text-[10px] uppercase tracking-widest px-2 py-1 rounded ${item.status === 'critical'
+                          ? 'text-error bg-error/10'
+                          : item.status === 'warning'
+                            ? 'text-[#773200] bg-[#ffdbca]'
+                            : 'text-secondary'
+                          }`}
                       >
                         {item.status === 'critical' ? 'Refill Needed' : item.status === 'warning' ? 'Low' : 'Stable'}
                       </span>
@@ -1175,13 +1171,12 @@ export default function ManagerDashboard({ user, onLogout }) {
                       </div>
                       <div className="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
                         <div
-                          className={`h-full ${
-                            item.status === 'critical'
-                              ? 'bg-error'
-                              : item.status === 'warning'
-                                ? 'bg-[#d76100]'
-                                : 'bg-secondary'
-                          }`}
+                          className={`h-full ${item.status === 'critical'
+                            ? 'bg-error'
+                            : item.status === 'warning'
+                              ? 'bg-[#d76100]'
+                              : 'bg-secondary'
+                            }`}
                           style={{ width: `${item.percent}%` }}
                         ></div>
                       </div>
@@ -1265,7 +1260,7 @@ export default function ManagerDashboard({ user, onLogout }) {
 
             <div className="bg-surface-container-lowest border border-outline-variant/20 p-4 md:p-5 mb-6 space-y-4">
               <h3 className="text-xs font-black uppercase tracking-[0.2em]">Create New Menu Item</h3>
-              <div className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
+              <div className="grid grid-cols-1 md:grid-cols-7 gap-3 items-end">
                 <div className="md:col-span-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-1 block">
                     Name
@@ -1303,17 +1298,17 @@ export default function ManagerDashboard({ user, onLogout }) {
                     placeholder="0.00"
                   />
                 </div>
-                <div>
+                <div className="md:col-span-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-1 block">
                     Availability
                   </label>
-                  <div className="h-10 px-3 bg-white border border-outline-variant/30 flex items-center justify-between">
+                  <div className="h-10 px-3 bg-white border border-outline-variant/30 flex items-center gap-3">
                     <AvailabilitySwitch
                       checked={newMenuActive}
                       onToggle={setNewMenuActive}
                     />
-                    <span className={`text-[10px] font-black uppercase tracking-widest ${newMenuActive ? 'text-secondary' : 'text-on-surface-variant'}`}>
-                      {newMenuActive ? 'Active' : 'Sold Out'}
+                    <span className={`text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${newMenuActive ? 'text-secondary' : 'text-on-surface-variant'}`}>
+                      {newMenuActive ? 'Available' : 'Sold Out'}
                     </span>
                   </div>
                 </div>
@@ -1342,11 +1337,11 @@ export default function ManagerDashboard({ user, onLogout }) {
                   </button>
                 </div>
                 {newMenuIngredients.map((entry, index) => (
-                  <div key={`new-ing-${index}`} className="grid grid-cols-1 md:grid-cols-4 gap-2">
+                  <div key={`new-ing-${index}`} className="grid grid-cols-1 md:grid-cols-12 gap-2">
                     <select
                       value={entry.ingredient_id}
                       onChange={(e) => updateMenuIngredientRow(null, index, { ingredient_id: e.target.value })}
-                      className="px-3 py-2 bg-white border border-outline-variant/30 md:col-span-2"
+                      className="px-3 py-2 bg-white border border-outline-variant/30 md:col-span-5"
                     >
                       <option value="">Select ingredient</option>
                       {ingredientsCatalog.map((ingredientOption) => (
@@ -1360,14 +1355,14 @@ export default function ManagerDashboard({ user, onLogout }) {
                       step="0.01"
                       value={entry.quantity_required}
                       onChange={(e) => updateMenuIngredientRow(null, index, { quantity_required: e.target.value })}
-                      className="px-3 py-2 bg-white border border-outline-variant/30"
+                      className="px-3 py-2 bg-white border border-outline-variant/30 md:col-span-3"
                       placeholder="Qty"
                     />
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 md:col-span-4">
                       <UnitSelect
                         value={entry.unit}
                         onChange={(v) => updateMenuIngredientRow(null, index, { unit: v })}
-                        className="flex-1 px-3 py-2 bg-white border border-outline-variant/30 text-sm"
+                        className="flex-1 px-3 py-2 pr-8 bg-white border border-outline-variant/30 text-sm"
                       />
                       <button
                         type="button"
@@ -1437,19 +1432,19 @@ export default function ManagerDashboard({ user, onLogout }) {
                         <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2">
                           Availability
                         </label>
-                        <div className="bg-surface-container-high border border-outline-variant/20 px-3 py-2 flex items-center justify-between">
+                        <div className="bg-surface-container-high border border-outline-variant/20 px-3 py-2 flex items-center justify-between gap-2 overflow-hidden h-10">
                           <AvailabilitySwitch
                             checked={Boolean(draft.active)}
                             onToggle={(nextValue) => setMenuDraft(item.id, { active: nextValue })}
                           />
-                          <span className={`text-[10px] font-black uppercase tracking-widest ${draft.active ? 'text-secondary' : 'text-on-surface-variant'}`}>
-                            {draft.active ? 'Active' : 'Sold Out'}
+                          <span className={`text-[10px] font-black uppercase tracking-widest truncate ${draft.active ? 'text-secondary' : 'text-on-surface-variant'}`}>
+                            {draft.active ? 'Available' : 'Sold Out'}
                           </span>
                         </div>
                       </div>
 
-                      <div className="sm:col-span-2 pt-2 border-t border-outline-variant/20 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="flex flex-wrap gap-2">
+                      <div className="sm:col-span-2 pt-2 border-t border-outline-variant/20 flex items-center gap-3 flex-wrap sm:flex-nowrap">
+                        <div className="flex gap-2 shrink-0">
                           <button
                             type="button"
                             onClick={() => saveMenuItem(item)}
@@ -1462,13 +1457,13 @@ export default function ManagerDashboard({ user, onLogout }) {
                             type="button"
                             onClick={() => removeMenuItemPermanently(item)}
                             disabled={removingMenuId === item.id}
-                            className="px-5 py-3 font-headline font-black uppercase text-xs tracking-widest border-2 border-error text-error hover:bg-error-container disabled:opacity-50"
+                            className="px-5 py-3 font-headline font-black uppercase text-xs tracking-widest border-2 border-error text-error hover:bg-error-container disabled:opacity-50 whitespace-nowrap"
                           >
                             {removingMenuId === item.id ? 'Removing...' : 'Remove from menu'}
                           </button>
                         </div>
-                        <span className={`text-[10px] font-black uppercase tracking-widest ${hasChanges ? 'text-[#d76100]' : 'text-secondary'}`}>
-                          {hasChanges ? 'Unsaved changes' : 'Synced'}
+                        <span className={`text-[10px] font-black uppercase tracking-widest text-right ml-auto leading-tight ${hasChanges ? 'text-[#d76100]' : 'text-secondary'}`}>
+                          {hasChanges ? <>{`Unsaved`}<br />{`changes`}</> : 'Synced'}
                         </span>
                       </div>
                       <div className="sm:col-span-2 border-t border-outline-variant/20 pt-3 space-y-2">
@@ -1485,11 +1480,11 @@ export default function ManagerDashboard({ user, onLogout }) {
                           </button>
                         </div>
                         {(draft.ingredients || []).map((entry, idx) => (
-                          <div key={`${item.id}-ingredient-${idx}`} className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                          <div key={`${item.id}-ingredient-${idx}`} className="grid grid-cols-1 sm:grid-cols-12 gap-2">
                             <select
                               value={entry.ingredient_id}
                               onChange={(e) => updateMenuIngredientRow(item.id, idx, { ingredient_id: e.target.value })}
-                              className="sm:col-span-2 px-2 py-2 bg-surface-container-high border border-outline-variant/20 text-xs"
+                              className="sm:col-span-5 px-2 py-2 bg-surface-container-high border border-outline-variant/20 text-xs"
                             >
                               <option value="">Select ingredient</option>
                               {ingredientsCatalog.map((ingredientOption) => (
@@ -1503,14 +1498,14 @@ export default function ManagerDashboard({ user, onLogout }) {
                               step="0.01"
                               value={entry.quantity_required}
                               onChange={(e) => updateMenuIngredientRow(item.id, idx, { quantity_required: e.target.value })}
-                              className="px-2 py-2 bg-surface-container-high border border-outline-variant/20 text-xs"
+                              className="sm:col-span-3 px-2 py-2 bg-surface-container-high border border-outline-variant/20 text-xs"
                               placeholder="Qty"
                             />
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 sm:col-span-4">
                               <UnitSelect
                                 value={entry.unit}
                                 onChange={(v) => updateMenuIngredientRow(item.id, idx, { unit: v })}
-                                className="flex-1 px-2 py-2 bg-surface-container-high border border-outline-variant/20 text-xs"
+                                className="flex-1 px-2 py-2 pr-8 bg-surface-container-high border border-outline-variant/20 text-xs"
                               />
                               <button
                                 type="button"
@@ -1684,9 +1679,8 @@ export default function ManagerDashboard({ user, onLogout }) {
         <button
           type="button"
           onClick={() => scrollToSection(staffSectionRef, 'team')}
-          className={`flex flex-col items-center justify-center h-full w-full transition-all active:bg-[#1b6d24] ${
-            mobileTab === 'team' ? 'bg-[#1c1b1b] text-white border-t-4 border-[#1b6d24]' : 'text-[#e5e2e1]/70 hover:bg-[#1c1b1b]'
-          }`}
+          className={`flex flex-col items-center justify-center h-full w-full transition-all active:bg-[#1b6d24] ${mobileTab === 'team' ? 'bg-[#1c1b1b] text-white border-t-4 border-[#1b6d24]' : 'text-[#e5e2e1]/70 hover:bg-[#1c1b1b]'
+            }`}
         >
           <span className="material-symbols-outlined mb-1">group</span>
           <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest">Team</span>
@@ -1694,9 +1688,8 @@ export default function ManagerDashboard({ user, onLogout }) {
         <button
           type="button"
           onClick={() => scrollToSection(inventorySectionRef, 'inventory')}
-          className={`flex flex-col items-center justify-center h-full w-full transition-all active:bg-[#1b6d24] ${
-            mobileTab === 'inventory' ? 'bg-[#1c1b1b] text-white border-t-4 border-[#1b6d24]' : 'text-[#e5e2e1]/70 hover:bg-[#1c1b1b]'
-          }`}
+          className={`flex flex-col items-center justify-center h-full w-full transition-all active:bg-[#1b6d24] ${mobileTab === 'inventory' ? 'bg-[#1c1b1b] text-white border-t-4 border-[#1b6d24]' : 'text-[#e5e2e1]/70 hover:bg-[#1c1b1b]'
+            }`}
         >
           <span className="material-symbols-outlined mb-1">inventory_2</span>
           <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest">Inventory</span>
@@ -1704,9 +1697,8 @@ export default function ManagerDashboard({ user, onLogout }) {
         <button
           type="button"
           onClick={() => scrollToSection(menuSectionRef, 'menu')}
-          className={`flex flex-col items-center justify-center h-full w-full transition-all active:bg-[#1b6d24] ${
-            mobileTab === 'menu' ? 'bg-[#1c1b1b] text-white border-t-4 border-[#1b6d24]' : 'text-[#e5e2e1]/70 hover:bg-[#1c1b1b]'
-          }`}
+          className={`flex flex-col items-center justify-center h-full w-full transition-all active:bg-[#1b6d24] ${mobileTab === 'menu' ? 'bg-[#1c1b1b] text-white border-t-4 border-[#1b6d24]' : 'text-[#e5e2e1]/70 hover:bg-[#1c1b1b]'
+            }`}
         >
           <span className="material-symbols-outlined mb-1">restaurant_menu</span>
           <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest">Menu</span>
@@ -1717,9 +1709,8 @@ export default function ManagerDashboard({ user, onLogout }) {
             setMobileTab('count');
             openInventoryModalNew();
           }}
-          className={`flex flex-col items-center justify-center h-full w-full transition-all active:bg-[#1b6d24] ${
-            mobileTab === 'count' ? 'bg-[#1c1b1b] text-white border-t-4 border-[#1b6d24]' : 'text-[#e5e2e1]/70 hover:bg-[#1c1b1b]'
-          }`}
+          className={`flex flex-col items-center justify-center h-full w-full transition-all active:bg-[#1b6d24] ${mobileTab === 'count' ? 'bg-[#1c1b1b] text-white border-t-4 border-[#1b6d24]' : 'text-[#e5e2e1]/70 hover:bg-[#1c1b1b]'
+            }`}
         >
           <span className="material-symbols-outlined mb-1">add_box</span>
           <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest">Count</span>

@@ -69,7 +69,7 @@ export default function LoginPage({ onLogin }) {
               Management
             </h1>
             <p className="text-on-surface-variant text-sm font-bold uppercase tracking-[0.2em]">
-              The Kinetic Editorial
+              Bread & Co
             </p>
           </div>
 
