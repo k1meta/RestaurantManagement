@@ -10,7 +10,6 @@ import {
   getInventory,
   getMenu,
   getOrders,
-  getSales,
   getUsers,
   patchInventoryItem,
   updateMenuItem,
@@ -149,7 +148,6 @@ export default function ManagerDashboard({ user, onLogout }) {
   const [menuItems, setMenuItems] = useState([]);
   const [staff, setStaff] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [salesSummary, setSalesSummary] = useState({ total_revenue: 0, total_orders: 0, total_items_sold: 0 });
 
   const [menuDrafts, setMenuDrafts] = useState({});
   const [savingMenuId, setSavingMenuId] = useState(null);
@@ -256,12 +254,11 @@ export default function ManagerDashboard({ user, onLogout }) {
     setError('');
 
     try {
-      const [inventoryRes, menuRes, usersRes, ordersRes, salesRes, ingredientsRes] = await Promise.all([
+      const [inventoryRes, menuRes, usersRes, ordersRes, ingredientsRes] = await Promise.all([
         getInventory(),
         getMenu({ include_inactive: true }),
         getUsers(),
         getOrders({ include_closed: false }),
-        getSales('monthly'),
         getIngredients(),
       ]);
 
@@ -274,7 +271,6 @@ export default function ManagerDashboard({ user, onLogout }) {
       const nextStaff = usersRes.data.users || [];
       setStaff(nextStaff);
       setOrders(ordersRes.data.orders || []);
-      setSalesSummary(salesRes.data.summary || { total_revenue: 0, total_orders: 0, total_items_sold: 0 });
 
       setMenuDrafts(() => {
         const next = {};
@@ -406,8 +402,8 @@ export default function ManagerDashboard({ user, onLogout }) {
     }
   }
 
-  async function applyStaffRole(member) {
-    const nextRole = staffRoleDrafts[member.id];
+  async function applyStaffRole(member, roleOverride) {
+    const nextRole = roleOverride ?? staffRoleDrafts[member.id];
     if (!nextRole || nextRole === member.role) {
       return;
     }
@@ -896,13 +892,13 @@ export default function ManagerDashboard({ user, onLogout }) {
         ) : null}
 
         <div className="lg:col-span-4 flex flex-col gap-6">
-          <section
-            className={
-              lowStock.length
-                ? 'bg-[#ffdad6] p-6 rounded-lg relative overflow-hidden border-2 border-error ring-4 ring-error/10'
-                : 'bg-surface-container-low p-6 rounded-lg relative overflow-hidden border border-outline-variant/20'
-            }
-          >
+        <section
+          className={
+            lowStock.length
+              ? 'bg-[#ffdad6] p-6 rounded-lg relative overflow-hidden border-2 border-error ring-4 ring-error/10'
+              : 'bg-surface-container-low p-6 rounded-lg relative overflow-hidden border border-outline-variant/20'
+          }
+        >
             <div className="flex justify-between items-center mb-4">
               <div
                 className={
@@ -962,9 +958,9 @@ export default function ManagerDashboard({ user, onLogout }) {
                   ? `Refill all low (${lowStock.length})`
                   : 'All Good'}
             </button>
-          </section>
+        </section>
 
-          <section ref={staffSectionRef} className="bg-surface-container-low p-6 rounded-lg">
+        <section ref={staffSectionRef} className="bg-surface-container-low p-6 rounded-lg">
             <div className="flex justify-between items-center mb-6 border-b border-outline-variant/20 pb-2">
               <h2 className="font-headline text-xs font-bold uppercase tracking-[0.2em]">Live: On Shift</h2>
               <span className="bg-secondary/10 text-secondary text-[10px] font-bold px-2 py-0.5 rounded-full">
@@ -1004,12 +1000,16 @@ export default function ManagerDashboard({ user, onLogout }) {
                     <div className="flex flex-wrap items-center gap-2">
                       <select
                         value={roleDraft}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const nextRole = e.target.value;
                           setStaffRoleDrafts((prev) => ({
                             ...prev,
-                            [member.id]: e.target.value,
-                          }))
-                        }
+                            [member.id]: nextRole,
+                          }));
+                          if (canManage && nextRole !== member.role) {
+                            applyStaffRole(member, nextRole);
+                          }
+                        }}
                         disabled={!canManage || updatingStaffId === member.id}
                         className="px-2 py-1 pr-6 bg-surface-container-high border border-outline-variant/30 text-xs font-bold uppercase"
                       >
@@ -1019,15 +1019,6 @@ export default function ManagerDashboard({ user, onLogout }) {
                         <option value="waiter">Waiter</option>
                         <option value="kitchen">Kitchen</option>
                       </select>
-
-                      <button
-                        type="button"
-                        onClick={() => applyStaffRole(member)}
-                        disabled={!canManage || roleDraft === member.role || updatingStaffId === member.id}
-                        className="px-3 py-1 text-[10px] font-black uppercase tracking-widest bg-black text-white disabled:opacity-50"
-                      >
-                        {updatingStaffId === member.id ? 'Saving...' : 'Authorize'}
-                      </button>
 
                       {canManage ? (
                         <button
@@ -1098,15 +1089,11 @@ export default function ManagerDashboard({ user, onLogout }) {
               <span>Open tickets</span>
               <span>{orders.length}</span>
             </div>
-            <div className="mt-2 w-full py-2 text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant border border-outline-variant/20 bg-white flex justify-between px-4">
-              <span>Monthly revenue</span>
-              <span>${Number(salesSummary.total_revenue || 0).toFixed(2)}</span>
-            </div>
-          </section>
+        </section>
         </div>
 
         <div className="lg:col-span-8 flex flex-col gap-6">
-          <section ref={inventorySectionRef} className="bg-surface-container-low p-6 md:p-8 rounded-lg">
+        <section ref={inventorySectionRef} className="bg-surface-container-low p-6 md:p-8 rounded-lg">
             <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-8 gap-4">
               <div>
                 <span className="font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
@@ -1239,9 +1226,9 @@ export default function ManagerDashboard({ user, onLogout }) {
                 </div>
               )}
             </div>
-          </section>
+        </section>
 
-          <section ref={menuSectionRef} className="bg-surface-container-low p-6 md:p-8 rounded-lg">
+        <section ref={menuSectionRef} className="bg-surface-container-low p-6 md:p-8 rounded-lg">
             <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-8 gap-4">
               <div>
                 <span className="font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
@@ -1376,14 +1363,17 @@ export default function ManagerDashboard({ user, onLogout }) {
                 ))}
               </div>
             </div>
+        </section>
+        </div>
 
-            <div className="grid grid-cols-1 gap-4">
-              {menuRows.map(({ item, draft, hasChanges }) => {
-                return (
-                  <div
-                    key={item.id}
-                    className="bg-surface-container-lowest p-6 border border-outline-variant/10 shadow-sm grid grid-cols-1 xl:grid-cols-2 gap-6"
-                  >
+        <section className="lg:col-span-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {menuRows.map(({ item, draft, hasChanges }) => {
+              return (
+                <div
+                  key={item.id}
+                  className="bg-surface-container-lowest p-6 border border-outline-variant/10 shadow-sm grid grid-cols-1 gap-6"
+                >
                     <div className="flex items-center gap-6">
                       <div className="w-20 h-20 bg-surface-container-high rounded overflow-hidden flex-shrink-0 flex items-center justify-center text-on-surface-variant">
                         <span className="material-symbols-outlined text-3xl">restaurant</span>
@@ -1411,7 +1401,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 xl:content-start">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="flex flex-col gap-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2">
                           Price ($)
@@ -1522,9 +1512,8 @@ export default function ManagerDashboard({ user, onLogout }) {
                   </div>
                 );
               })}
-            </div>
-          </section>
-        </div>
+          </div>
+        </section>
       </main>
 
       {showInventoryModal ? (

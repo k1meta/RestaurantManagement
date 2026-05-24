@@ -79,11 +79,6 @@ export default function OwnerScreen() {
       .slice(0, 6);
   }, [sales]);
 
-  const maxRevenue = useMemo(() => {
-    if (locationRows.length === 0) return 1;
-    return Math.max(...locationRows.map(([, d]) => d.revenue), 1);
-  }, [locationRows]);
-
   const totalRevenue = parseFloat(summary.total_revenue || 0) || sales.reduce(
     (sum, s) => sum + parseFloat(s.total_revenue || 0),
     0
@@ -103,7 +98,6 @@ export default function OwnerScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       <KineticHeader
         brand="METRIC_OS"
-        subtitle="Global command"
         userName={user?.name}
         onLogout={logout}
       />
@@ -120,10 +114,6 @@ export default function OwnerScreen() {
         }
       >
         <View style={styles.heroBlock}>
-          <View style={styles.liveRow}>
-            <View style={styles.liveDot} />
-            <Text style={styles.liveLabel}>Global command active</Text>
-          </View>
           <View style={styles.heroTitleWrap}>
             <View style={styles.heroBar} />
             <Text style={styles.heroTitle}>
@@ -169,26 +159,15 @@ export default function OwnerScreen() {
           <Text style={styles.empty}>No location data for this period</Text>
         ) : (
           locationRows.map(([loc, data]) => {
-            const pct = Math.round((data.revenue / maxRevenue) * 100);
             const isWatch = data.activeOrders > 5;
             return (
               <View
                 key={loc}
                 style={[styles.locCard, isWatch && styles.locCardWatch]}
               >
-                <View style={styles.locTop}>
-                  <Text style={styles.locName}>{loc}</Text>
-                  <MaterialIcons
-                    name={pct > 50 ? 'trending-up' : 'trending-flat'}
-                    size={22}
-                    color={isWatch ? colors.onTertiaryContainer : colors.secondary}
-                  />
-                </View>
+                <Text style={styles.locName}>{loc}</Text>
                 <Text style={styles.locRevenue}>${data.revenue.toFixed(0)}</Text>
                 <Text style={styles.locRevenueLabel}>Revenue ({period})</Text>
-                <View style={styles.locProgress}>
-                  <View style={[styles.locProgressFill, { width: `${pct}%` }]} />
-                </View>
                 <View style={styles.locFooter}>
                   <Text style={styles.locFooterLabel}>Active orders</Text>
                   <Text style={styles.locFooterValue}>{data.activeOrders}</Text>
@@ -229,21 +208,6 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   scrollContent: { paddingHorizontal: 16, paddingBottom: 32 },
   heroBlock: { marginTop: 8, marginBottom: 16 },
-  liveRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
-  liveDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: colors.secondary,
-  },
-  liveLabel: {
-    fontFamily: fonts.label,
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.secondary,
-    textTransform: 'uppercase',
-    letterSpacing: 2,
-  },
   heroTitleWrap: { flexDirection: 'row', gap: 12 },
   heroBar: { width: 6, backgroundColor: colors.primary },
   heroTitle: {
@@ -315,7 +279,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
   },
   locCardWatch: { borderLeftWidth: 4, borderLeftColor: colors.tertiaryFixedDim },
-  locTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   locName: {
     fontFamily: fonts.headlineBlack,
     fontSize: 18,
@@ -339,14 +302,6 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginTop: 2,
   },
-  locProgress: {
-    height: 8,
-    backgroundColor: colors.surfaceContainerHighest,
-    marginTop: 12,
-    borderRadius: 2,
-    overflow: 'hidden',
-  },
-  locProgressFill: { height: '100%', backgroundColor: colors.secondary },
   locFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',

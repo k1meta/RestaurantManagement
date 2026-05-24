@@ -165,17 +165,6 @@ export default function OwnerDashboard({ user, onLogout }) {
 
   const filteredOrderCount = useMemo(() => filteredOrders.length, [filteredOrders]);
 
-  const fleetHealth = useMemo(() => {
-    if (!locationPerformance.length) return 'UNKNOWN';
-    const alertCount = locationPerformance.filter((loc) => loc.health === 'alert').length;
-    if (alertCount > 0) return 'ALERT';
-
-    const watchCount = locationPerformance.filter((loc) => loc.health === 'watch').length;
-    if (watchCount > 0) return 'WATCH';
-
-    return 'NOMINAL';
-  }, [locationPerformance]);
-
   const topSellers = useMemo(() => {
     const grouped = new Map();
 
@@ -233,13 +222,6 @@ export default function OwnerDashboard({ user, onLogout }) {
       setNotice(`Focused analytics on ${locationName || 'selected location'}.`);
       return locationId;
     });
-  }
-
-  async function runDiagnostics() {
-    setError('');
-    setNotice('Running diagnostics...');
-    await loadDashboard(false);
-    setNotice('Diagnostics complete. Data feed is synchronized.');
   }
 
   function isLocationChanged(location) {
@@ -541,58 +523,29 @@ export default function OwnerDashboard({ user, onLogout }) {
           </div>
         ) : null}
 
-        <section className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <section>
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 bg-secondary rounded-full animate-pulse"></span>
-              <p className="text-secondary font-black text-xs tracking-[0.3em] uppercase font-label">
-                Global Command Active
-              </p>
-            </div>
             <h2 className="text-6xl md:text-7xl font-black tracking-tighter uppercase leading-[0.9] border-l-8 border-black pl-6">
               Owner
               <br />
               Dashboard
             </h2>
           </div>
-          <div className="grid grid-cols-2 gap-2 w-full md:w-auto">
-            <div className="bg-surface-container-low px-5 py-4 flex flex-col items-start border border-outline-variant/20">
-              <span className="text-[10px] font-bold uppercase text-on-surface-variant tracking-[0.2em] mb-1">
-                Nodes Online
-              </span>
-              <span className="text-3xl font-black font-headline">
-                {locations.length} <span className="text-on-surface-variant/30">/ {locations.length || 0}</span>
-              </span>
-            </div>
-            <div className="bg-primary px-5 py-4 flex flex-col items-start text-on-primary border border-primary">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 mb-1">Fleet Health</span>
-              <span className="text-3xl font-black font-headline flex items-center gap-3">
-                {fleetHealth}
-                <span className="material-symbols-outlined text-secondary text-2xl">verified_user</span>
-              </span>
-            </div>
-          </div>
         </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-          <div className="lg:col-span-3 bg-surface-container-low border border-outline-variant/10 p-10 flex flex-col justify-between relative overflow-hidden">
+          <div className="lg:col-span-3 lg:row-start-1 lg:row-end-3 bg-surface-container-low border border-outline-variant/10 p-10 flex flex-col justify-between relative overflow-hidden">
             <div className="relative z-10 space-y-12">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-xs font-black uppercase tracking-[0.3em] text-on-surface-variant mb-4">
-                    Total Aggregate Revenue
-                  </h3>
-                  <span className="text-7xl md:text-9xl font-black font-headline tracking-tighter block leading-none">
-                      ${Number(selectedLocationId ? filteredRevenue : salesSummary.total_revenue || 0).toFixed(2)}
-                  </span>
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-on-surface-variant mt-3">
-                    {selectedLocationName} • {selectedLocationId ? filteredOrderCount : Number(salesSummary.total_orders || 0)} orders
-                  </p>
-                </div>
-                <div className="bg-secondary text-white px-4 py-2 font-black text-sm tracking-tighter flex items-center gap-2">
-                  <span className="material-symbols-outlined font-bold">trending_up</span>
-                  {period}
-                </div>
+              <div>
+                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-on-surface-variant mb-4">
+                  Total Aggregate Revenue
+                </h3>
+                <span className="text-7xl md:text-9xl font-black font-headline tracking-tighter block leading-none">
+                    ${Number(selectedLocationId ? filteredRevenue : salesSummary.total_revenue || 0).toFixed(2)}
+                </span>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-on-surface-variant mt-3">
+                  {selectedLocationName} • {selectedLocationId ? filteredOrderCount : Number(salesSummary.total_orders || 0)} orders
+                </p>
               </div>
 
               <div className="space-y-4">
@@ -621,50 +574,53 @@ export default function OwnerDashboard({ user, onLogout }) {
             </div>
           </div>
 
-          <div className="bg-tertiary text-on-primary p-8 flex flex-col justify-between border border-tertiary relative">
-            <div className="space-y-8">
-              <h3 className="text-xs font-black uppercase tracking-[0.3em] opacity-60">System Health Node</h3>
-              <div className="space-y-6">
-                {locationPerformance.map((location) => (
-                  <button
-                    key={location.id}
-                    type="button"
-                    onClick={() => focusLocation(location.id)}
-                    className={`w-full text-left flex justify-between items-center group cursor-pointer p-1 border ${
-                      Number(selectedLocationId) === Number(location.id) ? 'border-secondary' : 'border-transparent'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`w-2 h-2 rounded-full ${
-                          location.health === 'alert'
-                            ? 'bg-error animate-pulse'
-                            : location.health === 'watch'
-                              ? 'bg-[#ffb68f]'
-                              : 'bg-secondary'
-                        }`}
-                      ></span>
-                      <span className="font-headline font-bold text-sm uppercase">{location.name}</span>
-                    </div>
-                    <span className={`text-[10px] font-black ${location.health === 'alert' ? 'text-error' : 'opacity-60'}`}>
-                      ${location.revenue.toFixed(0)}
-                    </span>
-                  </button>
-                ))}
+          <div className="lg:col-span-1 lg:row-start-2 lg:row-end-4 flex flex-col gap-4">
+            <div className="bg-surface-container-low px-5 py-4 flex flex-col items-start border border-outline-variant/20">
+              <span className="text-[10px] font-bold uppercase text-on-surface-variant tracking-[0.2em] mb-1">
+                Nodes Online
+              </span>
+              <span className="text-3xl font-black font-headline">
+                {locations.length} <span className="text-on-surface-variant/30">/ {locations.length || 0}</span>
+              </span>
+            </div>
+
+            <div className="bg-tertiary text-on-primary p-8 flex flex-col flex-1 border border-tertiary relative min-h-[280px]">
+              <div className="space-y-8">
+                <h3 className="text-xs font-black uppercase tracking-[0.3em] opacity-60">System Health Node</h3>
+                <div className="space-y-6">
+                  {locationPerformance.map((location) => (
+                    <button
+                      key={location.id}
+                      type="button"
+                      onClick={() => focusLocation(location.id)}
+                      className={`w-full text-left flex justify-between items-center group cursor-pointer p-1 border ${
+                        Number(selectedLocationId) === Number(location.id) ? 'border-secondary' : 'border-transparent'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span
+                          className={`w-2 h-2 rounded-full ${
+                            location.health === 'alert'
+                              ? 'bg-error animate-pulse'
+                              : location.health === 'watch'
+                                ? 'bg-[#ffb68f]'
+                                : 'bg-secondary'
+                          }`}
+                        ></span>
+                        <span className="font-headline font-bold text-sm uppercase">{location.name}</span>
+                      </div>
+                      <span className={`text-[10px] font-black ${location.health === 'alert' ? 'text-error' : 'opacity-60'}`}>
+                        ${location.revenue.toFixed(0)}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={runDiagnostics}
-              className="mt-8 w-full py-4 border border-on-primary/20 font-black text-[10px] uppercase tracking-[0.3em] hover:bg-on-primary hover:text-primary transition-all active:scale-[0.98]"
-            >
-              Diagnostics
-            </button>
           </div>
-        </section>
 
-        <section ref={locationsSectionRef} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {locationPerformance.map((location) => (
+          <div ref={locationsSectionRef} className="lg:col-span-3 lg:row-start-3 grid grid-cols-1 md:grid-cols-3 gap-6">
+            {locationPerformance.map((location) => (
             <button
               key={`perf-${location.id}`}
               type="button"
@@ -673,28 +629,20 @@ export default function OwnerDashboard({ user, onLogout }) {
                 Number(selectedLocationId) === Number(location.id) ? 'ring-2 ring-secondary/50' : ''
               }`}
             >
-              <div className="flex justify-between items-center">
+              <div>
                 <h4 className="text-xl font-black uppercase tracking-tighter">{location.name}</h4>
-                <span className="material-symbols-outlined text-secondary">
-                  {location.health === 'alert' ? 'trending_down' : location.health === 'watch' ? 'trending_flat' : 'trending_up'}
-                </span>
               </div>
               <div className="space-y-1">
                 <p className="text-4xl font-black font-headline tracking-tighter">${location.revenue.toFixed(2)}</p>
                 <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Revenue ({period})</p>
-              </div>
-              <div className="h-1 bg-surface-container-highest">
-                <div
-                  className={`h-full ${location.health === 'alert' ? 'bg-error' : location.health === 'watch' ? 'bg-[#d76100]' : 'bg-secondary'}`}
-                  style={{ width: `${Math.min(100, Math.max(10, location.activeOrders * 12))}%` }}
-                ></div>
               </div>
               <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
                 <span>Active Orders</span>
                 <span>{location.activeOrders}</span>
               </div>
             </button>
-          ))}
+            ))}
+          </div>
         </section>
 
         <section className="grid grid-cols-1 xl:grid-cols-2 gap-8">
