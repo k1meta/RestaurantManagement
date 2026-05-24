@@ -1,0 +1,14 @@
+{
+  "title": "Restaurant\nManagement",
+  "subtitle": "Bread & Co",
+  "emailLabel": "Email",
+  "emailPlaceholder": "Enter your email",
+  "passwordLabel": "Password",
+  "passwordPlaceholder": "Enter your password",
+  "signIn": "Sign In",
+  "signingIn": "Signing In...",
+  "staffProfiles": "Staff Profiles",
+  "clickToAutofill": "Click any to auto-fill email",
+  "loadingProfiles": "Loading profiles...",
+  "profilesError": "Could not load quick-fill profiles. You can still log in manually."
+}

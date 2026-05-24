@@ -1,21 +1,23 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createOrder, getMenu, getOrders, updateOrderStatus } from '../api/client';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const STATUS_META = {
   pending: {
-    label: 'Waiting for Food',
+    labelKey: 'statusWaiting',
     borderClass: 'border-[#d76100]',
     cardClass: 'bg-surface-container-low',
     badgeClass: 'bg-[#ffdbca] text-[#773200]',
   },
   preparing: {
-    label: 'Cooking',
+    labelKey: 'statusCooking',
     borderClass: 'border-primary',
     cardClass: 'bg-surface-container-low',
     badgeClass: 'bg-primary text-on-primary',
   },
   ready: {
-    label: 'Order Ready',
+    labelKey: 'statusReady',
     borderClass: 'border-secondary',
     cardClass: 'bg-white shadow-md',
     badgeClass: 'bg-secondary text-on-secondary',
@@ -28,11 +30,8 @@ function minutesSince(timestamp) {
   return Math.max(1, Math.round((now - started) / 60000));
 }
 
-function statusLabel(status) {
-  return STATUS_META[status]?.label || status;
-}
-
 export default function WaiterDashboard({ user, onLogout }) {
+  const { t } = useTranslation(['waiter', 'common']);
   const [orders, setOrders] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,6 +50,11 @@ export default function WaiterDashboard({ user, onLogout }) {
 
   function scrollToSection(ref) {
     ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function statusLabel(status) {
+    const key = STATUS_META[status]?.labelKey;
+    return key ? t(key) : status;
   }
 
   const loadData = useCallback(async (showSpinner = true) => {
@@ -120,7 +124,7 @@ export default function WaiterDashboard({ user, onLogout }) {
       }));
 
     if (!items.length) {
-      setError('Select at least one item to create an order');
+      setError(t('selectAtLeastOne'));
       return;
     }
 
@@ -161,7 +165,7 @@ export default function WaiterDashboard({ user, onLogout }) {
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           <p className="mt-4 text-on-surface font-headline uppercase text-sm tracking-widest">
-            Loading Waiter Dashboard
+            {t('loadingDashboard')}
           </p>
         </div>
       </div>
@@ -175,27 +179,28 @@ export default function WaiterDashboard({ user, onLogout }) {
           <span className="material-symbols-outlined text-2xl">restaurant_menu</span>
           <div className="flex flex-col">
             <span className="font-headline font-bold text-sm uppercase tracking-tight">
-              Downtown Central
+              {t('downtownCentral')}
             </span>
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant">
-              Waiter: {user.name}
+              {t('waiterLabel', { name: user.name })}
             </span>
           </div>
         </div>
-        <h1 className="text-2xl font-black font-headline hidden md:block">Bread & Co</h1>
+        <h1 className="text-2xl font-black font-headline hidden md:block">{t('common:brandName')}</h1>
         <div className="flex items-center gap-4">
+          <LanguageSwitcher />
           <button
             onClick={() => loadData(false)}
             className="text-xs font-black uppercase tracking-widest hover:text-primary transition-colors"
             disabled={refreshing}
           >
-            {refreshing ? 'Refreshing...' : 'Refresh'}
+            {refreshing ? t('common:refreshing') : t('common:refresh')}
           </button>
           <button
             onClick={onLogout}
             className="text-xs font-bold uppercase tracking-widest hover:text-primary transition-colors"
           >
-            Logout
+            {t('common:logout')}
           </button>
         </div>
       </header>
@@ -212,10 +217,10 @@ export default function WaiterDashboard({ user, onLogout }) {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
                 <h2 className="font-headline text-5xl font-black tracking-tight uppercase leading-none">
-                  Active Tables
+                  {t('activeTables')}
                 </h2>
                 <p className="font-label text-[11px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mt-2">
-                  {activeOrders.length} tickets in play • {readyOrders.length} ready to serve
+                  {t('ticketsInPlay', { active: activeOrders.length, ready: readyOrders.length })}
                 </p>
               </div>
               <button
@@ -223,17 +228,17 @@ export default function WaiterDashboard({ user, onLogout }) {
                 className="bg-primary text-on-primary px-8 py-5 font-headline font-black text-xl flex items-center justify-center gap-3 hover:bg-on-primary-fixed active:scale-[0.98] transition-all shadow-lg"
               >
                 <span className="material-symbols-outlined font-bold">add</span>
-                Create New Order
+                {t('createNewOrder')}
               </button>
             </div>
 
             <div ref={readySectionRef} className="bg-secondary-container border border-secondary/30 p-4 md:p-5 space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <h3 className="font-headline text-xl font-black uppercase tracking-tight text-on-secondary-container">
-                  Ready To Serve
+                  {t('readyToServe')}
                 </h3>
                 <span className="text-[10px] font-black uppercase tracking-widest text-on-secondary-container/70">
-                  {readyOrders.length} ready
+                  {t('readyCount', { count: readyOrders.length })}
                 </span>
               </div>
 
@@ -242,22 +247,22 @@ export default function WaiterDashboard({ user, onLogout }) {
                   {readyOrders.map((order) => (
                     <div key={`ready-${order.id}`} className="bg-white border border-secondary/40 p-3 flex items-center justify-between gap-3">
                       <div>
-                        <p className="text-xs font-black uppercase tracking-widest text-secondary">Ticket #{order.id}</p>
-                        <p className="font-headline font-black text-xl tracking-tight">Table {order.table_number || '--'}</p>
+                        <p className="text-xs font-black uppercase tracking-widest text-secondary">{t('ticket', { id: order.id })}</p>
+                        <p className="font-headline font-black text-xl tracking-tight">{t('table', { number: order.table_number || '--' })}</p>
                       </div>
                       <button
                         type="button"
                         onClick={() => handleServeOrder(order.id)}
                         className="bg-secondary text-on-secondary px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:brightness-110"
                       >
-                        Serve
+                        {t('serve')}
                       </button>
                     </div>
                   ))}
                 </div>
               ) : (
                 <p className="text-sm font-bold text-on-secondary-container/80">
-                  No tickets are currently ready.
+                  {t('noTicketsReady')}
                 </p>
               )}
             </div>
@@ -283,7 +288,7 @@ export default function WaiterDashboard({ user, onLogout }) {
                             {order.table_number || '--'}
                           </span>
                           <p className="font-label text-[10px] font-black uppercase tracking-widest text-on-surface-variant -mt-2">
-                            Table Number
+                            {t('tableNumber')}
                           </p>
                         </div>
                         <div className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 ${meta.badgeClass}`}>
@@ -294,10 +299,10 @@ export default function WaiterDashboard({ user, onLogout }) {
                       <div className="flex justify-between items-end mt-4">
                         <div className="space-y-1">
                           <p className="text-xs font-bold font-headline uppercase tracking-tight">
-                            {order.items?.length || 0} items • {minutesSince(order.created_at)} min
+                            {t('itemsAndTime', { items: order.items?.length || 0, minutes: minutesSince(order.created_at) })}
                           </p>
                           <p className="text-xs text-on-surface-variant font-bold uppercase tracking-wider">
-                            Ticket #{order.id}
+                            {t('ticket', { id: order.id })}
                           </p>
                         </div>
                         <span className="material-symbols-outlined text-on-surface-variant">chevron_right</span>
@@ -307,8 +312,8 @@ export default function WaiterDashboard({ user, onLogout }) {
                 })
               ) : (
                 <div className="md:col-span-2 bg-surface-container-low border border-outline-variant/20 p-8 text-center">
-                  <p className="font-headline font-black text-2xl uppercase mb-2">No Active Orders</p>
-                  <p className="text-sm text-on-surface-variant">Create a new order to get started.</p>
+                  <p className="font-headline font-black text-2xl uppercase mb-2">{t('noActiveOrders')}</p>
+                  <p className="text-sm text-on-surface-variant">{t('noActiveOrdersHint')}</p>
                 </div>
               )}
             </div>
@@ -319,17 +324,17 @@ export default function WaiterDashboard({ user, onLogout }) {
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <span className="font-headline text-[10px] font-black uppercase tracking-[0.3em] text-on-surface-variant">
-                    Current View
+                    {t('currentView')}
                   </span>
                   <h2 className="font-headline text-5xl font-black leading-none mt-1">
-                    TABLE {selectedOrder?.table_number || '--'}
+                    {t('tableLabel', { number: selectedOrder?.table_number || '--' })}
                   </h2>
                 </div>
               </div>
               {selectedOrder ? (
                 <div className="flex flex-wrap gap-2">
                   <span className="bg-primary text-on-primary text-[10px] font-black px-3 py-1 uppercase tracking-tighter">
-                    TICKET #{selectedOrder.id}
+                    {t('ticket', { id: selectedOrder.id }).toUpperCase()}
                   </span>
                   <span className="bg-surface-container-highest text-on-surface text-[10px] font-black px-3 py-1 uppercase tracking-tighter">
                     {statusLabel(selectedOrder.status)}
@@ -356,7 +361,7 @@ export default function WaiterDashboard({ user, onLogout }) {
                               {item.item_name}
                             </h4>
                             <p className="text-[11px] font-bold text-on-surface-variant mt-2 uppercase tracking-wide">
-                              Qty {item.quantity} • {item.category || 'general'}
+                              {t('qty', { quantity: item.quantity, category: item.category || 'general' })}
                             </p>
                           </div>
                         </div>
@@ -370,7 +375,7 @@ export default function WaiterDashboard({ user, onLogout }) {
                   {selectedOrder.notes ? (
                     <div className="mt-10 p-4 border border-outline-variant/30 bg-surface-container-low">
                       <p className="font-headline text-[10px] font-black uppercase tracking-[0.3em] mb-2 text-on-surface-variant">
-                        Notes
+                        {t('common:notes')}
                       </p>
                       <p className="text-sm font-bold">{selectedOrder.notes}</p>
                     </div>
@@ -379,9 +384,9 @@ export default function WaiterDashboard({ user, onLogout }) {
               ) : (
                 <div className="h-full flex items-center justify-center text-center">
                   <div>
-                    <p className="font-headline font-black text-2xl uppercase">No Ticket Selected</p>
+                    <p className="font-headline font-black text-2xl uppercase">{t('noTicketSelected')}</p>
                     <p className="text-sm text-on-surface-variant mt-2">
-                      Pick a table card to see details.
+                      {t('noTicketSelectedHint')}
                     </p>
                   </div>
                 </div>
@@ -391,7 +396,7 @@ export default function WaiterDashboard({ user, onLogout }) {
             <div className="p-6 bg-surface-container-low space-y-6">
               <div className="flex justify-between items-end">
                 <span className="font-headline text-[11px] font-black uppercase tracking-[0.3em] text-on-surface-variant mb-1">
-                  Total Due
+                  {t('totalDue')}
                 </span>
                 <span className="font-headline text-4xl font-black tracking-tighter leading-none">
                   ${selectedOrder?.total_amount?.toFixed(2) || '0.00'}
@@ -402,7 +407,7 @@ export default function WaiterDashboard({ user, onLogout }) {
                 onClick={() => selectedOrder && handleServeOrder(selectedOrder.id)}
                 className="w-full bg-primary text-on-primary py-5 font-headline font-black text-xl tracking-tighter uppercase flex justify-center items-center gap-4 hover:bg-black/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-xl"
               >
-                Mark Served
+                {t('markServed')}
                 <span className="material-symbols-outlined">done</span>
               </button>
             </div>
@@ -415,9 +420,9 @@ export default function WaiterDashboard({ user, onLogout }) {
           <div className="w-full max-w-3xl bg-white border border-outline-variant/20 shadow-2xl max-h-[90vh] overflow-hidden flex flex-col">
             <div className="p-6 border-b border-outline-variant/20 flex items-center justify-between">
               <div>
-                <h3 className="font-headline text-3xl font-black uppercase tracking-tight">Create New Order</h3>
+                <h3 className="font-headline text-3xl font-black uppercase tracking-tight">{t('createNewOrder')}</h3>
                 <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mt-2">
-                  Select items and send ticket to kitchen
+                  {t('selectItemsHint')}
                 </p>
               </div>
               <button
@@ -433,7 +438,7 @@ export default function WaiterDashboard({ user, onLogout }) {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-black uppercase tracking-widest mb-2 text-on-surface-variant">
-                    Table Number
+                    {t('tableNumber')}
                   </label>
                   <input
                     type="text"
@@ -445,14 +450,14 @@ export default function WaiterDashboard({ user, onLogout }) {
                 </div>
                 <div>
                   <label className="block text-xs font-black uppercase tracking-widest mb-2 text-on-surface-variant">
-                    Notes
+                    {t('common:notes')}
                   </label>
                   <input
                     type="text"
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 focus:outline-none focus:border-primary"
-                    placeholder="No onions, allergy info, etc."
+                    placeholder={t('notesPlaceholder')}
                   />
                 </div>
               </div>
@@ -500,7 +505,7 @@ export default function WaiterDashboard({ user, onLogout }) {
                 onClick={() => setShowCreateOrder(false)}
                 className="sm:flex-1 py-3 border border-outline-variant/30 font-black uppercase tracking-widest text-xs hover:bg-surface-container-low"
               >
-                Cancel
+                {t('common:cancel')}
               </button>
               <button
                 type="button"
@@ -508,7 +513,7 @@ export default function WaiterDashboard({ user, onLogout }) {
                 disabled={savingOrder}
                 className="sm:flex-1 py-3 bg-primary text-on-primary font-black uppercase tracking-widest text-xs disabled:opacity-50"
               >
-                {savingOrder ? 'Sending...' : 'Send To Kitchen'}
+                {savingOrder ? t('sending') : t('sendToKitchen')}
               </button>
             </div>
           </div>
@@ -522,7 +527,7 @@ export default function WaiterDashboard({ user, onLogout }) {
           className="flex flex-col items-center justify-center bg-[#1c1b1b] text-white rounded-none border-t-4 border-[#1b6d24] h-full w-full active:bg-[#1b6d24] transition-colors"
         >
           <span className="material-symbols-outlined">receipt_long</span>
-          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">Orders</span>
+          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">{t('orders')}</span>
         </button>
         <button
           type="button"
@@ -530,7 +535,7 @@ export default function WaiterDashboard({ user, onLogout }) {
           className="flex flex-col items-center justify-center text-[#e5e2e1]/70 h-full w-full hover:bg-[#1c1b1b] active:bg-[#1b6d24] transition-all"
         >
           <span className="material-symbols-outlined">done_all</span>
-          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">Ready</span>
+          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">{t('ready')}</span>
         </button>
         <button
           type="button"
@@ -538,15 +543,16 @@ export default function WaiterDashboard({ user, onLogout }) {
           className="flex flex-col items-center justify-center text-[#e5e2e1]/70 h-full w-full hover:bg-[#1c1b1b] active:bg-[#1b6d24] transition-all"
         >
           <span className="material-symbols-outlined">add_circle</span>
-          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">New</span>
+          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">{t('new')}</span>
         </button>
+        <LanguageSwitcher compact />
         <button
           type="button"
           onClick={onLogout}
           className="flex flex-col items-center justify-center text-[#e5e2e1]/70 h-full w-full hover:bg-[#1c1b1b] active:bg-[#1b6d24] transition-all"
         >
           <span className="material-symbols-outlined">logout</span>
-          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">Logout</span>
+          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">{t('common:logout')}</span>
         </button>
       </nav>
     </div>

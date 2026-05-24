@@ -12,6 +12,8 @@ import {
   updateLocation,
   updateUser,
 } from '../api/client';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const PERIODS = ['weekly', 'monthly', 'yearly'];
 const TARGET_MINUTES = 15;
@@ -40,6 +42,7 @@ function groupByLocation(locations, salesRows, orders) {
 }
 
 export default function OwnerDashboard({ user, onLogout }) {
+  const { t } = useTranslation(['owner', 'common']);
   const [period, setPeriod] = useState('monthly');
   const [locations, setLocations] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -438,7 +441,7 @@ export default function OwnerDashboard({ user, onLogout }) {
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           <p className="mt-4 text-on-surface font-headline uppercase text-sm tracking-widest">
-            Loading Owner Command
+            {t('loadingCommand')}
           </p>
         </div>
       </div>
@@ -457,7 +460,7 @@ export default function OwnerDashboard({ user, onLogout }) {
             restaurant_menu
           </button>
           <h1 className="text-[#000000] dark:text-white font-['Space_Grotesk'] font-black text-2xl tracking-tight uppercase">
-            Bread & Co
+            {t('common:brandName')}
           </h1>
         </div>
         <div className="flex items-center gap-6">
@@ -467,27 +470,28 @@ export default function OwnerDashboard({ user, onLogout }) {
               onClick={() => scrollToSection(analyticsSectionRef)}
               className="text-black dark:text-white font-black underline underline-offset-8 decoration-4 font-['Space_Grotesk'] uppercase tracking-tighter"
             >
-              Analytics
+              {t('analytics')}
             </button>
             <button
               type="button"
               onClick={() => scrollToSection(locationsSectionRef)}
               className="text-[#1c1b1b]/60 dark:text-[#e5e2e1]/60 font-medium font-['Space_Grotesk'] uppercase tracking-tighter hover:text-black transition-colors"
             >
-              Locations
+              {t('locations')}
             </button>
             <button
               onClick={() => loadDashboard(false)}
               className="text-[#1c1b1b]/60 dark:text-[#e5e2e1]/60 font-medium font-['Space_Grotesk'] uppercase tracking-tighter hover:text-black transition-colors"
             >
-              {refreshing ? 'Refreshing...' : 'Refresh'}
+              {refreshing ? t('common:refreshing') : t('common:refresh')}
             </button>
             <button
               onClick={onLogout}
               className="text-[#1c1b1b]/60 dark:text-[#e5e2e1]/60 font-medium font-['Space_Grotesk'] uppercase tracking-tighter hover:text-black transition-colors"
             >
-              Logout
+              {t('common:logout')}
             </button>
+            <LanguageSwitcher />
           </nav>
           <div className="w-10 h-10 bg-surface-container-highest rounded-full flex items-center justify-center overflow-hidden border border-outline-variant/20 active:scale-[0.97] transition-transform cursor-pointer">
             <span className="font-bold text-lg">{String(user.name || 'O')[0].toUpperCase()}</span>
@@ -509,7 +513,7 @@ export default function OwnerDashboard({ user, onLogout }) {
         ) : null}
         {selectedLocationId ? (
           <div className="bg-surface-container-low border border-outline-variant/30 p-3 flex flex-wrap items-center justify-between gap-3 text-xs font-bold uppercase tracking-widest">
-            <span>Location Filter: {selectedLocationName}</span>
+            <span>{t('locationFilter', { name: selectedLocationName })}</span>
             <button
               type="button"
               onClick={() => {
@@ -518,7 +522,7 @@ export default function OwnerDashboard({ user, onLogout }) {
               }}
               className="px-3 py-1 bg-black text-white hover:opacity-90"
             >
-              Clear Filter
+              {t('clearFilter')}
             </button>
           </div>
         ) : null}
@@ -526,9 +530,9 @@ export default function OwnerDashboard({ user, onLogout }) {
         <section>
           <div className="space-y-2">
             <h2 className="text-6xl md:text-7xl font-black tracking-tighter uppercase leading-[0.9] border-l-8 border-black pl-6">
-              Owner
-              <br />
-              Dashboard
+              {t('ownerDashboard').split('\n').map((line, i) => (
+                <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
+              ))}
             </h2>
           </div>
         </section>
@@ -538,20 +542,20 @@ export default function OwnerDashboard({ user, onLogout }) {
             <div className="relative z-10 space-y-12">
               <div>
                 <h3 className="text-xs font-black uppercase tracking-[0.3em] text-on-surface-variant mb-4">
-                  Total Aggregate Revenue
+                  {t('totalAggregateRevenue')}
                 </h3>
                 <span className="text-7xl md:text-9xl font-black font-headline tracking-tighter block leading-none">
                     ${Number(selectedLocationId ? filteredRevenue : salesSummary.total_revenue || 0).toFixed(2)}
                 </span>
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-on-surface-variant mt-3">
-                  {selectedLocationName} • {selectedLocationId ? filteredOrderCount : Number(salesSummary.total_orders || 0)} orders
+                  {t('ordersLabel', { location: selectedLocationName, count: selectedLocationId ? filteredOrderCount : Number(salesSummary.total_orders || 0) })}
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div className="flex justify-between items-end border-b-2 border-black pb-2">
-                  <p className="text-[10px] font-black uppercase tracking-widest">Order Velocity</p>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Live Feed</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest">{t('orderVelocity')}</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">{t('liveFeed')}</p>
                 </div>
                 <div className="h-32 flex items-end gap-1">
                   {orderTrend.map((bucket) => (
@@ -577,7 +581,7 @@ export default function OwnerDashboard({ user, onLogout }) {
           <div className="lg:col-span-1 lg:row-start-2 lg:row-end-4 flex flex-col gap-4">
             <div className="bg-surface-container-low px-5 py-4 flex flex-col items-start border border-outline-variant/20">
               <span className="text-[10px] font-bold uppercase text-on-surface-variant tracking-[0.2em] mb-1">
-                Nodes Online
+                {t('nodesOnline')}
               </span>
               <span className="text-3xl font-black font-headline">
                 {locations.length} <span className="text-on-surface-variant/30">/ {locations.length || 0}</span>
@@ -586,7 +590,7 @@ export default function OwnerDashboard({ user, onLogout }) {
 
             <div className="bg-tertiary text-on-primary p-8 flex flex-col flex-1 border border-tertiary relative min-h-[280px]">
               <div className="space-y-8">
-                <h3 className="text-xs font-black uppercase tracking-[0.3em] opacity-60">System Health Node</h3>
+                <h3 className="text-xs font-black uppercase tracking-[0.3em] opacity-60">{t('systemHealthNode')}</h3>
                 <div className="space-y-6">
                   {locationPerformance.map((location) => (
                     <button
@@ -634,10 +638,10 @@ export default function OwnerDashboard({ user, onLogout }) {
               </div>
               <div className="space-y-1">
                 <p className="text-4xl font-black font-headline tracking-tighter">${location.revenue.toFixed(2)}</p>
-                <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Revenue ({period})</p>
+                <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">{t('revenuePeriod', { period: t(period) })}</p>
               </div>
               <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-                <span>Active Orders</span>
+                <span>{t('activeOrders')}</span>
                 <span>{location.activeOrders}</span>
               </div>
             </button>
@@ -648,23 +652,23 @@ export default function OwnerDashboard({ user, onLogout }) {
         <section className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           <div className="bg-surface-container-low border border-outline-variant/20 p-6 space-y-5">
             <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-black uppercase tracking-tighter">Location Studio</h3>
+              <h3 className="text-2xl font-black uppercase tracking-tighter">{t('locationStudio')}</h3>
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant">
-                Create And Edit
+                {t('createAndEdit')}
               </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
               <input
                 type="text"
-                placeholder="Location name"
+                placeholder={t('locationNamePlaceholder')}
                 value={newLocationName}
                 onChange={(e) => setNewLocationName(e.target.value)}
                 className="md:col-span-1 px-3 py-2 bg-white border border-outline-variant/30"
               />
               <input
                 type="text"
-                placeholder="Address"
+                placeholder={t('addressPlaceholder')}
                 value={newLocationAddress}
                 onChange={(e) => setNewLocationAddress(e.target.value)}
                 className="md:col-span-1 px-3 py-2 bg-white border border-outline-variant/30"
@@ -675,7 +679,7 @@ export default function OwnerDashboard({ user, onLogout }) {
                 disabled={creatingLocation}
                 className="md:col-span-1 px-4 py-2 bg-black text-white text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
               >
-                {creatingLocation ? 'Creating...' : 'Add Location'}
+                {creatingLocation ? t('common:creating') : t('addLocation')}
               </button>
             </div>
 
@@ -721,7 +725,7 @@ export default function OwnerDashboard({ user, onLogout }) {
                         disabled={!isLocationChanged(location) || savingLocationId === location.id}
                         className="px-3 py-1 bg-black text-white text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
                       >
-                        {savingLocationId === location.id ? 'Saving...' : 'Save'}
+                        {savingLocationId === location.id ? t('common:saving') : t('common:save')}
                       </button>
                       <button
                         type="button"
@@ -729,7 +733,7 @@ export default function OwnerDashboard({ user, onLogout }) {
                         disabled={deletingLocationId === location.id}
                         className="px-3 py-1 border border-error text-error text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
                       >
-                        {deletingLocationId === location.id ? 'Deleting...' : 'Delete'}
+                        {deletingLocationId === location.id ? t('common:deleting') : t('common:delete')}
                       </button>
                     </div>
                   </div>
@@ -740,30 +744,30 @@ export default function OwnerDashboard({ user, onLogout }) {
 
           <div className="bg-surface-container-low border border-outline-variant/20 p-6 space-y-5">
             <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-black uppercase tracking-tighter">Access Control</h3>
+              <h3 className="text-2xl font-black uppercase tracking-tighter">{t('accessControl')}</h3>
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant">
-                Authorize Users
+                {t('authorizeUsers')}
               </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-6 gap-2 items-end">
               <input
                 type="text"
-                placeholder="Name"
+                placeholder={t('namePlaceholder')}
                 value={newUserName}
                 onChange={(e) => setNewUserName(e.target.value)}
                 className="md:col-span-1 px-3 py-2 bg-white border border-outline-variant/30"
               />
               <input
                 type="email"
-                placeholder="Email"
+                placeholder={t('emailPlaceholder')}
                 value={newUserEmail}
                 onChange={(e) => setNewUserEmail(e.target.value)}
                 className="md:col-span-1 px-3 py-2 bg-white border border-outline-variant/30"
               />
               <input
                 type="password"
-                placeholder="Password"
+                placeholder={t('passwordPlaceholder')}
                 value={newUserPassword}
                 onChange={(e) => setNewUserPassword(e.target.value)}
                 className="md:col-span-1 px-3 py-2 bg-white border border-outline-variant/30"
@@ -779,10 +783,10 @@ export default function OwnerDashboard({ user, onLogout }) {
                 }}
                 className="md:col-span-1 px-3 py-2 pr-8 bg-white border border-outline-variant/30"
               >
-                <option value="owner">Owner</option>
-                <option value="manager">Manager</option>
-                <option value="waiter">Waiter</option>
-                <option value="kitchen">Kitchen</option>
+                <option value="owner">{t('common:owner')}</option>
+                <option value="manager">{t('common:manager')}</option>
+                <option value="waiter">{t('common:waiter')}</option>
+                <option value="kitchen">{t('common:kitchen')}</option>
               </select>
               <div className="md:col-span-2 flex gap-2">
                 <select
@@ -791,7 +795,7 @@ export default function OwnerDashboard({ user, onLogout }) {
                   disabled={newUserRole === 'owner'}
                   className="flex-1 px-2 py-2 pr-8 bg-white border border-outline-variant/30 disabled:opacity-50"
                 >
-                  <option value="">Location</option>
+                  <option value="">{t('location')}</option>
                   {locations.map((location) => (
                     <option key={`new-user-location-${location.id}`} value={String(location.id)}>
                       {location.name}
@@ -804,7 +808,7 @@ export default function OwnerDashboard({ user, onLogout }) {
                   disabled={creatingUser}
                   className="px-3 py-2 bg-black text-white text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
                 >
-                  {creatingUser ? 'Adding...' : 'Add'}
+                  {creatingUser ? t('common:adding') : t('common:add')}
                 </button>
               </div>
             </div>
@@ -871,10 +875,10 @@ export default function OwnerDashboard({ user, onLogout }) {
                         }
                         className="px-3 py-2 pr-8 bg-surface-container-low border border-outline-variant/30"
                       >
-                        <option value="owner">Owner</option>
-                        <option value="manager">Manager</option>
-                        <option value="waiter">Waiter</option>
-                        <option value="kitchen">Kitchen</option>
+                        <option value="owner">{t('common:owner')}</option>
+                        <option value="manager">{t('common:manager')}</option>
+                        <option value="waiter">{t('common:waiter')}</option>
+                        <option value="kitchen">{t('common:kitchen')}</option>
                       </select>
 
                       <select
@@ -891,7 +895,7 @@ export default function OwnerDashboard({ user, onLogout }) {
                         disabled={draft.role === 'owner'}
                         className="px-3 py-2 pr-8 bg-surface-container-low border border-outline-variant/30 disabled:opacity-50"
                       >
-                        <option value="">Location</option>
+                        <option value="">{t('location')}</option>
                         {locations.map((location) => (
                           <option key={`member-location-${member.id}-${location.id}`} value={String(location.id)}>
                             {location.name}
@@ -901,7 +905,7 @@ export default function OwnerDashboard({ user, onLogout }) {
 
                       <input
                         type="password"
-                        placeholder="New password (optional)"
+                        placeholder={t('newPasswordPlaceholder')}
                         value={draft.password}
                         onChange={(e) =>
                           setUserDrafts((prev) => ({
@@ -923,7 +927,7 @@ export default function OwnerDashboard({ user, onLogout }) {
                         disabled={!isUserChanged(member) || savingUserId === member.id}
                         className="px-3 py-1 bg-black text-white text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
                       >
-                        {savingUserId === member.id ? 'Saving...' : 'Save'}
+                        {savingUserId === member.id ? t('common:saving') : t('common:save')}
                       </button>
                       <button
                         type="button"
@@ -931,7 +935,7 @@ export default function OwnerDashboard({ user, onLogout }) {
                         disabled={isSelf || deletingUserId === member.id}
                         className="px-3 py-1 border border-error text-error text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
                       >
-                        {deletingUserId === member.id ? 'Deleting...' : isSelf ? 'Current User' : 'Delete'}
+                        {deletingUserId === member.id ? t('common:deleting') : isSelf ? t('currentUser') : t('common:delete')}
                       </button>
                     </div>
                   </div>
@@ -944,7 +948,7 @@ export default function OwnerDashboard({ user, onLogout }) {
         <section ref={analyticsSectionRef} className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           <div className="lg:col-span-8 space-y-8">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-4">
-              <h3 className="text-3xl font-black tracking-tighter uppercase font-headline">Sales Performance</h3>
+              <h3 className="text-3xl font-black tracking-tighter uppercase font-headline">{t('salesPerformance')}</h3>
               <div className="flex bg-surface-container-low p-1 gap-1">
                 {PERIODS.map((value) => (
                   <button
@@ -956,7 +960,7 @@ export default function OwnerDashboard({ user, onLogout }) {
                         : 'hover:bg-surface-container-highest transition-colors'
                     }`}
                   >
-                    {value}
+                    {t(value)}
                   </button>
                 ))}
               </div>
@@ -982,8 +986,8 @@ export default function OwnerDashboard({ user, onLogout }) {
 
           <div className="lg:col-span-4 bg-surface-container-low border border-outline-variant/20 flex flex-col h-full">
             <div className="p-6 border-b border-outline-variant/20 flex justify-between items-center">
-              <h3 className="text-xs font-black uppercase tracking-[0.2em]">Global Top Sellers</h3>
-              <span className="text-[10px] font-black bg-black text-white px-2 py-1">{period}</span>
+              <h3 className="text-xs font-black uppercase tracking-[0.2em]">{t('globalTopSellers')}</h3>
+              <span className="text-[10px] font-black bg-black text-white px-2 py-1">{t(period)}</span>
             </div>
             <div className="flex-1 p-6 space-y-8">
               {topSellers.map((item) => (
@@ -994,7 +998,7 @@ export default function OwnerDashboard({ user, onLogout }) {
                   <div className="flex-1 space-y-1">
                     <p className="font-black font-headline uppercase tracking-tight text-lg">{item.item_name}</p>
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-bold text-on-surface-variant uppercase">{item.total_sold} units</span>
+                      <span className="text-[10px] font-bold text-on-surface-variant uppercase">{t('units', { count: item.total_sold })}</span>
                       <span className="text-xs font-black text-secondary">${item.total_revenue.toFixed(2)}</span>
                     </div>
                   </div>
@@ -1002,12 +1006,12 @@ export default function OwnerDashboard({ user, onLogout }) {
               ))}
 
               {!topSellers.length ? (
-                <p className="text-sm text-on-surface-variant">No sales yet for this period.</p>
+                <p className="text-sm text-on-surface-variant">{t('noSalesYet')}</p>
               ) : null}
             </div>
             <div className="p-6 bg-black">
               <p className="text-[10px] font-black uppercase text-white text-center tracking-[0.3em]">
-                {menuItems.length} menu items in catalog
+                {t('menuItemsInCatalog', { count: menuItems.length })}
               </p>
             </div>
           </div>
@@ -1022,7 +1026,7 @@ export default function OwnerDashboard({ user, onLogout }) {
           className="flex flex-col items-center justify-center bg-[#1c1b1b] text-white rounded-none border-t-4 border-[#1b6d24] h-full w-full active:bg-[#1b6d24] transition-colors"
         >
           <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>monitoring</span>
-          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">Analytics</span>
+          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">{t('analytics')}</span>
         </button>
         <button
           type="button"
@@ -1030,11 +1034,12 @@ export default function OwnerDashboard({ user, onLogout }) {
           className="flex flex-col items-center justify-center text-[#e5e2e1]/70 h-full w-full hover:bg-[#1c1b1b] active:bg-[#1b6d24] transition-all"
         >
           <span className="material-symbols-outlined">location_on</span>
-          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">Locations</span>
+          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">{t('locations')}</span>
         </button>
+        <LanguageSwitcher compact />
         <button onClick={onLogout} className="flex flex-col items-center justify-center text-[#e5e2e1]/70 h-full w-full hover:bg-[#1c1b1b] active:bg-[#1b6d24] transition-all">
           <span className="material-symbols-outlined">logout</span>
-          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">Logout</span>
+          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest mt-1">{t('common:logout')}</span>
         </button>
       </nav>
     </div>

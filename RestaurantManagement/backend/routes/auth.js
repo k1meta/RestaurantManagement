@@ -16,6 +16,7 @@ function userPayload(user) {
     email: user.email,
     role: user.role,
     location_id: user.location_id ?? null,
+    preferred_language: user.preferred_language || 'en',
   };
 }
 
@@ -153,6 +154,26 @@ router.get('/me', authenticate, async (req, res) => {
     return res.json({ user: userPayload(user) });
   } catch (err) {
     console.error('Get me error:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// PATCH /api/auth/language
+router.patch('/language', authenticate, async (req, res) => {
+  try {
+    const { language } = req.body;
+    if (!language || typeof language !== 'string') {
+      return res.status(400).json({ error: 'Valid language is required' });
+    }
+
+    await db.collection('users').doc(String(req.user.id)).update({
+      preferred_language: language
+    });
+
+    const user = await getById('users', req.user.id);
+    return res.json({ user: userPayload(user) });
+  } catch (err) {
+    console.error('Update language error:', err);
     return res.status(500).json({ error: 'Server error' });
   }
 });

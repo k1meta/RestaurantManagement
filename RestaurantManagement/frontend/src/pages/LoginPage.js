@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getLoginProfiles } from '../api/client';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const LAST_LOGIN_EMAIL_KEY = 'lastLoginEmail';
 
 export default function LoginPage({ onLogin }) {
+  const { t } = useTranslation(['login', 'common']);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -26,7 +29,7 @@ export default function LoginPage({ onLogin }) {
         setProfiles(response.data?.profiles || []);
       } catch (_err) {
         if (!active) return;
-        setProfilesError('Could not load quick-fill profiles. You can still log in manually.');
+        setProfilesError(t('profilesError'));
       } finally {
         if (active) setProfilesLoading(false);
       }
@@ -35,7 +38,7 @@ export default function LoginPage({ onLogin }) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [t]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,41 +66,44 @@ export default function LoginPage({ onLogin }) {
         {/* Left: Login Form */}
         <div className="space-y-8">
           <div>
-            <h1 className="font-headline text-5xl font-black tracking-tighter mb-2 uppercase">
-              Restaurant
-              <br />
-              Management
-            </h1>
+            <div className="flex justify-between items-start">
+              <h1 className="font-headline text-5xl font-black tracking-tighter mb-2 uppercase">
+                {t('common:restaurantManagement').split('\n').map((line, i) => (
+                  <React.Fragment key={i}>{i > 0 && <br />}{line}</React.Fragment>
+                ))}
+              </h1>
+              <LanguageSwitcher />
+            </div>
             <p className="text-on-surface-variant text-sm font-bold uppercase tracking-[0.2em]">
-              Bread & Co
+              {t('common:brandName')}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-bold uppercase tracking-[0.2em] mb-2 text-on-surface-variant">
-                Email
+                {t('emailLabel')}
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
-                placeholder="Enter your email"
+                placeholder={t('emailPlaceholder')}
                 className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant focus:border-primary focus:outline-none disabled:opacity-50"
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold uppercase tracking-[0.2em] mb-2 text-on-surface-variant">
-                Password
+                {t('passwordLabel')}
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
-                placeholder="Enter your password"
+                placeholder={t('passwordPlaceholder')}
                 className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant focus:border-primary focus:outline-none disabled:opacity-50"
               />
             </div>
@@ -113,16 +119,16 @@ export default function LoginPage({ onLogin }) {
               disabled={loading}
               className="w-full bg-primary text-on-primary py-4 font-headline font-black uppercase tracking-[0.1em] hover:bg-on-primary-fixed disabled:opacity-50 transition-colors"
             >
-              {loading ? 'Signing In...' : 'Sign In'}
+              {loading ? t('signingIn') : t('signIn')}
             </button>
           </form>
         </div>
 
         {/* Right: Login Profiles */}
         <div className="bg-surface-container-low p-8 border border-outline-variant/20">
-          <h3 className="font-headline text-2xl font-black mb-2 uppercase">Staff Profiles</h3>
+          <h3 className="font-headline text-2xl font-black mb-2 uppercase">{t('staffProfiles')}</h3>
           <p className="text-on-surface-variant text-xs font-bold uppercase tracking-[0.2em] mb-6">
-            Click any to auto-fill email
+            {t('clickToAutofill')}
           </p>
 
           {profilesError ? (
@@ -134,7 +140,7 @@ export default function LoginPage({ onLogin }) {
           <div className="space-y-3">
             {profilesLoading ? (
               <div className="text-xs text-on-surface-variant font-bold uppercase tracking-widest">
-                Loading profiles...
+                {t('loadingProfiles')}
               </div>
             ) : (
               profiles.map((profile) => (

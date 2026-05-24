@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getOrders, updateOrderStatus } from '../api/client';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const TARGET_MINUTES = 15;
 
@@ -23,6 +25,7 @@ function urgencyClass(order) {
 }
 
 export default function KitchenDashboard({ user, onLogout }) {
+  const { t } = useTranslation(['kitchen', 'common']);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -131,7 +134,7 @@ export default function KitchenDashboard({ user, onLogout }) {
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           <p className="mt-4 text-on-surface font-headline uppercase text-sm tracking-widest">
-            Loading Kitchen Queue
+            {t('loadingQueue')}
           </p>
         </div>
       </div>
@@ -145,26 +148,27 @@ export default function KitchenDashboard({ user, onLogout }) {
           <span className="material-symbols-outlined text-2xl">restaurant_menu</span>
           <div className="flex flex-col">
             <h1 className="font-headline font-bold text-lg uppercase tracking-tight">
-              Bread & Co <span className="mx-1 opacity-30">/</span> Kitchen
+              {t('common:brandName')} <span className="mx-1 opacity-30">/</span> {t('common:kitchen')}
             </h1>
             <span className="text-[10px] font-headline font-bold uppercase tracking-[0.2em] text-on-surface-variant">
-              Station A • Main Line • {user.name}
+              {t('stationInfo', { name: user.name })}
             </span>
           </div>
         </div>
         <div className="flex items-center gap-4">
+          <LanguageSwitcher />
           <button
             onClick={() => loadQueue(false)}
             className="text-xs font-black uppercase tracking-widest hover:text-primary transition-colors"
             disabled={refreshing}
           >
-            {refreshing ? 'Refreshing...' : 'Refresh'}
+            {refreshing ? t('common:refreshing') : t('common:refresh')}
           </button>
           <button
             onClick={onLogout}
             className="text-xs font-bold uppercase tracking-widest hover:text-primary transition-colors"
           >
-            Logout
+            {t('common:logout')}
           </button>
         </div>
       </header>
@@ -179,22 +183,22 @@ export default function KitchenDashboard({ user, onLogout }) {
         <section className="mb-10 grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="bg-primary text-on-primary p-5 flex flex-col justify-between h-32">
             <p className="font-headline text-[10px] font-bold uppercase tracking-widest opacity-70 leading-none">
-              Active Tickets
+              {t('activeTickets')}
             </p>
             <h2 className="font-headline text-5xl font-black leading-none">{stats.active}</h2>
           </div>
           <div className="bg-surface-container-low border border-outline-variant/30 p-5 flex flex-col justify-between h-32">
             <p className="font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant leading-none">
-              Avg Prep Time
+              {t('avgPrepTime')}
             </p>
             <div className="flex items-baseline gap-1">
               <h2 className="font-headline text-4xl font-bold leading-none">{stats.avgPrep || 0}</h2>
-              <span className="text-xs opacity-50 uppercase">Min</span>
+              <span className="text-xs opacity-50 uppercase">{t('min')}</span>
             </div>
           </div>
           <div className="bg-error-container p-5 flex flex-col justify-between h-32">
             <p className="font-headline text-[10px] font-bold uppercase tracking-widest text-on-error-container leading-none">
-              Delayed
+              {t('delayed')}
             </p>
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-error text-3xl">warning</span>
@@ -203,7 +207,7 @@ export default function KitchenDashboard({ user, onLogout }) {
           </div>
           <div className="bg-secondary-container p-5 flex flex-col justify-between h-32">
             <p className="font-headline text-[10px] font-bold uppercase tracking-widest text-on-secondary-container leading-none">
-              Ready
+              {t('ready')}
             </p>
             <h2 className="font-headline text-4xl font-black text-on-secondary-container leading-none">{stats.ready}</h2>
           </div>
@@ -228,10 +232,10 @@ export default function KitchenDashboard({ user, onLogout }) {
                         {isUrgent ? 'priority_high' : 'restaurant'}
                       </span>
                       <span className="font-headline text-[11px] font-black uppercase tracking-widest">
-                        {isUrgent ? 'Urgent' : order.status} • Kitchen
+                        {isUrgent ? t('urgent') : order.status} • {t('kitchenLabel')}
                       </span>
                     </div>
-                    <div className="font-headline text-[11px] font-bold uppercase">Ticket #{order.id}</div>
+                    <div className="font-headline text-[11px] font-bold uppercase">{t('ticket', { id: order.id })}</div>
                   </div>
 
                   <div className="p-5 flex justify-between items-start border-b border-outline-variant/20">
@@ -245,7 +249,7 @@ export default function KitchenDashboard({ user, onLogout }) {
                         {orderAge}m
                       </span>
                       <span className="text-[9px] font-black uppercase opacity-60">
-                        {isUrgent ? `${overTarget}m over target` : order.status === 'ready' ? 'Ready' : 'In progress'}
+                        {isUrgent ? t('overTarget', { minutes: overTarget }) : order.status === 'ready' ? t('ready') : t('inProgress')}
                       </span>
                     </div>
                   </div>
@@ -272,7 +276,7 @@ export default function KitchenDashboard({ user, onLogout }) {
                         <div className="flex items-center gap-1 mb-1">
                           <span className="material-symbols-outlined text-sm">sticky_note_2</span>
                           <span className="font-headline text-[10px] font-bold uppercase tracking-widest">
-                            Kitchen Notes
+                            {t('kitchenNotes')}
                           </span>
                         </div>
                         <p className="font-body text-sm font-bold italic">"{order.notes}"</p>
@@ -286,14 +290,14 @@ export default function KitchenDashboard({ user, onLogout }) {
                       disabled={order.status !== 'pending'}
                       className="bg-white text-black py-5 font-headline font-black uppercase tracking-widest text-sm hover:bg-surface-container transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Bump
+                      {t('bump')}
                     </button>
                     <button
                       onClick={() => markReady(order)}
                       disabled={order.status === 'ready'}
                       className="bg-secondary text-white py-5 font-headline font-black uppercase tracking-widest text-sm hover:brightness-110 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Mark Ready
+                      {t('markReady')}
                     </button>
                   </div>
                 </div>
@@ -302,12 +306,12 @@ export default function KitchenDashboard({ user, onLogout }) {
           ) : (
             <div className="bg-surface-container-low p-10 text-center border border-outline-variant/20">
               <p className="font-headline text-3xl font-black uppercase tracking-tight">
-                {viewMode === 'all' ? 'Kitchen Queue Is Clear' : 'No Tickets In This View'}
+                {viewMode === 'all' ? t('queueClear') : t('noTicketsInView')}
               </p>
               <p className="text-sm text-on-surface-variant mt-2">
                 {viewMode === 'all'
-                  ? 'New tickets will appear here automatically.'
-                  : 'Try switching back to All to see every ticket.'}
+                  ? t('queueClearHint')
+                  : t('noTicketsInViewHint')}
               </p>
             </div>
           )}
@@ -323,7 +327,7 @@ export default function KitchenDashboard({ user, onLogout }) {
           }`}
         >
           <span className="material-symbols-outlined mb-1">receipt_long</span>
-          <span className="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">Orders</span>
+          <span className="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">{t('orders')}</span>
         </button>
         <button
           type="button"
@@ -333,7 +337,7 @@ export default function KitchenDashboard({ user, onLogout }) {
           }`}
         >
           <span className="material-symbols-outlined mb-1">warning</span>
-          <span className="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">Delayed</span>
+          <span className="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">{t('delayed')}</span>
         </button>
         <button
           type="button"
@@ -343,15 +347,16 @@ export default function KitchenDashboard({ user, onLogout }) {
           }`}
         >
           <span className="material-symbols-outlined mb-1">done_all</span>
-          <span className="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">Ready</span>
+          <span className="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">{t('ready')}</span>
         </button>
+        <LanguageSwitcher compact />
         <button
           type="button"
           onClick={onLogout}
           className="flex flex-col items-center justify-center text-[#e5e2e1]/70 w-full hover:bg-[#1c1b1b] transition-all"
         >
           <span className="material-symbols-outlined mb-1">logout</span>
-          <span className="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">Logout</span>
+          <span className="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">{t('common:logout')}</span>
         </button>
       </nav>
     </div>

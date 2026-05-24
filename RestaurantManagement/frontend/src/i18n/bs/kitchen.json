@@ -1,0 +1,23 @@
+{
+  "loadingQueue": "Učitavanje Kuhinjskog Reda",
+  "headerTitle": "Bread & Co / Kuhinja",
+  "stationInfo": "Stanica A • Glavna Linija • {{name}}",
+  "activeTickets": "Aktivne Narudžbe",
+  "avgPrepTime": "Prosj. Vrijeme Pripreme",
+  "min": "Min",
+  "delayed": "Kasni",
+  "ready": "Spremno",
+  "urgent": "Hitno",
+  "kitchenLabel": "Kuhinja",
+  "ticket": "Narudžba #{{id}}",
+  "overTarget": "{{minutes}}m preko cilja",
+  "inProgress": "U pripremi",
+  "kitchenNotes": "Napomene Za Kuhinju",
+  "bump": "Preuzmi",
+  "markReady": "Označi Spremno",
+  "queueClear": "Kuhinjski Red Je Prazan",
+  "queueClearHint": "Nove narudžbe će se pojaviti automatski.",
+  "noTicketsInView": "Nema Narudžbi U Ovom Prikazu",
+  "noTicketsInViewHint": "Pokušajte se prebaciti na Sve da vidite sve narudžbe.",
+  "orders": "Narudžbe"
+}
