@@ -1,0 +1,23 @@
+{
+  "loadingQueue": "Loading Kitchen Queue",
+  "headerTitle": "Bread & Co / Kitchen",
+  "stationInfo": "Station A • Main Line • {{name}}",
+  "activeTickets": "Active Tickets",
+  "avgPrepTime": "Avg Prep Time",
+  "min": "Min",
+  "delayed": "Delayed",
+  "ready": "Ready",
+  "urgent": "Urgent",
+  "kitchenLabel": "Kitchen",
+  "ticket": "Ticket #{{id}}",
+  "overTarget": "{{minutes}}m over target",
+  "inProgress": "In progress",
+  "kitchenNotes": "Kitchen Notes",
+  "bump": "Bump",
+  "markReady": "Mark Ready",
+  "queueClear": "Kitchen Queue Is Clear",
+  "queueClearHint": "New tickets will appear here automatically.",
+  "noTicketsInView": "No Tickets In This View",
+  "noTicketsInViewHint": "Try switching back to All to see every ticket.",
+  "orders": "Orders"
+}

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   createMenuItem,
   createIngredient,
@@ -17,6 +18,7 @@ import {
   upsertInventoryItem,
 } from '../api/client';
 import { ALLOWED_UNITS, isAllowedUnit } from '../constants/units';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 function initials(name) {
   return String(name || '?')
@@ -143,6 +145,7 @@ function AvailabilitySwitch({ checked, onToggle, disabled = false }) {
 }
 
 export default function ManagerDashboard({ user, onLogout }) {
+  const { t } = useTranslation(['manager', 'common']);
   const [inventory, setInventory] = useState([]);
   const [ingredientsCatalog, setIngredientsCatalog] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
@@ -844,7 +847,7 @@ export default function ManagerDashboard({ user, onLogout }) {
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           <p className="mt-4 text-on-surface font-headline uppercase text-sm tracking-widest">
-            Loading Manager Hub
+            {t('loadingHub')}
           </p>
         </div>
       </div>
@@ -859,22 +862,23 @@ export default function ManagerDashboard({ user, onLogout }) {
             <span className="font-black">{initials(user.name)}</span>
           </div>
           <h1 className="font-['Space_Grotesk'] font-black text-2xl tracking-tight text-[#000000] dark:text-white uppercase tracking-tighter">
-            Bread & Co
+            {t('common:brandName')}
           </h1>
         </div>
         <div className="flex items-center gap-4">
+          <LanguageSwitcher />
           <button
             onClick={() => loadDashboard(false)}
             className="text-xs font-black uppercase tracking-widest hover:text-primary transition-colors"
             disabled={refreshing}
           >
-            {refreshing ? 'Refreshing...' : 'Refresh'}
+            {refreshing ? t('common:refreshing') : t('common:refresh')}
           </button>
           <button
             onClick={onLogout}
             className="text-xs font-bold uppercase tracking-widest hover:text-primary transition-colors"
           >
-            Logout
+            {t('common:logout')}
           </button>
         </div>
       </header>
@@ -910,7 +914,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                 <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>
                   {lowStock.length ? 'priority_high' : 'check_circle'}
                 </span>
-                {lowStock.length ? 'Critical' : 'Stable'}
+                {lowStock.length ? t('critical') : t('stable')}
               </div>
               <span
                 className={
@@ -919,7 +923,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                     : 'text-[10px] font-bold uppercase tracking-widest text-on-surface-variant'
                 }
               >
-                {lowStock.length ? 'Immediate Attention' : 'Stock Levels OK'}
+                {lowStock.length ? t('immediateAttention') : t('stockLevelsOk')}
               </span>
             </div>
             <h3
@@ -929,7 +933,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                   : 'font-headline text-2xl font-black text-on-surface leading-none mb-3 uppercase tracking-tighter'
               }
             >
-              {lowStock.length ? 'Refill Low Inventory' : 'Service Momentum Stable'}
+              {lowStock.length ? t('refillLowInventory') : t('serviceMomentumStable')}
             </h3>
             <p
               className={
@@ -939,8 +943,8 @@ export default function ManagerDashboard({ user, onLogout }) {
               }
             >
               {lowStock.length
-                ? `${lowStock.length} ingredient(s) are below healthy stock level. Prioritize refills before dinner rush.`
-                : 'No critical stock issues detected in this location.'}
+                ? t('lowStockWarning', { count: lowStock.length })
+                : t('noStockIssues')}
             </p>
             <button
               type="button"
@@ -953,18 +957,18 @@ export default function ManagerDashboard({ user, onLogout }) {
               }
             >
               {refillingAll
-                ? 'Refilling...'
+                ? t('refillingAll')
                 : lowStock.length
-                  ? `Refill all low (${lowStock.length})`
-                  : 'All Good'}
+                  ? t('refillAllLow', { count: lowStock.length })
+                  : t('allGood')}
             </button>
         </section>
 
         <section ref={staffSectionRef} className="bg-surface-container-low p-6 rounded-lg">
             <div className="flex justify-between items-center mb-6 border-b border-outline-variant/20 pb-2">
-              <h2 className="font-headline text-xs font-bold uppercase tracking-[0.2em]">Live: On Shift</h2>
+              <h2 className="font-headline text-xs font-bold uppercase tracking-[0.2em]">{t('liveOnShift')}</h2>
               <span className="bg-secondary/10 text-secondary text-[10px] font-bold px-2 py-0.5 rounded-full">
-                {staff.length} active
+                {t('activeCount', { count: staff.length })}
               </span>
             </div>
 
@@ -1016,8 +1020,8 @@ export default function ManagerDashboard({ user, onLogout }) {
                         {roleDraft !== 'waiter' && roleDraft !== 'kitchen' ? (
                           <option value={roleDraft}>{roleDraft}</option>
                         ) : null}
-                        <option value="waiter">Waiter</option>
-                        <option value="kitchen">Kitchen</option>
+                        <option value="waiter">{t('common:waiter')}</option>
+                        <option value="kitchen">{t('common:kitchen')}</option>
                       </select>
 
                       {canManage ? (
@@ -1027,11 +1031,11 @@ export default function ManagerDashboard({ user, onLogout }) {
                           disabled={deletingStaffId === member.id}
                           className="px-3 py-1 text-[10px] font-black uppercase tracking-widest border border-error text-error disabled:opacity-50"
                         >
-                          {deletingStaffId === member.id ? 'Removing...' : 'Remove'}
+                          {deletingStaffId === member.id ? t('common:removing') : t('common:remove')}
                         </button>
                       ) : (
                         <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-                          {isSelf ? 'Current Session' : 'Protected'}
+                          {isSelf ? t('currentSession') : t('protected')}
                         </span>
                       )}
                     </div>
@@ -1041,25 +1045,25 @@ export default function ManagerDashboard({ user, onLogout }) {
             </div>
 
             <div className="mt-6 pt-5 border-t border-outline-variant/20 space-y-3">
-              <h3 className="text-xs font-black uppercase tracking-[0.2em]">Add Staff User</h3>
+              <h3 className="text-xs font-black uppercase tracking-[0.2em]">{t('addStaffUser')}</h3>
               <div className="grid grid-cols-1 gap-2">
                 <input
                   type="text"
-                  placeholder="Full name"
+                  placeholder={t('fullNamePlaceholder')}
                   value={newStaffName}
                   onChange={(e) => setNewStaffName(e.target.value)}
                   className="px-3 py-2 text-sm bg-white border border-outline-variant/30"
                 />
                 <input
                   type="email"
-                  placeholder="Email"
+                  placeholder={t('emailPlaceholder')}
                   value={newStaffEmail}
                   onChange={(e) => setNewStaffEmail(e.target.value)}
                   className="px-3 py-2 text-sm bg-white border border-outline-variant/30"
                 />
                 <input
                   type="password"
-                  placeholder="Temporary password"
+                  placeholder={t('temporaryPasswordPlaceholder')}
                   value={newStaffPassword}
                   onChange={(e) => setNewStaffPassword(e.target.value)}
                   className="px-3 py-2 text-sm bg-white border border-outline-variant/30"
@@ -1070,8 +1074,8 @@ export default function ManagerDashboard({ user, onLogout }) {
                     onChange={(e) => setNewStaffRole(e.target.value)}
                     className="flex-1 px-3 py-2 pr-8 text-sm bg-white border border-outline-variant/30"
                   >
-                    <option value="waiter">Waiter</option>
-                    <option value="kitchen">Kitchen</option>
+                    <option value="waiter">{t('common:waiter')}</option>
+                    <option value="kitchen">{t('common:kitchen')}</option>
                   </select>
                   <button
                     type="button"
@@ -1079,14 +1083,14 @@ export default function ManagerDashboard({ user, onLogout }) {
                     disabled={creatingStaff}
                     className="px-4 py-2 bg-primary text-on-primary text-xs font-black uppercase tracking-widest disabled:opacity-50"
                   >
-                    {creatingStaff ? 'Creating...' : 'Add User'}
+                    {creatingStaff ? t('common:creating') : t('addUser')}
                   </button>
                 </div>
               </div>
             </div>
 
             <div className="mt-6 w-full py-2 text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant border border-outline-variant/20 bg-white flex justify-between px-4">
-              <span>Open tickets</span>
+              <span>{t('openTickets')}</span>
               <span>{orders.length}</span>
             </div>
         </section>
@@ -1097,9 +1101,9 @@ export default function ManagerDashboard({ user, onLogout }) {
             <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-8 gap-4">
               <div>
                 <span className="font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-                  Supply Chain
+                  {t('supplyChain')}
                 </span>
-                <h2 className="font-headline text-3xl font-black uppercase tracking-tighter">Kitchen Inventory</h2>
+                <h2 className="font-headline text-3xl font-black uppercase tracking-tighter">{t('kitchenInventory')}</h2>
               </div>
               <div className="flex gap-2">
                 <button
@@ -1107,7 +1111,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                   className="flex items-center gap-2 px-4 py-2 bg-surface-container-highest hover:bg-outline-variant/30 transition-colors"
                 >
                   <span className="material-symbols-outlined text-xl">filter_list</span>
-                  <span className="text-xs font-bold uppercase">Refresh</span>
+                  <span className="text-xs font-bold uppercase">{t('common:refresh')}</span>
                 </button>
                 <button
                   type="button"
@@ -1115,7 +1119,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                   className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary hover:opacity-90 transition-colors"
                 >
                   <span className="material-symbols-outlined text-xl">add</span>
-                  <span className="text-xs font-bold uppercase">Manual Count</span>
+                  <span className="text-xs font-bold uppercase">{t('manualCount')}</span>
                 </button>
               </div>
             </div>
@@ -1147,14 +1151,14 @@ export default function ManagerDashboard({ user, onLogout }) {
                             : 'text-secondary'
                           }`}
                       >
-                        {item.status === 'critical' ? 'Refill Needed' : item.status === 'warning' ? 'Low' : 'Stable'}
+                        {item.status === 'critical' ? t('refillNeeded') : item.status === 'warning' ? t('low') : t('stable')}
                       </span>
                     </div>
 
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-[10px] font-bold uppercase tracking-tighter">
-                        <span>{item.quantity} {item.unit || 'units'} Current</span>
-                        <span>{item.target} Full target</span>
+                        <span>{t('currentStock', { qty: item.quantity, unit: item.unit || 'units' })}</span>
+                        <span>{t('fullTarget', { qty: item.target })}</span>
                       </div>
                       <div className="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
                         <div
@@ -1177,7 +1181,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                             onClick={() => restockItem(item)}
                             className="flex-1 min-w-[120px] bg-error-container text-on-error-container py-2 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-error hover:text-white transition-colors"
                           >
-                            Refill To {item.target}
+                            {t('refillTo', { target: item.target })}
                           </button>
                         ) : null}
                         <button
@@ -1185,14 +1189,14 @@ export default function ManagerDashboard({ user, onLogout }) {
                           onClick={() => openInventoryModalEdit(item)}
                           className="flex-1 min-w-[120px] px-3 py-2 text-[10px] font-black uppercase tracking-widest border border-outline-variant/40 bg-surface-container-high"
                         >
-                          Edit thresholds
+                          {t('editThresholds')}
                         </button>
                         <button
                           type="button"
                           onClick={() => removeInventoryItem(item)}
                           className="px-3 py-2 text-[10px] font-black uppercase tracking-widest border border-error text-error"
                         >
-                          Delete
+                          {t('common:delete')}
                         </button>
                       </div>
                       <div className="flex gap-2 items-center">
@@ -1200,7 +1204,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                           type="number"
                           min="0"
                           step="0.01"
-                          placeholder={`On-hand (${item.quantity})`}
+                          placeholder={t('onHandPlaceholder', { qty: item.quantity })}
                           value={qtyAdjustDraft[item.id] ?? ''}
                           onChange={(e) =>
                             setQtyAdjustDraft((prev) => ({ ...prev, [item.id]: e.target.value }))
@@ -1213,7 +1217,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                           disabled={patchingQtyId === item.id}
                           className="px-3 py-2 text-[10px] font-black uppercase tracking-widest bg-black text-white disabled:opacity-50 whitespace-nowrap"
                         >
-                          {patchingQtyId === item.id ? 'Saving...' : 'Save qty'}
+                          {patchingQtyId === item.id ? t('common:saving') : t('saveQty')}
                         </button>
                       </div>
                     </div>
@@ -1221,8 +1225,8 @@ export default function ManagerDashboard({ user, onLogout }) {
                 ))
               ) : (
                 <div className="md:col-span-2 bg-surface-container-lowest p-8 border border-outline-variant/20 text-center">
-                  <p className="font-headline text-2xl font-black uppercase">No Inventory Data</p>
-                  <p className="text-sm text-on-surface-variant mt-2">Use Manual Count to add your first item.</p>
+                  <p className="font-headline text-2xl font-black uppercase">{t('noInventoryData')}</p>
+                  <p className="text-sm text-on-surface-variant mt-2">{t('noInventoryDataHint')}</p>
                 </div>
               )}
             </div>
@@ -1232,49 +1236,49 @@ export default function ManagerDashboard({ user, onLogout }) {
             <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-8 gap-4">
               <div>
                 <span className="font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-                  Global Availability
+                  {t('globalAvailability')}
                 </span>
-                <h2 className="font-headline text-3xl font-black uppercase tracking-tighter">Menu Hub</h2>
+                <h2 className="font-headline text-3xl font-black uppercase tracking-tighter">{t('menuHub')}</h2>
               </div>
               <button
                 onClick={publishAllMenuChanges}
                 disabled={publishingAll}
                 className="bg-primary text-on-primary px-8 py-3 font-headline font-black uppercase tracking-[0.2em] hover:opacity-90 active:scale-95 transition-all text-xs shadow-lg shadow-black/10 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {publishingAll ? 'Publishing...' : 'Publish Changes'}
+                {publishingAll ? t('publishing') : t('publishChanges')}
               </button>
             </div>
 
             <div className="bg-surface-container-lowest border border-outline-variant/20 p-4 md:p-5 mb-6 space-y-4">
-              <h3 className="text-xs font-black uppercase tracking-[0.2em]">Create New Menu Item</h3>
+              <h3 className="text-xs font-black uppercase tracking-[0.2em]">{t('createNewMenuItem')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-7 gap-3 items-end">
                 <div className="md:col-span-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-1 block">
-                    Name
+                    {t('common:name')}
                   </label>
                   <input
                     type="text"
                     value={newMenuName}
                     onChange={(e) => setNewMenuName(e.target.value)}
                     className="w-full px-3 py-2 bg-white border border-outline-variant/30"
-                    placeholder="Example: Truffle Pasta"
+                    placeholder={t('exampleNamePlaceholder')}
                   />
                 </div>
                 <div>
                   <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-1 block">
-                    Category
+                    {t('common:category')}
                   </label>
                   <input
                     type="text"
                     value={newMenuCategory}
                     onChange={(e) => setNewMenuCategory(e.target.value)}
                     className="w-full px-3 py-2 bg-white border border-outline-variant/30"
-                    placeholder="food"
+                    placeholder={t('foodPlaceholder')}
                   />
                 </div>
                 <div>
                   <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-1 block">
-                    Price
+                    {t('common:price')}
                   </label>
                   <input
                     type="number"
@@ -1287,7 +1291,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                 </div>
                 <div className="md:col-span-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-1 block">
-                    Availability
+                    {t('availability')}
                   </label>
                   <div className="h-10 px-3 bg-white border border-outline-variant/30 flex items-center gap-3">
                     <AvailabilitySwitch
@@ -1295,7 +1299,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                       onToggle={setNewMenuActive}
                     />
                     <span className={`text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${newMenuActive ? 'text-secondary' : 'text-on-surface-variant'}`}>
-                      {newMenuActive ? 'Available' : 'Sold Out'}
+                      {newMenuActive ? t('common:available') : t('common:soldOut')}
                     </span>
                   </div>
                 </div>
@@ -1306,21 +1310,21 @@ export default function ManagerDashboard({ user, onLogout }) {
                     disabled={creatingMenuItem}
                     className="w-full h-10 px-4 bg-black text-white text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
                   >
-                    {creatingMenuItem ? 'Creating...' : 'Create'}
+                    {creatingMenuItem ? t('common:creating') : t('common:create')}
                   </button>
                 </div>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant block">
-                    Required Ingredients
+                    {t('requiredIngredients')}
                   </label>
                   <button
                     type="button"
                     onClick={() => addMenuIngredientRow(null)}
                     className="text-[10px] font-black uppercase tracking-widest px-2 py-1 border border-outline-variant/30"
                   >
-                    Add Ingredient
+                    {t('addIngredient')}
                   </button>
                 </div>
                 {newMenuIngredients.map((entry, index) => (
@@ -1330,7 +1334,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                       onChange={(e) => updateMenuIngredientRow(null, index, { ingredient_id: e.target.value })}
                       className="px-3 py-2 bg-white border border-outline-variant/30 md:col-span-5"
                     >
-                      <option value="">Select ingredient</option>
+                      <option value="">{t('common:selectIngredient')}</option>
                       {ingredientsCatalog.map((ingredientOption) => (
                         <option key={ingredientOption.id} value={ingredientOption.id}>
                           {ingredientOption.name}
@@ -1356,7 +1360,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                         onClick={() => removeMenuIngredientRow(null, index)}
                         className="px-3 py-2 text-[10px] font-black uppercase tracking-widest border border-error text-error"
                       >
-                        Remove
+                        {t('common:remove')}
                       </button>
                     </div>
                   </div>
@@ -1380,7 +1384,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                       </div>
                       <div>
                         <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-1 block">
-                          Name
+                          {t('common:name')}
                         </label>
                         <input
                           type="text"
@@ -1389,7 +1393,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                           className="px-2 py-1 bg-surface-container-high border border-outline-variant/20 font-headline font-bold text-sm w-52"
                         />
                         <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mt-2 mb-1 block">
-                          Category
+                          {t('common:category')}
                         </label>
                         <input
                           type="text"
@@ -1404,7 +1408,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="flex flex-col gap-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2">
-                          Price ($)
+                          {t('priceDollar')}
                         </label>
                         <div className="flex items-center bg-surface-container-high border border-outline-variant/20 px-2">
                           <span className="text-lg font-bold mr-1">$</span>
@@ -1420,7 +1424,7 @@ export default function ManagerDashboard({ user, onLogout }) {
 
                       <div className="flex flex-col gap-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2">
-                          Availability
+                          {t('availability')}
                         </label>
                         <div className="bg-surface-container-high border border-outline-variant/20 px-3 py-2 flex items-center justify-between gap-2 overflow-hidden h-10">
                           <AvailabilitySwitch
@@ -1428,7 +1432,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                             onToggle={(nextValue) => setMenuDraft(item.id, { active: nextValue })}
                           />
                           <span className={`text-[10px] font-black uppercase tracking-widest truncate ${draft.active ? 'text-secondary' : 'text-on-surface-variant'}`}>
-                            {draft.active ? 'Available' : 'Sold Out'}
+                            {draft.active ? t('common:available') : t('common:soldOut')}
                           </span>
                         </div>
                       </div>
@@ -1441,7 +1445,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                             disabled={savingMenuId === item.id}
                             className="bg-primary text-on-primary px-5 py-3 font-headline font-black uppercase text-xs tracking-widest disabled:opacity-50"
                           >
-                            {savingMenuId === item.id ? 'Saving...' : 'Save'}
+                            {savingMenuId === item.id ? t('common:saving') : t('common:save')}
                           </button>
                           <button
                             type="button"
@@ -1449,24 +1453,24 @@ export default function ManagerDashboard({ user, onLogout }) {
                             disabled={removingMenuId === item.id}
                             className="px-5 py-3 font-headline font-black uppercase text-xs tracking-widest border-2 border-error text-error hover:bg-error-container disabled:opacity-50 whitespace-nowrap"
                           >
-                            {removingMenuId === item.id ? 'Removing...' : 'Remove from menu'}
+                            {removingMenuId === item.id ? t('common:removing') : t('removeFromMenu')}
                           </button>
                         </div>
                         <span className={`text-[10px] font-black uppercase tracking-widest text-right ml-auto leading-tight ${hasChanges ? 'text-[#d76100]' : 'text-secondary'}`}>
-                          {hasChanges ? <>{`Unsaved`}<br />{`changes`}</> : 'Synced'}
+                          {hasChanges ? <span className="whitespace-pre-line">{t('unsavedChanges')}</span> : t('synced')}
                         </span>
                       </div>
                       <div className="sm:col-span-2 border-t border-outline-variant/20 pt-3 space-y-2">
                         <div className="flex items-center justify-between">
                           <p className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">
-                            Ingredients (required)
+                            {t('ingredientsRequired')}
                           </p>
                           <button
                             type="button"
                             onClick={() => addMenuIngredientRow(item.id)}
                             className="text-[10px] font-black uppercase tracking-widest px-2 py-1 border border-outline-variant/30"
                           >
-                            Add
+                            {t('common:add')}
                           </button>
                         </div>
                         {(draft.ingredients || []).map((entry, idx) => (
@@ -1476,7 +1480,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                               onChange={(e) => updateMenuIngredientRow(item.id, idx, { ingredient_id: e.target.value })}
                               className="sm:col-span-5 px-2 py-2 bg-surface-container-high border border-outline-variant/20 text-xs"
                             >
-                              <option value="">Select ingredient</option>
+                              <option value="">{t('common:selectIngredient')}</option>
                               {ingredientsCatalog.map((ingredientOption) => (
                                 <option key={ingredientOption.id} value={ingredientOption.id}>
                                   {ingredientOption.name}
@@ -1521,7 +1525,7 @@ export default function ManagerDashboard({ user, onLogout }) {
           <div className="w-full max-w-lg bg-white border border-outline-variant/20 shadow-2xl">
             <div className="p-6 border-b border-outline-variant/20 flex items-center justify-between">
               <h3 className="font-headline text-2xl font-black uppercase">
-                {editingInventoryId ? 'Edit inventory' : 'Manual Inventory Count'}
+                {editingInventoryId ? t('editInventory') : t('manualInventoryCount')}
               </h3>
               <button
                 type="button"
@@ -1544,14 +1548,14 @@ export default function ManagerDashboard({ user, onLogout }) {
                 <>
                   <div>
                     <label className="block text-xs font-black uppercase tracking-widest mb-2 text-on-surface-variant">
-                      Existing Ingredient
+                      {t('existingIngredient')}
                     </label>
                     <select
                       value={inventoryIngredientId}
                       onChange={(e) => setInventoryIngredientId(e.target.value)}
                       className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 focus:outline-none focus:border-primary"
                     >
-                      <option value="">Select ingredient</option>
+                      <option value="">{t('common:selectIngredient')}</option>
                       {ingredientsCatalog.map((ingredientOption) => (
                         <option key={ingredientOption.id} value={ingredientOption.id}>
                           {ingredientOption.name}
@@ -1562,19 +1566,19 @@ export default function ManagerDashboard({ user, onLogout }) {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-black uppercase tracking-widest mb-2 text-on-surface-variant">
-                        Or New Ingredient
+                        {t('orNewIngredient')}
                       </label>
                       <input
                         type="text"
                         value={newIngredientName}
                         onChange={(e) => setNewIngredientName(e.target.value)}
                         className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 focus:outline-none focus:border-primary"
-                        placeholder="Tomato Sauce"
+                        placeholder={t('newIngredientPlaceholder')}
                       />
                     </div>
                     <div>
                       <label className="block text-xs font-black uppercase tracking-widest mb-2 text-on-surface-variant">
-                        New Ingredient Unit
+                        {t('newIngredientUnit')}
                       </label>
                       <UnitSelect value={newIngredientUnit} onChange={setNewIngredientUnit} />
                     </div>
@@ -1585,7 +1589,7 @@ export default function ManagerDashboard({ user, onLogout }) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-black uppercase tracking-widest mb-2 text-on-surface-variant">
-                    Quantity
+                    {t('quantity')}
                   </label>
                   <input
                     type="number"
@@ -1599,7 +1603,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                 </div>
                 <div>
                   <label className="block text-xs font-black uppercase tracking-widest mb-2 text-on-surface-variant">
-                    Unit
+                    {t('unit')}
                   </label>
                   <UnitSelect value={unit} onChange={setUnit} />
                 </div>
@@ -1608,7 +1612,7 @@ export default function ManagerDashboard({ user, onLogout }) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-black uppercase tracking-widest mb-2 text-on-surface-variant">
-                    Low stock threshold
+                    {t('lowStockThreshold')}
                   </label>
                   <input
                     type="number"
@@ -1617,15 +1621,15 @@ export default function ManagerDashboard({ user, onLogout }) {
                     value={lowStockThreshold}
                     onChange={(e) => setLowStockThreshold(e.target.value)}
                     className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 focus:outline-none focus:border-primary"
-                    placeholder="Optional"
+                    placeholder={t('common:optional')}
                   />
                   <p className="text-[10px] text-on-surface-variant mt-1">
-                    Below this counts as low stock (leave empty for automatic bands).
+                    {t('lowStockHint')}
                   </p>
                 </div>
                 <div>
                   <label className="block text-xs font-black uppercase tracking-widest mb-2 text-on-surface-variant">
-                    Full stock target
+                    {t('fullStockTarget')}
                   </label>
                   <input
                     type="number"
@@ -1634,10 +1638,10 @@ export default function ManagerDashboard({ user, onLogout }) {
                     value={fullStockTarget}
                     onChange={(e) => setFullStockTarget(e.target.value)}
                     className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 focus:outline-none focus:border-primary"
-                    placeholder="Optional"
+                    placeholder={t('common:optional')}
                   />
                   <p className="text-[10px] text-on-surface-variant mt-1">
-                    Refill actions bring stock here (leave empty for automatic target).
+                    {t('fullStockHint')}
                   </p>
                 </div>
               </div>
@@ -1649,7 +1653,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                 onClick={closeInventoryModal}
                 className="flex-1 py-3 border border-outline-variant/30 font-black uppercase tracking-widest text-xs hover:bg-surface-container-low"
               >
-                Cancel
+                {t('common:cancel')}
               </button>
               <button
                 type="button"
@@ -1657,7 +1661,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                 disabled={savingInventory}
                 className="flex-1 py-3 bg-primary text-on-primary font-black uppercase tracking-widest text-xs disabled:opacity-50"
               >
-                {savingInventory ? 'Saving...' : editingInventoryId ? 'Update' : 'Save'}
+                {savingInventory ? t('common:saving') : editingInventoryId ? t('common:update') : t('common:save')}
               </button>
             </div>
           </div>
@@ -1672,7 +1676,7 @@ export default function ManagerDashboard({ user, onLogout }) {
             }`}
         >
           <span className="material-symbols-outlined mb-1">group</span>
-          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest">Team</span>
+          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest">{t('team')}</span>
         </button>
         <button
           type="button"
@@ -1681,7 +1685,7 @@ export default function ManagerDashboard({ user, onLogout }) {
             }`}
         >
           <span className="material-symbols-outlined mb-1">inventory_2</span>
-          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest">Inventory</span>
+          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest">{t('inventory')}</span>
         </button>
         <button
           type="button"
@@ -1690,7 +1694,7 @@ export default function ManagerDashboard({ user, onLogout }) {
             }`}
         >
           <span className="material-symbols-outlined mb-1">restaurant_menu</span>
-          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest">Menu</span>
+          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest">{t('menu')}</span>
         </button>
         <button
           type="button"
@@ -1702,8 +1706,9 @@ export default function ManagerDashboard({ user, onLogout }) {
             }`}
         >
           <span className="material-symbols-outlined mb-1">add_box</span>
-          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest">Count</span>
+          <span className="font-['Work_Sans'] font-bold text-[11px] uppercase tracking-widest">{t('count')}</span>
         </button>
+        <LanguageSwitcher compact />
       </nav>
     </div>
   );

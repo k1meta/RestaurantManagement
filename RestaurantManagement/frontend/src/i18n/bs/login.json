@@ -1,0 +1,14 @@
+{
+  "title": "Upravljanje\nRestoranom",
+  "subtitle": "Bread & Co",
+  "emailLabel": "Email",
+  "emailPlaceholder": "Unesite vaš email",
+  "passwordLabel": "Lozinka",
+  "passwordPlaceholder": "Unesite vašu lozinku",
+  "signIn": "Prijava",
+  "signingIn": "Prijavljivanje...",
+  "staffProfiles": "Profili Osoblja",
+  "clickToAutofill": "Kliknite za automatsko popunjavanje emaila",
+  "loadingProfiles": "Učitavanje profila...",
+  "profilesError": "Nije moguće učitati brze profile. Još uvijek se možete prijaviti ručno."
+}

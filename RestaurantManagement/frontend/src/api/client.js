@@ -97,6 +97,7 @@ api.interceptors.response.use(
 export const login = (email, password) => api.post('/api/auth/login', { email, password });
 export const getMe = () => api.get('/api/auth/me');
 export const getLoginProfiles = () => api.get('/api/auth/login-profiles');
+export const updateUserLanguage = (language) => api.patch('/api/auth/language', { language });
 
 // ─── Orders ──────────────────────────────────────────────────────────────────
 export const getOrders = (params = {}) => api.get('/api/orders', { params });
