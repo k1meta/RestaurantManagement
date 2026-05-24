@@ -13,7 +13,7 @@
   "noTicketsReady": "Trenutno nema spremnih narudžbi.",
   "tableNumber": "Broj Stola",
   "statusWaiting": "Čeka se hrana",
-  "statusCooking": "Kuha se",
+  "statusCooking": "Priprema se",
   "statusReady": "Narudžba spremna",
   "itemsAndTime": "{{items}} stavki • {{minutes}} min",
   "noActiveOrders": "Nema Aktivnih Narudžbi",

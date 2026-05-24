@@ -27,7 +27,7 @@
   "passwordPlaceholder": "Lozinka",
   "location": "Lokacija",
   "salesPerformance": "Performanse Prodaje",
-  "globalTopSellers": "Globalni Top Prodavači",
+  "globalTopSellers": "Globalno Najprodavaniji Artikli",
   "units": "{{count}} jedinica",
   "noSalesYet": "Nema prodaje za ovaj period.",
   "menuItemsInCatalog": "{{count}} stavki menija u katalogu",
