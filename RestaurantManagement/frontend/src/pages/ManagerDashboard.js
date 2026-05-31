@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   createMenuItem,
@@ -19,6 +19,8 @@ import {
 } from '../api/client';
 import { ALLOWED_UNITS, isAllowedUnit } from '../constants/units';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import ToastContainer from '../components/ToastContainer';
+import useToast from '../hooks/useToast';
 
 function initials(name) {
   return String(name || '?')
@@ -190,8 +192,7 @@ export default function ManagerDashboard({ user, onLogout }) {
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState('');
-  const [notice, setNotice] = useState('');
+  const { toasts, addToast, removeToast } = useToast();
   const [publishingAll, setPublishingAll] = useState(false);
   const [mobileTab, setMobileTab] = useState('inventory');
 
@@ -247,14 +248,12 @@ export default function ManagerDashboard({ user, onLogout }) {
     resetInventoryModalForm();
   }
 
-  async function loadDashboard(showSpinner = true) {
+  const loadDashboard = useCallback(async (showSpinner = true) => {
     if (showSpinner) {
       setLoading(true);
     } else {
       setRefreshing(true);
     }
-
-    setError('');
 
     try {
       const [inventoryRes, menuRes, usersRes, ordersRes, ingredientsRes] = await Promise.all([
@@ -291,16 +290,16 @@ export default function ManagerDashboard({ user, onLogout }) {
         return next;
       });
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not load manager dashboard data');
+      addToast(err.response?.data?.error || 'Could not load manager dashboard data', 'error');
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }
+  }, [addToast]);
 
   useEffect(() => {
     loadDashboard(true);
-  }, []);
+  }, [loadDashboard]);
 
   const inventoryView = useMemo(() => normalizeInventory(inventory), [inventory]);
   const lowStock = useMemo(
@@ -335,21 +334,19 @@ export default function ManagerDashboard({ user, onLogout }) {
       unit: String(entry.unit || '').trim() || null,
     }));
     if (!newMenuName.trim() || !Number.isFinite(parsedPrice) || parsedPrice <= 0) {
-      setError('New menu item requires a name and valid price');
+      addToast('New menu item requires a name and valid price', 'error');
       return;
     }
     if (!parsedIngredients.length || parsedIngredients.some((entry) => !entry.ingredient_id || !Number.isFinite(entry.quantity_required) || entry.quantity_required <= 0)) {
-      setError('Each menu item must include at least one valid ingredient requirement');
+      addToast('Each menu item must include at least one valid ingredient requirement', 'error');
       return;
     }
     if (parsedIngredients.some((entry) => !isAllowedUnit(entry.unit))) {
-      setError('Each ingredient must have a unit selected (Kg, g, pieces, L, ml)');
+      addToast('Each ingredient must have a unit selected (Kg, g, pieces, L, ml)', 'error');
       return;
     }
 
     setCreatingMenuItem(true);
-    setError('');
-    setNotice('');
 
     try {
       await createMenuItem({
@@ -365,10 +362,10 @@ export default function ManagerDashboard({ user, onLogout }) {
       setNewMenuPrice('');
       setNewMenuActive(true);
       setNewMenuIngredients([{ ingredient_id: '', quantity_required: '', unit: '' }]);
-      setNotice('New menu item created successfully.');
+      addToast('New menu item created successfully.', 'success');
       await loadDashboard(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not create menu item');
+      addToast(err.response?.data?.error || 'Could not create menu item', 'error');
     } finally {
       setCreatingMenuItem(false);
     }
@@ -376,13 +373,11 @@ export default function ManagerDashboard({ user, onLogout }) {
 
   async function handleCreateStaffUser() {
     if (!newStaffName.trim() || !newStaffEmail.trim() || !newStaffPassword.trim()) {
-      setError('Name, email, and password are required to create a user');
+      addToast('Name, email, and password are required to create a user', 'error');
       return;
     }
 
     setCreatingStaff(true);
-    setError('');
-    setNotice('');
 
     try {
       await createUser({
@@ -396,10 +391,10 @@ export default function ManagerDashboard({ user, onLogout }) {
       setNewStaffEmail('');
       setNewStaffPassword('');
       setNewStaffRole('waiter');
-      setNotice('New staff user created successfully.');
+      addToast('New staff user created successfully.', 'success');
       await loadDashboard(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not create user');
+      addToast(err.response?.data?.error || 'Could not create user', 'error');
     } finally {
       setCreatingStaff(false);
     }
@@ -412,15 +407,13 @@ export default function ManagerDashboard({ user, onLogout }) {
     }
 
     setUpdatingStaffId(member.id);
-    setError('');
-    setNotice('');
 
     try {
       await updateUser(member.id, { role: nextRole });
-      setNotice(`Updated role for ${member.name}.`);
+      addToast(`Updated role for ${member.name}.`, 'success');
       await loadDashboard(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not update user role');
+      addToast(err.response?.data?.error || 'Could not update user role', 'error');
     } finally {
       setUpdatingStaffId(null);
     }
@@ -432,15 +425,13 @@ export default function ManagerDashboard({ user, onLogout }) {
     }
 
     setDeletingStaffId(member.id);
-    setError('');
-    setNotice('');
 
     try {
       await deleteUser(member.id);
-      setNotice(`Deleted user ${member.name}.`);
+      addToast(`Deleted user ${member.name}.`, 'success');
       await loadDashboard(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not delete user');
+      addToast(err.response?.data?.error || 'Could not delete user', 'error');
     } finally {
       setDeletingStaffId(null);
     }
@@ -449,7 +440,7 @@ export default function ManagerDashboard({ user, onLogout }) {
   async function handleInventorySave() {
     const parsedQuantity = Number(quantity);
     if (!Number.isFinite(parsedQuantity) || parsedQuantity < 0) {
-      setError('A valid quantity is required');
+      addToast('A valid quantity is required', 'error');
       return;
     }
 
@@ -458,7 +449,7 @@ export default function ManagerDashboard({ user, onLogout }) {
       if (!t) return undefined;
       const n = Number(t);
       if (!Number.isFinite(n) || n < 0) {
-        setError(`${label} must be empty or a non-negative number`);
+        addToast(`${label} must be empty or a non-negative number`, 'error');
         return null;
       }
       return n;
@@ -469,19 +460,17 @@ export default function ManagerDashboard({ user, onLogout }) {
     const fullN = parseOptionalThresholdInput(fullStockTarget, 'Full stock target');
     if (fullN === null) return;
     if (lowN != null && fullN != null && lowN > fullN) {
-      setError('Low stock threshold cannot exceed full stock target');
+      addToast('Low stock threshold cannot exceed full stock target', 'error');
       return;
     }
 
     const inventoryUnit = String(unit || '').trim();
     if (!isAllowedUnit(inventoryUnit)) {
-      setError('Select a unit (Kg, g, pieces, L, or ml)');
+      addToast('Select a unit (Kg, g, pieces, L, or ml)', 'error');
       return;
     }
 
     setSavingInventory(true);
-    setError('');
-    setNotice('');
 
     try {
       if (editingInventoryId) {
@@ -493,10 +482,10 @@ export default function ManagerDashboard({ user, onLogout }) {
         if (fullN !== undefined) payload.full_stock_target = fullN;
         await patchInventoryItem(editingInventoryId, payload);
         closeInventoryModal();
-        setNotice('Inventory updated successfully.');
+        addToast('Inventory updated successfully.', 'success');
       } else {
         if (!inventoryIngredientId && !newIngredientName.trim()) {
-          setError('Select an ingredient or create a new one');
+          addToast('Select an ingredient or create a new one', 'error');
           setSavingInventory(false);
           return;
         }
@@ -505,7 +494,7 @@ export default function ManagerDashboard({ user, onLogout }) {
         const catalogDefaultUnit = String(newIngredientUnit || '').trim();
         if (!selectedIngredientId && newIngredientName.trim()) {
           if (!isAllowedUnit(catalogDefaultUnit)) {
-            setError('Select a default unit for the new ingredient');
+            addToast('Select a default unit for the new ingredient', 'error');
             setSavingInventory(false);
             return;
           }
@@ -527,11 +516,11 @@ export default function ManagerDashboard({ user, onLogout }) {
 
         await upsertInventoryItem(payload);
         closeInventoryModal();
-        setNotice('Inventory count saved successfully.');
+        addToast('Inventory count saved successfully.', 'success');
       }
       await loadDashboard(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not save inventory item');
+      addToast(err.response?.data?.error || 'Could not save inventory item', 'error');
     } finally {
       setSavingInventory(false);
     }
@@ -565,21 +554,19 @@ export default function ManagerDashboard({ user, onLogout }) {
     }));
 
     if (!nextName || !Number.isFinite(nextPrice) || nextPrice <= 0) {
-      setError('Menu item requires a name and positive price');
+      addToast('Menu item requires a name and positive price', 'error');
       return;
     }
     if (!parsedIngredients.length || parsedIngredients.some((entry) => !entry.ingredient_id || !Number.isFinite(entry.quantity_required) || entry.quantity_required <= 0)) {
-      setError('Menu item must include at least one valid ingredient requirement');
+      addToast('Menu item must include at least one valid ingredient requirement', 'error');
       return;
     }
     if (parsedIngredients.some((entry) => !isAllowedUnit(entry.unit))) {
-      setError('Each ingredient must have a unit selected (Kg, g, pieces, L, ml)');
+      addToast('Each ingredient must have a unit selected (Kg, g, pieces, L, ml)', 'error');
       return;
     }
 
     setSavingMenuId(item.id);
-    setError('');
-    setNotice('');
 
     try {
       await updateMenuItem(item.id, {
@@ -589,10 +576,10 @@ export default function ManagerDashboard({ user, onLogout }) {
         active: Boolean(draft.active),
         ingredients: parsedIngredients,
       });
-      setNotice(`Saved changes for ${item.name}.`);
+      addToast(`Saved changes for ${nextName}.`, 'success');
       await loadDashboard(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not update menu item');
+      addToast(err.response?.data?.error || 'Could not update menu item', 'error');
     } finally {
       setSavingMenuId(null);
     }
@@ -606,18 +593,16 @@ export default function ManagerDashboard({ user, onLogout }) {
         quantity: item.target,
         unit: item.unit,
       });
-      setNotice(`${item.ingredient} restocked to ${item.target} ${item.unit || 'units'}.`);
+      addToast(`${item.ingredient} restocked to ${item.target} ${item.unit || 'units'}.`, 'success');
       await loadDashboard(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not restock item');
+      addToast(err.response?.data?.error || 'Could not restock item', 'error');
     }
   }
 
   async function refillAllLow() {
     if (!lowStock.length) return;
     setRefillingAll(true);
-    setError('');
-    setNotice('');
     const targets = [...lowStock];
     try {
       const results = await Promise.allSettled(
@@ -632,11 +617,11 @@ export default function ManagerDashboard({ user, onLogout }) {
       );
       const failed = results.filter((r) => r.status === 'rejected');
       if (failed.length === targets.length) {
-        setError('Could not refill low stock items');
+        addToast('Could not refill low stock items', 'error');
       } else if (failed.length > 0) {
-        setNotice(`Refilled ${targets.length - failed.length} of ${targets.length} ingredient(s); some failed.`);
+        addToast(`Refilled ${targets.length - failed.length} of ${targets.length} ingredient(s); some failed.`, 'success');
       } else {
-        setNotice(`Refilled ${targets.length} low-stock ingredient(s) to target levels.`);
+        addToast(`Refilled ${targets.length} low-stock ingredient(s) to target levels.`, 'success');
       }
       await loadDashboard(false);
     } finally {
@@ -653,8 +638,6 @@ export default function ManagerDashboard({ user, onLogout }) {
       return;
     }
     setRemovingMenuId(item.id);
-    setError('');
-    setNotice('');
     try {
       await deleteMenuItem(item.id);
       const removedId = item.id;
@@ -665,15 +648,12 @@ export default function ManagerDashboard({ user, onLogout }) {
         delete next[removedId];
         return next;
       });
-      setNotice(`Removed "${removedName}" from the menu.`);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      addToast(`Removed "${removedName}" from the menu.`, 'success');
       await loadDashboard(false);
     } catch (err) {
       const msg = err.response?.data?.error || 'Could not remove menu item';
       const status = err.response?.status;
-      setError(msg);
-      window.alert(msg);
-      menuSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      addToast(msg, 'error');
 
       if (status === 409) {
         if (
@@ -683,14 +663,11 @@ export default function ManagerDashboard({ user, onLogout }) {
         ) {
           try {
             await updateMenuItem(item.id, { active: false });
-            setNotice(`"${item.name}" is now inactive (sold out).`);
-            setError('');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            addToast(`"${item.name}" is now inactive (sold out).`, 'success');
             await loadDashboard(false);
           } catch (e2) {
             const msg2 = e2.response?.data?.error || 'Could not deactivate menu item';
-            setError(msg2);
-            window.alert(msg2);
+            addToast(msg2, 'error');
           }
         }
       }
@@ -702,11 +679,8 @@ export default function ManagerDashboard({ user, onLogout }) {
   async function publishAllMenuChanges() {
     const changedItems = topMenu.filter((item) => isMenuChanged(item));
 
-    setError('');
-    setNotice('');
-
     if (!changedItems.length) {
-      setNotice('No pending menu changes to publish.');
+      addToast('No pending menu changes to publish.', 'success');
       return;
     }
 
@@ -726,11 +700,11 @@ export default function ManagerDashboard({ user, onLogout }) {
             entry.quantity_required <= 0
         )
       ) {
-        setError(`"${item.name}": fix ingredient rows before publishing`);
+        addToast(`"${item.name}": fix ingredient rows before publishing`, 'error');
         return;
       }
       if (parsedIngredients.some((entry) => !isAllowedUnit(entry.unit))) {
-        setError(`"${item.name}": each ingredient needs a unit (Kg, g, pieces, L, ml)`);
+        addToast(`"${item.name}": each ingredient needs a unit (Kg, g, pieces, L, ml)`, 'error');
         return;
       }
     }
@@ -754,10 +728,10 @@ export default function ManagerDashboard({ user, onLogout }) {
         })
       );
 
-      setNotice(`Published ${changedItems.length} menu change(s).`);
+      addToast(`Published ${changedItems.length} menu change(s).`, 'success');
       await loadDashboard(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not publish all menu changes');
+      addToast(err.response?.data?.error || 'Could not publish all menu changes', 'error');
     } finally {
       setPublishingAll(false);
     }
@@ -808,10 +782,10 @@ export default function ManagerDashboard({ user, onLogout }) {
 
     try {
       await deleteInventoryItem(item.id);
-      setNotice(`Removed ${item.ingredient} from inventory.`);
+      addToast(`Removed ${item.ingredient} from inventory.`, 'success');
       await loadDashboard(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not delete inventory item');
+      addToast(err.response?.data?.error || 'Could not delete inventory item', 'error');
     }
   }
 
@@ -819,12 +793,10 @@ export default function ManagerDashboard({ user, onLogout }) {
     const raw = qtyAdjustDraft[item.id];
     const parsed = raw !== undefined && String(raw).trim() !== '' ? Number(raw) : NaN;
     if (!Number.isFinite(parsed) || parsed < 0) {
-      setError('Enter a valid quantity to save');
+      addToast('Enter a valid quantity to save', 'error');
       return;
     }
     setPatchingQtyId(item.id);
-    setError('');
-    setNotice('');
     try {
       await patchInventoryItem(item.id, { quantity: parsed });
       setQtyAdjustDraft((prev) => {
@@ -832,10 +804,10 @@ export default function ManagerDashboard({ user, onLogout }) {
         delete next[item.id];
         return next;
       });
-      setNotice(`Updated ${item.ingredient} quantity.`);
+      addToast(`Updated ${item.ingredient} quantity.`, 'success');
       await loadDashboard(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not update quantity');
+      addToast(err.response?.data?.error || 'Could not update quantity', 'error');
     } finally {
       setPatchingQtyId(null);
     }
@@ -883,26 +855,18 @@ export default function ManagerDashboard({ user, onLogout }) {
         </div>
       </header>
 
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
+
       <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {error ? (
-          <div className="lg:col-span-12 bg-error-container border border-error/30 text-on-error-container p-4 text-sm font-bold">
-            {error}
-          </div>
-        ) : null}
-        {notice ? (
-          <div className="lg:col-span-12 bg-secondary-container border border-secondary/30 text-on-secondary-container p-4 text-sm font-bold">
-            {notice}
-          </div>
-        ) : null}
 
         <div className="lg:col-span-4 flex flex-col gap-6">
-        <section
-          className={
-            lowStock.length
-              ? 'bg-[#ffdad6] p-6 rounded-lg relative overflow-hidden border-2 border-error ring-4 ring-error/10'
-              : 'bg-surface-container-low p-6 rounded-lg relative overflow-hidden border border-outline-variant/20'
-          }
-        >
+          <section
+            className={
+              lowStock.length
+                ? 'bg-[#ffdad6] p-6 rounded-lg relative overflow-hidden border-2 border-error ring-4 ring-error/10'
+                : 'bg-surface-container-low p-6 rounded-lg relative overflow-hidden border border-outline-variant/20'
+            }
+          >
             <div className="flex justify-between items-center mb-4">
               <div
                 className={
@@ -962,9 +926,9 @@ export default function ManagerDashboard({ user, onLogout }) {
                   ? t('refillAllLow', { count: lowStock.length })
                   : t('allGood')}
             </button>
-        </section>
+          </section>
 
-        <section ref={staffSectionRef} className="bg-surface-container-low p-6 rounded-lg">
+          <section ref={staffSectionRef} className="bg-surface-container-low p-6 rounded-lg">
             <div className="flex justify-between items-center mb-6 border-b border-outline-variant/20 pb-2">
               <h2 className="font-headline text-xs font-bold uppercase tracking-[0.2em]">{t('liveOnShift')}</h2>
               <span className="bg-secondary/10 text-secondary text-[10px] font-bold px-2 py-0.5 rounded-full">
@@ -1093,11 +1057,11 @@ export default function ManagerDashboard({ user, onLogout }) {
               <span>{t('openTickets')}</span>
               <span>{orders.length}</span>
             </div>
-        </section>
+          </section>
         </div>
 
         <div className="lg:col-span-8 flex flex-col gap-6">
-        <section ref={inventorySectionRef} className="bg-surface-container-low p-6 md:p-8 rounded-lg">
+          <section ref={inventorySectionRef} className="bg-surface-container-low p-6 md:p-8 rounded-lg">
             <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-8 gap-4">
               <div>
                 <span className="font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
@@ -1230,9 +1194,9 @@ export default function ManagerDashboard({ user, onLogout }) {
                 </div>
               )}
             </div>
-        </section>
+          </section>
 
-        <section ref={menuSectionRef} className="bg-surface-container-low p-6 md:p-8 rounded-lg">
+          <section ref={menuSectionRef} className="bg-surface-container-low p-6 md:p-8 rounded-lg">
             <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-8 gap-4">
               <div>
                 <span className="font-headline text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
@@ -1367,7 +1331,7 @@ export default function ManagerDashboard({ user, onLogout }) {
                 ))}
               </div>
             </div>
-        </section>
+          </section>
         </div>
 
         <section className="lg:col-span-12">
@@ -1378,144 +1342,144 @@ export default function ManagerDashboard({ user, onLogout }) {
                   key={item.id}
                   className="bg-surface-container-lowest p-6 border border-outline-variant/10 shadow-sm grid grid-cols-1 gap-6"
                 >
-                    <div className="flex items-center gap-6">
-                      <div className="w-20 h-20 bg-surface-container-high rounded overflow-hidden flex-shrink-0 flex items-center justify-center text-on-surface-variant">
-                        <span className="material-symbols-outlined text-3xl">restaurant</span>
-                      </div>
-                      <div>
-                        <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-1 block">
-                          {t('common:name')}
-                        </label>
-                        <input
-                          type="text"
-                          value={draft.name}
-                          onChange={(e) => setMenuDraft(item.id, { name: e.target.value })}
-                          className="px-2 py-1 bg-surface-container-high border border-outline-variant/20 font-headline font-bold text-sm w-52"
-                        />
-                        <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mt-2 mb-1 block">
-                          {t('common:category')}
-                        </label>
-                        <input
-                          type="text"
-                          value={draft.category}
-                          onChange={(e) => setMenuDraft(item.id, { category: e.target.value })}
-                          className="px-2 py-1 bg-surface-container-high border border-outline-variant/20 text-sm w-40"
-                        />
-                        <p className="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mt-2">#{item.id}</p>
-                      </div>
+                  <div className="flex items-center gap-6">
+                    <div className="w-20 h-20 bg-surface-container-high rounded overflow-hidden flex-shrink-0 flex items-center justify-center text-on-surface-variant">
+                      <span className="material-symbols-outlined text-3xl">restaurant</span>
                     </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="flex flex-col gap-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2">
-                          {t('priceDollar')}
-                        </label>
-                        <div className="flex items-center bg-surface-container-high border border-outline-variant/20 px-2">
-                          <span className="text-lg font-bold mr-1">$</span>
-                          <input
-                            className="bg-transparent border-none font-headline font-black text-xl w-24 focus:ring-2 focus:ring-primary p-2 text-center"
-                            type="number"
-                            step="0.01"
-                            value={draft.price}
-                            onChange={(e) => setMenuDraft(item.id, { price: e.target.value })}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col gap-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2">
-                          {t('availability')}
-                        </label>
-                        <div className="bg-surface-container-high border border-outline-variant/20 px-3 py-2 flex items-center justify-between gap-2 overflow-hidden h-10">
-                          <AvailabilitySwitch
-                            checked={Boolean(draft.active)}
-                            onToggle={(nextValue) => setMenuDraft(item.id, { active: nextValue })}
-                          />
-                          <span className={`text-[10px] font-black uppercase tracking-widest truncate ${draft.active ? 'text-secondary' : 'text-on-surface-variant'}`}>
-                            {draft.active ? t('common:available') : t('common:soldOut')}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="sm:col-span-2 pt-2 border-t border-outline-variant/20 flex items-center gap-3 flex-wrap sm:flex-nowrap">
-                        <div className="flex gap-2 shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => saveMenuItem(item)}
-                            disabled={savingMenuId === item.id}
-                            className="bg-primary text-on-primary px-5 py-3 font-headline font-black uppercase text-xs tracking-widest disabled:opacity-50"
-                          >
-                            {savingMenuId === item.id ? t('common:saving') : t('common:save')}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => removeMenuItemPermanently(item)}
-                            disabled={removingMenuId === item.id}
-                            className="px-5 py-3 font-headline font-black uppercase text-xs tracking-widest border-2 border-error text-error hover:bg-error-container disabled:opacity-50 whitespace-nowrap"
-                          >
-                            {removingMenuId === item.id ? t('common:removing') : t('removeFromMenu')}
-                          </button>
-                        </div>
-                        <span className={`text-[10px] font-black uppercase tracking-widest text-right ml-auto leading-tight ${hasChanges ? 'text-[#d76100]' : 'text-secondary'}`}>
-                          {hasChanges ? <span className="whitespace-pre-line">{t('unsavedChanges')}</span> : t('synced')}
-                        </span>
-                      </div>
-                      <div className="sm:col-span-2 border-t border-outline-variant/20 pt-3 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">
-                            {t('ingredientsRequired')}
-                          </p>
-                          <button
-                            type="button"
-                            onClick={() => addMenuIngredientRow(item.id)}
-                            className="text-[10px] font-black uppercase tracking-widest px-2 py-1 border border-outline-variant/30"
-                          >
-                            {t('common:add')}
-                          </button>
-                        </div>
-                        {(draft.ingredients || []).map((entry, idx) => (
-                          <div key={`${item.id}-ingredient-${idx}`} className="grid grid-cols-1 sm:grid-cols-12 gap-2">
-                            <select
-                              value={entry.ingredient_id}
-                              onChange={(e) => updateMenuIngredientRow(item.id, idx, { ingredient_id: e.target.value })}
-                              className="sm:col-span-5 px-2 py-2 bg-surface-container-high border border-outline-variant/20 text-xs"
-                            >
-                              <option value="">{t('common:selectIngredient')}</option>
-                              {ingredientsCatalog.map((ingredientOption) => (
-                                <option key={ingredientOption.id} value={ingredientOption.id}>
-                                  {ingredientOption.name}
-                                </option>
-                              ))}
-                            </select>
-                            <input
-                              type="number"
-                              step="0.01"
-                              value={entry.quantity_required}
-                              onChange={(e) => updateMenuIngredientRow(item.id, idx, { quantity_required: e.target.value })}
-                              className="sm:col-span-3 px-2 py-2 bg-surface-container-high border border-outline-variant/20 text-xs"
-                              placeholder="Qty"
-                            />
-                            <div className="flex gap-2 sm:col-span-4">
-                              <UnitSelect
-                                value={entry.unit}
-                                onChange={(v) => updateMenuIngredientRow(item.id, idx, { unit: v })}
-                                className="flex-1 px-2 py-2 pr-8 bg-surface-container-high border border-outline-variant/20 text-xs"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => removeMenuIngredientRow(item.id, idx)}
-                                className="px-2 py-2 text-[10px] font-black uppercase tracking-widest border border-error text-error"
-                              >
-                                X
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                    <div>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-1 block">
+                        {t('common:name')}
+                      </label>
+                      <input
+                        type="text"
+                        value={draft.name}
+                        onChange={(e) => setMenuDraft(item.id, { name: e.target.value })}
+                        className="px-2 py-1 bg-surface-container-high border border-outline-variant/20 font-headline font-bold text-sm w-52"
+                      />
+                      <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mt-2 mb-1 block">
+                        {t('common:category')}
+                      </label>
+                      <input
+                        type="text"
+                        value={draft.category}
+                        onChange={(e) => setMenuDraft(item.id, { category: e.target.value })}
+                        className="px-2 py-1 bg-surface-container-high border border-outline-variant/20 text-sm w-40"
+                      />
+                      <p className="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold mt-2">#{item.id}</p>
                     </div>
                   </div>
-                );
-              })}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2">
+                        {t('priceDollar')}
+                      </label>
+                      <div className="flex items-center bg-surface-container-high border border-outline-variant/20 px-2">
+                        <span className="text-lg font-bold mr-1">$</span>
+                        <input
+                          className="bg-transparent border-none font-headline font-black text-xl w-24 focus:ring-2 focus:ring-primary p-2 text-center"
+                          type="number"
+                          step="0.01"
+                          value={draft.price}
+                          onChange={(e) => setMenuDraft(item.id, { price: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant mb-2">
+                        {t('availability')}
+                      </label>
+                      <div className="bg-surface-container-high border border-outline-variant/20 px-3 py-2 flex items-center justify-between gap-2 overflow-hidden h-10">
+                        <AvailabilitySwitch
+                          checked={Boolean(draft.active)}
+                          onToggle={(nextValue) => setMenuDraft(item.id, { active: nextValue })}
+                        />
+                        <span className={`text-[10px] font-black uppercase tracking-widest truncate ${draft.active ? 'text-secondary' : 'text-on-surface-variant'}`}>
+                          {draft.active ? t('common:available') : t('common:soldOut')}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-2 pt-2 border-t border-outline-variant/20 flex items-center gap-3 flex-wrap sm:flex-nowrap">
+                      <div className="flex gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => saveMenuItem(item)}
+                          disabled={savingMenuId === item.id}
+                          className="bg-primary text-on-primary px-5 py-3 font-headline font-black uppercase text-xs tracking-widest disabled:opacity-50"
+                        >
+                          {savingMenuId === item.id ? t('common:saving') : t('common:save')}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeMenuItemPermanently(item)}
+                          disabled={removingMenuId === item.id}
+                          className="px-5 py-3 font-headline font-black uppercase text-xs tracking-widest border-2 border-error text-error hover:bg-error-container disabled:opacity-50 whitespace-nowrap"
+                        >
+                          {removingMenuId === item.id ? t('common:removing') : t('removeFromMenu')}
+                        </button>
+                      </div>
+                      <span className={`text-[10px] font-black uppercase tracking-widest text-right ml-auto leading-tight ${hasChanges ? 'text-[#d76100]' : 'text-secondary'}`}>
+                        {hasChanges ? <span className="whitespace-pre-line">{t('unsavedChanges')}</span> : t('synced')}
+                      </span>
+                    </div>
+                    <div className="sm:col-span-2 border-t border-outline-variant/20 pt-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">
+                          {t('ingredientsRequired')}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => addMenuIngredientRow(item.id)}
+                          className="text-[10px] font-black uppercase tracking-widest px-2 py-1 border border-outline-variant/30"
+                        >
+                          {t('common:add')}
+                        </button>
+                      </div>
+                      {(draft.ingredients || []).map((entry, idx) => (
+                        <div key={`${item.id}-ingredient-${idx}`} className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                          <select
+                            value={entry.ingredient_id}
+                            onChange={(e) => updateMenuIngredientRow(item.id, idx, { ingredient_id: e.target.value })}
+                            className="sm:col-span-5 px-2 py-2 bg-surface-container-high border border-outline-variant/20 text-xs"
+                          >
+                            <option value="">{t('common:selectIngredient')}</option>
+                            {ingredientsCatalog.map((ingredientOption) => (
+                              <option key={ingredientOption.id} value={ingredientOption.id}>
+                                {ingredientOption.name}
+                              </option>
+                            ))}
+                          </select>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={entry.quantity_required}
+                            onChange={(e) => updateMenuIngredientRow(item.id, idx, { quantity_required: e.target.value })}
+                            className="sm:col-span-3 px-2 py-2 bg-surface-container-high border border-outline-variant/20 text-xs"
+                            placeholder="Qty"
+                          />
+                          <div className="flex gap-2 sm:col-span-4">
+                            <UnitSelect
+                              value={entry.unit}
+                              onChange={(v) => updateMenuIngredientRow(item.id, idx, { unit: v })}
+                              className="flex-1 px-2 py-2 pr-8 bg-surface-container-high border border-outline-variant/20 text-xs"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeMenuIngredientRow(item.id, idx)}
+                              className="px-2 py-2 text-[10px] font-black uppercase tracking-widest border border-error text-error"
+                            >
+                              X
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
       </main>
