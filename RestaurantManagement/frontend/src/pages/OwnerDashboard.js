@@ -14,6 +14,8 @@ import {
 } from '../api/client';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import ToastContainer from '../components/ToastContainer';
+import useToast from '../hooks/useToast';
 
 const PERIODS = ['weekly', 'monthly', 'yearly'];
 const TARGET_MINUTES = 15;
@@ -70,8 +72,7 @@ export default function OwnerDashboard({ user, onLogout }) {
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState('');
-  const [notice, setNotice] = useState('');
+  const { toasts, addToast, removeToast } = useToast();
 
   const [selectedLocationId, setSelectedLocationId] = useState(null);
 
@@ -88,8 +89,6 @@ export default function OwnerDashboard({ user, onLogout }) {
     } else {
       setRefreshing(true);
     }
-
-    setError('');
 
     try {
       const [locationsRes, ordersRes, salesRes, menuRes, usersRes] = await Promise.all([
@@ -135,12 +134,12 @@ export default function OwnerDashboard({ user, onLogout }) {
         return next;
       });
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not load owner dashboard data');
+      addToast(err.response?.data?.error || 'Could not load owner dashboard data', 'error');
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [period]);
+  }, [period, addToast]);
 
   useEffect(() => {
     loadDashboard(true);
@@ -217,12 +216,12 @@ export default function OwnerDashboard({ user, onLogout }) {
   function focusLocation(locationId) {
     setSelectedLocationId((current) => {
       if (Number(current) === Number(locationId)) {
-        setNotice('Location filter cleared.');
+        addToast('Location filter cleared.', 'success');
         return null;
       }
 
       const locationName = locations.find((location) => Number(location.id) === Number(locationId))?.name;
-      setNotice(`Focused analytics on ${locationName || 'selected location'}.`);
+      addToast(`Focused analytics on ${locationName || 'selected location'}.`, 'success');
       return locationId;
     });
   }
@@ -237,13 +236,11 @@ export default function OwnerDashboard({ user, onLogout }) {
 
   async function handleCreateLocation() {
     if (!newLocationName.trim()) {
-      setError('Location name is required');
+      addToast('Location name is required', 'error');
       return;
     }
 
     setCreatingLocation(true);
-    setError('');
-    setNotice('');
 
     try {
       await createLocation({
@@ -253,10 +250,10 @@ export default function OwnerDashboard({ user, onLogout }) {
 
       setNewLocationName('');
       setNewLocationAddress('');
-      setNotice('Location created successfully.');
+      addToast('Location created successfully.', 'success');
       await loadDashboard(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not create location');
+      addToast(err.response?.data?.error || 'Could not create location', 'error');
     } finally {
       setCreatingLocation(false);
     }
@@ -266,23 +263,21 @@ export default function OwnerDashboard({ user, onLogout }) {
     const draft = locationDrafts[location.id] || { name: location.name || '', address: location.address || '' };
     const nextName = String(draft.name || '').trim();
     if (!nextName) {
-      setError('Location name cannot be empty');
+      addToast('Location name cannot be empty', 'error');
       return;
     }
 
     setSavingLocationId(location.id);
-    setError('');
-    setNotice('');
 
     try {
       await updateLocation(location.id, {
         name: nextName,
         address: String(draft.address || '').trim() || null,
       });
-      setNotice(`Saved location ${location.name}.`);
+      addToast(`Saved location ${location.name}.`, 'success');
       await loadDashboard(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not update location');
+      addToast(err.response?.data?.error || 'Could not update location', 'error');
     } finally {
       setSavingLocationId(null);
     }
@@ -294,15 +289,13 @@ export default function OwnerDashboard({ user, onLogout }) {
     }
 
     setDeletingLocationId(location.id);
-    setError('');
-    setNotice('');
 
     try {
       await deleteLocation(location.id);
-      setNotice(`Deleted location ${location.name}.`);
+      addToast(`Deleted location ${location.name}.`, 'success');
       await loadDashboard(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not delete location');
+      addToast(err.response?.data?.error || 'Could not delete location', 'error');
     } finally {
       setDeletingLocationId(null);
     }
@@ -338,7 +331,7 @@ export default function OwnerDashboard({ user, onLogout }) {
     };
 
     if (!payload.name || !payload.email || !payload.role) {
-      setError('User name, email and role are required');
+      addToast('User name, email and role are required', 'error');
       return;
     }
 
@@ -347,7 +340,7 @@ export default function OwnerDashboard({ user, onLogout }) {
     } else {
       const parsedLocation = Number(draft.location_id);
       if (!Number.isInteger(parsedLocation) || parsedLocation <= 0) {
-        setError('Non-owner users require a valid location');
+        addToast('Non-owner users require a valid location', 'error');
         return;
       }
       payload.location_id = parsedLocation;
@@ -359,15 +352,13 @@ export default function OwnerDashboard({ user, onLogout }) {
     }
 
     setSavingUserId(member.id);
-    setError('');
-    setNotice('');
 
     try {
       await updateUser(member.id, payload);
-      setNotice(`Saved user ${member.name}.`);
+      addToast(`Saved user ${member.name}.`, 'success');
       await loadDashboard(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not update user');
+      addToast(err.response?.data?.error || 'Could not update user', 'error');
     } finally {
       setSavingUserId(null);
     }
@@ -379,15 +370,13 @@ export default function OwnerDashboard({ user, onLogout }) {
     }
 
     setDeletingUserId(member.id);
-    setError('');
-    setNotice('');
 
     try {
       await deleteUser(member.id);
-      setNotice(`Deleted user ${member.name}.`);
+      addToast(`Deleted user ${member.name}.`, 'success');
       await loadDashboard(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not delete user');
+      addToast(err.response?.data?.error || 'Could not delete user', 'error');
     } finally {
       setDeletingUserId(null);
     }
@@ -395,7 +384,7 @@ export default function OwnerDashboard({ user, onLogout }) {
 
   async function handleCreateUserAccount() {
     if (!newUserName.trim() || !newUserEmail.trim() || !newUserPassword.trim()) {
-      setError('Name, email and password are required');
+      addToast('Name, email and password are required', 'error');
       return;
     }
 
@@ -409,15 +398,13 @@ export default function OwnerDashboard({ user, onLogout }) {
     if (newUserRole !== 'owner') {
       const parsedLocation = Number(newUserLocationId);
       if (!Number.isInteger(parsedLocation) || parsedLocation <= 0) {
-        setError('Select a valid location for non-owner users');
+        addToast('Select a valid location for non-owner users', 'error');
         return;
       }
       payload.location_id = parsedLocation;
     }
 
     setCreatingUser(true);
-    setError('');
-    setNotice('');
 
     try {
       await createUser(payload);
@@ -426,10 +413,10 @@ export default function OwnerDashboard({ user, onLogout }) {
       setNewUserPassword('');
       setNewUserRole('manager');
       setNewUserLocationId('');
-      setNotice('User created successfully.');
+      addToast('User created successfully.', 'success');
       await loadDashboard(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not create user');
+      addToast(err.response?.data?.error || 'Could not create user', 'error');
     } finally {
       setCreatingUser(false);
     }
@@ -500,17 +487,9 @@ export default function OwnerDashboard({ user, onLogout }) {
         <div className="bg-[#f6f3f2] dark:bg-[#1c1b1b] h-[2px] w-full absolute bottom-0 left-0"></div>
       </header>
 
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
+
       <main className="max-w-7xl mx-auto px-6 pt-12 space-y-12">
-        {error ? (
-          <div className="bg-error-container border border-error/30 text-on-error-container p-4 text-sm font-bold">
-            {error}
-          </div>
-        ) : null}
-        {notice ? (
-          <div className="bg-secondary-container border border-secondary/30 text-on-secondary-container p-4 text-sm font-bold">
-            {notice}
-          </div>
-        ) : null}
         {selectedLocationId ? (
           <div className="bg-surface-container-low border border-outline-variant/30 p-3 flex flex-wrap items-center justify-between gap-3 text-xs font-bold uppercase tracking-widest">
             <span>{t('locationFilter', { name: selectedLocationName })}</span>
@@ -518,7 +497,7 @@ export default function OwnerDashboard({ user, onLogout }) {
               type="button"
               onClick={() => {
                 setSelectedLocationId(null);
-                setNotice('Location filter cleared.');
+                addToast('Location filter cleared.', 'success');
               }}
               className="px-3 py-1 bg-black text-white hover:opacity-90"
             >
@@ -545,7 +524,7 @@ export default function OwnerDashboard({ user, onLogout }) {
                   {t('totalAggregateRevenue')}
                 </h3>
                 <span className="text-7xl md:text-9xl font-black font-headline tracking-tighter block leading-none">
-                    ${Number(selectedLocationId ? filteredRevenue : salesSummary.total_revenue || 0).toFixed(2)}
+                  ${Number(selectedLocationId ? filteredRevenue : salesSummary.total_revenue || 0).toFixed(2)}
                 </span>
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-on-surface-variant mt-3">
                   {t('ordersLabel', { location: selectedLocationName, count: selectedLocationId ? filteredOrderCount : Number(salesSummary.total_orders || 0) })}
@@ -561,9 +540,8 @@ export default function OwnerDashboard({ user, onLogout }) {
                   {orderTrend.map((bucket) => (
                     <div
                       key={bucket.label}
-                      className={`flex-1 ${bucket.value ? 'bg-surface-container-highest hover:bg-black transition-colors' : 'bg-surface-container-highest/50'} ${
-                        bucket.pct >= 90 ? 'bg-black' : ''
-                      }`}
+                      className={`flex-1 ${bucket.value ? 'bg-surface-container-highest hover:bg-black transition-colors' : 'bg-surface-container-highest/50'} ${bucket.pct >= 90 ? 'bg-black' : ''
+                        }`}
                       style={{ height: `${Math.max(8, bucket.pct)}%` }}
                       title={`${bucket.label}: ${bucket.value} orders`}
                     ></div>
@@ -597,19 +575,17 @@ export default function OwnerDashboard({ user, onLogout }) {
                       key={location.id}
                       type="button"
                       onClick={() => focusLocation(location.id)}
-                      className={`w-full text-left flex justify-between items-center group cursor-pointer p-1 border ${
-                        Number(selectedLocationId) === Number(location.id) ? 'border-secondary' : 'border-transparent'
-                      }`}
+                      className={`w-full text-left flex justify-between items-center group cursor-pointer p-1 border ${Number(selectedLocationId) === Number(location.id) ? 'border-secondary' : 'border-transparent'
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         <span
-                          className={`w-2 h-2 rounded-full ${
-                            location.health === 'alert'
+                          className={`w-2 h-2 rounded-full ${location.health === 'alert'
                               ? 'bg-error animate-pulse'
                               : location.health === 'watch'
                                 ? 'bg-[#ffb68f]'
                                 : 'bg-secondary'
-                          }`}
+                            }`}
                         ></span>
                         <span className="font-headline font-bold text-sm uppercase">{location.name}</span>
                       </div>
@@ -625,26 +601,25 @@ export default function OwnerDashboard({ user, onLogout }) {
 
           <div ref={locationsSectionRef} className="lg:col-span-3 lg:row-start-3 grid grid-cols-1 md:grid-cols-3 gap-6">
             {locationPerformance.map((location) => (
-            <button
-              key={`perf-${location.id}`}
-              type="button"
-              onClick={() => focusLocation(location.id)}
-              className={`text-left bg-surface-container-low p-8 border-l-4 border-black space-y-6 ${
-                Number(selectedLocationId) === Number(location.id) ? 'ring-2 ring-secondary/50' : ''
-              }`}
-            >
-              <div>
-                <h4 className="text-xl font-black uppercase tracking-tighter">{location.name}</h4>
-              </div>
-              <div className="space-y-1">
-                <p className="text-4xl font-black font-headline tracking-tighter">${location.revenue.toFixed(2)}</p>
-                <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">{t('revenuePeriod', { period: t(period) })}</p>
-              </div>
-              <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-                <span>{t('activeOrders')}</span>
-                <span>{location.activeOrders}</span>
-              </div>
-            </button>
+              <button
+                key={`perf-${location.id}`}
+                type="button"
+                onClick={() => focusLocation(location.id)}
+                className={`text-left bg-surface-container-low p-8 border-l-4 border-black space-y-6 ${Number(selectedLocationId) === Number(location.id) ? 'ring-2 ring-secondary/50' : ''
+                  }`}
+              >
+                <div>
+                  <h4 className="text-xl font-black uppercase tracking-tighter">{location.name}</h4>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-4xl font-black font-headline tracking-tighter">${location.revenue.toFixed(2)}</p>
+                  <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">{t('revenuePeriod', { period: t(period) })}</p>
+                </div>
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                  <span>{t('activeOrders')}</span>
+                  <span>{location.activeOrders}</span>
+                </div>
+              </button>
             ))}
           </div>
         </section>
@@ -954,11 +929,10 @@ export default function OwnerDashboard({ user, onLogout }) {
                   <button
                     key={value}
                     onClick={() => setPeriod(value)}
-                    className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest ${
-                      period === value
+                    className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest ${period === value
                         ? 'bg-black text-white'
                         : 'hover:bg-surface-container-highest transition-colors'
-                    }`}
+                      }`}
                   >
                     {t(value)}
                   </button>

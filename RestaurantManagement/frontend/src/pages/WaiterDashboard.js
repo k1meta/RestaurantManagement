@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { createOrder, getMenu, getOrders, updateOrderStatus } from '../api/client';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import ToastContainer from '../components/ToastContainer';
+import useToast from '../hooks/useToast';
 
 const STATUS_META = {
   pending: {
@@ -35,7 +37,7 @@ export default function WaiterDashboard({ user, onLogout }) {
   const [orders, setOrders] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { toasts, addToast, removeToast } = useToast();
   const [refreshing, setRefreshing] = useState(false);
 
   const [showCreateOrder, setShowCreateOrder] = useState(false);
@@ -64,8 +66,6 @@ export default function WaiterDashboard({ user, onLogout }) {
       setRefreshing(true);
     }
 
-    setError('');
-
     try {
       const [ordersRes, menuRes] = await Promise.all([
         getOrders({ include_items: true, include_closed: false }),
@@ -77,12 +77,13 @@ export default function WaiterDashboard({ user, onLogout }) {
       setMenuItems(menuRes.data.menu || []);
       setSelectedOrderId((current) => current || (nextOrders[0]?.id ?? null));
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not load waiter dashboard data');
+      addToast(err.response?.data?.error || 'Could not load waiter dashboard data', 'error');
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [addToast]);
+
 
   useEffect(() => {
     loadData(true);
@@ -124,12 +125,11 @@ export default function WaiterDashboard({ user, onLogout }) {
       }));
 
     if (!items.length) {
-      setError(t('selectAtLeastOne'));
+      addToast(t('selectAtLeastOne'), 'error');
       return;
     }
 
     setSavingOrder(true);
-    setError('');
 
     try {
       await createOrder({
@@ -144,7 +144,7 @@ export default function WaiterDashboard({ user, onLogout }) {
       setQuantities({});
       await loadData(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not create order');
+      addToast(err.response?.data?.error || 'Could not create order', 'error');
     } finally {
       setSavingOrder(false);
     }
@@ -155,7 +155,7 @@ export default function WaiterDashboard({ user, onLogout }) {
       await updateOrderStatus(orderId, 'closed');
       await loadData(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not close order');
+      addToast(err.response?.data?.error || 'Could not close order', 'error');
     }
   }
 
@@ -205,12 +205,9 @@ export default function WaiterDashboard({ user, onLogout }) {
         </div>
       </header>
 
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
+
       <main className="p-6 max-w-[1500px] mx-auto">
-        {error ? (
-          <div className="mb-6 bg-error-container border border-error/30 text-on-error-container p-4 text-sm font-bold">
-            {error}
-          </div>
-        ) : null}
 
         <div className="grid lg:grid-cols-12 gap-6">
           <section ref={ordersSectionRef} className="lg:col-span-8 space-y-6">
@@ -278,9 +275,8 @@ export default function WaiterDashboard({ user, onLogout }) {
                       key={order.id}
                       type="button"
                       onClick={() => setSelectedOrderId(order.id)}
-                      className={`text-left p-5 flex flex-col justify-between h-56 border-l-[6px] transition-all ${meta.cardClass} ${meta.borderClass} ${
-                        isSelected ? 'ring-2 ring-primary/30' : 'hover:shadow-lg'
-                      }`}
+                      className={`text-left p-5 flex flex-col justify-between h-56 border-l-[6px] transition-all ${meta.cardClass} ${meta.borderClass} ${isSelected ? 'ring-2 ring-primary/30' : 'hover:shadow-lg'
+                        }`}
                     >
                       <div className="flex justify-between items-start gap-3">
                         <div className="flex flex-col">

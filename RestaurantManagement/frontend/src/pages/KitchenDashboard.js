@@ -1,7 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getOrders, updateOrderStatus } from '../api/client';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import ToastContainer from '../components/ToastContainer';
+import useToast from '../hooks/useToast';
 
 const TARGET_MINUTES = 15;
 
@@ -29,17 +31,15 @@ export default function KitchenDashboard({ user, onLogout }) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState('');
+  const { toasts, addToast, removeToast } = useToast();
   const [viewMode, setViewMode] = useState('all');
 
-  async function loadQueue(showSpinner = true) {
+  const loadQueue = useCallback(async (showSpinner = true) => {
     if (showSpinner) {
       setLoading(true);
     } else {
       setRefreshing(true);
     }
-
-    setError('');
 
     try {
       const response = await getOrders({
@@ -48,12 +48,12 @@ export default function KitchenDashboard({ user, onLogout }) {
       });
       setOrders(response.data.orders || []);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not load kitchen queue');
+      addToast(err.response?.data?.error || 'Could not load kitchen queue', 'error');
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }
+  }, [addToast]);
 
   useEffect(() => {
     loadQueue(true);
@@ -62,7 +62,7 @@ export default function KitchenDashboard({ user, onLogout }) {
     }, 10000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [loadQueue]);
 
   const queue = useMemo(() => {
     return [...orders].sort((a, b) => {
@@ -114,7 +114,7 @@ export default function KitchenDashboard({ user, onLogout }) {
       await updateOrderStatus(order.id, 'preparing');
       await loadQueue(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not update order');
+      addToast(err.response?.data?.error || 'Could not update order', 'error');
     }
   }
 
@@ -124,7 +124,7 @@ export default function KitchenDashboard({ user, onLogout }) {
       await updateOrderStatus(order.id, 'ready');
       await loadQueue(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not mark order as ready');
+      addToast(err.response?.data?.error || 'Could not mark order as ready', 'error');
     }
   }
 
@@ -173,12 +173,9 @@ export default function KitchenDashboard({ user, onLogout }) {
         </div>
       </header>
 
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
+
       <main className="p-6 max-w-[1600px] mx-auto">
-        {error ? (
-          <div className="mb-6 bg-error-container border border-error/30 text-on-error-container p-4 text-sm font-bold">
-            {error}
-          </div>
-        ) : null}
 
         <section className="mb-10 grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="bg-primary text-on-primary p-5 flex flex-col justify-between h-32">
@@ -223,9 +220,8 @@ export default function KitchenDashboard({ user, onLogout }) {
               return (
                 <div key={order.id} className={`bg-white flex flex-col border-l-[6px] ${urgencyClass(order)}`}>
                   <div
-                    className={`px-4 py-2 flex justify-between items-center ${
-                      isUrgent ? 'bg-error text-white animate-pulse' : 'bg-black text-white'
-                    }`}
+                    className={`px-4 py-2 flex justify-between items-center ${isUrgent ? 'bg-error text-white animate-pulse' : 'bg-black text-white'
+                      }`}
                   >
                     <div className="flex items-center gap-2">
                       <span className="material-symbols-outlined text-sm">
@@ -242,9 +238,8 @@ export default function KitchenDashboard({ user, onLogout }) {
                     <h3 className="font-headline text-5xl md:text-6xl font-black tracking-tighter">{toClock(order.created_at)}</h3>
                     <div className="text-right flex flex-col items-end">
                       <span
-                        className={`font-headline text-2xl font-black px-2 ${
-                          isUrgent ? 'text-error' : order.status === 'ready' ? 'text-secondary' : 'text-on-surface'
-                        }`}
+                        className={`font-headline text-2xl font-black px-2 ${isUrgent ? 'text-error' : order.status === 'ready' ? 'text-secondary' : 'text-on-surface'
+                          }`}
                       >
                         {orderAge}m
                       </span>
@@ -258,9 +253,8 @@ export default function KitchenDashboard({ user, onLogout }) {
                     {(order.items || []).map((item) => (
                       <div
                         key={item.id}
-                        className={`flex justify-between items-center p-3 border-l-4 ${
-                          isUrgent ? 'bg-red-50 border-error' : 'bg-surface-container-low border-outline-variant'
-                        }`}
+                        className={`flex justify-between items-center p-3 border-l-4 ${isUrgent ? 'bg-red-50 border-error' : 'bg-surface-container-low border-outline-variant'
+                          }`}
                       >
                         <span className="font-headline font-black text-lg md:text-xl uppercase tracking-tight text-black">
                           {item.quantity}x {item.item_name}
@@ -322,9 +316,8 @@ export default function KitchenDashboard({ user, onLogout }) {
         <button
           type="button"
           onClick={() => setViewMode('all')}
-          className={`flex flex-col items-center justify-center w-full transition-all ${
-            viewMode === 'all' ? 'bg-[#1c1b1b] text-white border-t-4 border-[#1b6d24]' : 'text-[#e5e2e1]/70 hover:bg-[#1c1b1b]'
-          }`}
+          className={`flex flex-col items-center justify-center w-full transition-all ${viewMode === 'all' ? 'bg-[#1c1b1b] text-white border-t-4 border-[#1b6d24]' : 'text-[#e5e2e1]/70 hover:bg-[#1c1b1b]'
+            }`}
         >
           <span className="material-symbols-outlined mb-1">receipt_long</span>
           <span className="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">{t('orders')}</span>
@@ -332,9 +325,8 @@ export default function KitchenDashboard({ user, onLogout }) {
         <button
           type="button"
           onClick={() => setViewMode('delayed')}
-          className={`flex flex-col items-center justify-center w-full transition-all ${
-            viewMode === 'delayed' ? 'bg-[#1c1b1b] text-white border-t-4 border-[#1b6d24]' : 'text-[#e5e2e1]/70 hover:bg-[#1c1b1b]'
-          }`}
+          className={`flex flex-col items-center justify-center w-full transition-all ${viewMode === 'delayed' ? 'bg-[#1c1b1b] text-white border-t-4 border-[#1b6d24]' : 'text-[#e5e2e1]/70 hover:bg-[#1c1b1b]'
+            }`}
         >
           <span className="material-symbols-outlined mb-1">warning</span>
           <span className="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">{t('delayed')}</span>
@@ -342,9 +334,8 @@ export default function KitchenDashboard({ user, onLogout }) {
         <button
           type="button"
           onClick={() => setViewMode('ready')}
-          className={`flex flex-col items-center justify-center w-full transition-all ${
-            viewMode === 'ready' ? 'bg-[#1c1b1b] text-white border-t-4 border-[#1b6d24]' : 'text-[#e5e2e1]/70 hover:bg-[#1c1b1b]'
-          }`}
+          className={`flex flex-col items-center justify-center w-full transition-all ${viewMode === 'ready' ? 'bg-[#1c1b1b] text-white border-t-4 border-[#1b6d24]' : 'text-[#e5e2e1]/70 hover:bg-[#1c1b1b]'
+            }`}
         >
           <span className="material-symbols-outlined mb-1">done_all</span>
           <span className="font-['Work_Sans'] text-[10px] font-bold uppercase tracking-widest">{t('ready')}</span>
