@@ -21,6 +21,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Test artifacts
+backend/coverage/
+
+# Local test notes (not for submission)
+backend/BACKEND_TEST_COVERAGE_REPORT.md
+
 # OS/editor
 .DS_Store
 Thumbs.db
