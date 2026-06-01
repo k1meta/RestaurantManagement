@@ -249,6 +249,7 @@ export default function WaiterScreen({ navigation }) {
         style={styles.fab}
         onPress={() => navigation.navigate('NewOrder')}
         activeOpacity={0.92}
+        accessibilityLabel="Add Order"
       >
         <MaterialIcons name="add" size={32} color={colors.onPrimary} />
       </TouchableOpacity>

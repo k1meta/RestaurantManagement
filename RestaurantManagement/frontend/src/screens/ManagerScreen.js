@@ -78,7 +78,7 @@ function InventoryCard({ item, onDelete }) {
           <Text style={[styles.invPct, item.status === 'critical' && { color: colors.error }]}>
             {item.percent}%
           </Text>
-          <TouchableOpacity onPress={onDelete} hitSlop={8}>
+          <TouchableOpacity onPress={onDelete} hitSlop={8} accessibilityLabel={`Delete ${item.ingredient}`}>
             <MaterialIcons name="close" size={18} color={colors.onSurfaceVariant} />
           </TouchableOpacity>
         </View>

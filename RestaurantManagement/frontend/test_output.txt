@@ -1,0 +1,1112 @@
+﻿
+> restaurant-management-frontend@1.0.0 test
+> jest
+
+node.exe : PASS src/screens/__tests__/WaiterScreen.test.js
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\ombe2\AppData\Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (PASS src/screen...rScreen.test.js:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+PASS src/screens/__tests__/OwnerScreen.test.js
+PASS src/screens/__tests__/KitchenScreen.test.js
+PASS src/screens/__tests__/NewOrderScreen.test.js
+PASS src/pages/__tests__/LoginPage.test.js
+PASS src/screens/__tests__/LoginScreen.test.js
+PASS src/screens/__tests__/ManagerScreen.test.js
+PASS src/pages/__tests__/KitchenDashboard.test.js
+  ÔùÅ Console
+
+    console.error
+      An update to KitchenDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 47 |[39m         status[33m:[39m [32m'pending,preparing,ready'[39m[33m,[39m
+     [90m 48 |[39m       })[33m;[39m
+    [31m[1m>[22m[39m[90m 49 |[39m       setOrders(response[33m.[39mdata[33m.[39morders [33m||[39m 
+[])[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 50 |[39m     } [36mcatch[39m (err) {
+     [90m 51 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load kitchen queue'[39m[33m,[39m [32m'error'[39m)[33m;[39m
+     [90m 52 |[39m     } [36mfinally[39m {[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setOrders (src/pages/KitchenDashboard.js:49:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to KitchenDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 51 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load kitchen queue'[39m[33m,[39m [32m'error'[39m)[33m;[39m
+     [90m 52 |[39m     } [36mfinally[39m {
+    [31m[1m>[22m[39m[90m 53 |[39m       setLoading([36mfalse[39m)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 54 |[39m       setRefreshing([36mfalse[39m)[33m;[39m
+     [90m 55 |[39m     }
+     [90m 56 |[39m   }[33m,[39m [addToast])[33m;[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setLoading (src/pages/KitchenDashboard.js:53:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to KitchenDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 52 |[39m     } [36mfinally[39m {
+     [90m 53 |[39m       setLoading([36mfalse[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 54 |[39m       setRefreshing([36mfalse[39m)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 55 |[39m     }
+     [90m 56 |[39m   }[33m,[39m [addToast])[33m;[39m
+     [90m 57 |[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setRefreshing (src/pages/KitchenDashboard.js:54:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to KitchenDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 47 |[39m         status[33m:[39m [32m'pending,preparing,ready'[39m[33m,[39m
+     [90m 48 |[39m       })[33m;[39m
+    [31m[1m>[22m[39m[90m 49 |[39m       setOrders(response[33m.[39mdata[33m.[39morders [33m||[39m 
+[])[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 50 |[39m     } [36mcatch[39m (err) {
+     [90m 51 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load kitchen queue'[39m[33m,[39m [32m'error'[39m)[33m;[39m
+     [90m 52 |[39m     } [36mfinally[39m {[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setOrders (src/pages/KitchenDashboard.js:49:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to KitchenDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 51 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load kitchen queue'[39m[33m,[39m [32m'error'[39m)[33m;[39m
+     [90m 52 |[39m     } [36mfinally[39m {
+    [31m[1m>[22m[39m[90m 53 |[39m       setLoading([36mfalse[39m)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 54 |[39m       setRefreshing([36mfalse[39m)[33m;[39m
+     [90m 55 |[39m     }
+     [90m 56 |[39m   }[33m,[39m [addToast])[33m;[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setLoading (src/pages/KitchenDashboard.js:53:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to KitchenDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 52 |[39m     } [36mfinally[39m {
+     [90m 53 |[39m       setLoading([36mfalse[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 54 |[39m       setRefreshing([36mfalse[39m)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 55 |[39m     }
+     [90m 56 |[39m   }[33m,[39m [addToast])[33m;[39m
+     [90m 57 |[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setRefreshing (src/pages/KitchenDashboard.js:54:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/pages/__tests__/WaiterDashboard.test.js
+  ÔùÅ Console
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 74 |[39m
+     [90m 75 |[39m       [36mconst[39m nextOrders [33m=[39m ordersRes[33m.[39mdata[33m.[39morders 
+[33m||[39m [][33m;[39m
+    [31m[1m>[22m[39m[90m 76 |[39m       setOrders(nextOrders)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 77 |[39m       setMenuItems(menuRes[33m.[39mdata[33m.[39mmenu [33m||[39m [])[33m;[39m
+     [90m 78 |[39m       setSelectedOrderId((current) [33m=>[39m current [33m||[39m 
+(nextOrders[[35m0[39m][33m?[39m[33m.[39mid [33m?[39m[33m?[39m [36mnull[39m))[33m;[39m
+     [90m 79 |[39m     } [36mcatch[39m (err) {[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setOrders (src/pages/WaiterDashboard.js:76:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 75 |[39m       [36mconst[39m nextOrders [33m=[39m ordersRes[33m.[39mdata[33m.[39morders 
+[33m||[39m [][33m;[39m
+     [90m 76 |[39m       setOrders(nextOrders)[33m;[39m
+    [31m[1m>[22m[39m[90m 77 |[39m       setMenuItems(menuRes[33m.[39mdata[33m.[39mmenu [33m||[39m 
+[])[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 78 |[39m       setSelectedOrderId((current) [33m=>[39m current [33m||[39m 
+(nextOrders[[35m0[39m][33m?[39m[33m.[39mid [33m?[39m[33m?[39m [36mnull[39m))[33m;[39m
+     [90m 79 |[39m     } [36mcatch[39m (err) {
+     [90m 80 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load waiter dashboard data'[39m[33m,[39m [32m'error'[39m)[33m;[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setMenuItems (src/pages/WaiterDashboard.js:77:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 76 |[39m       setOrders(nextOrders)[33m;[39m
+     [90m 77 |[39m       setMenuItems(menuRes[33m.[39mdata[33m.[39mmenu [33m||[39m [])[33m;[39m
+    [31m[1m>[22m[39m[90m 78 |[39m       setSelectedOrderId((current) [33m=>[39m current [33m||[39m 
+(nextOrders[[35m0[39m][33m?[39m[33m.[39mid [33m?[39m[33m?[39m [36mnull[39m))[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 79 |[39m     } [36mcatch[39m (err) {
+     [90m 80 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load waiter dashboard data'[39m[33m,[39m [32m'error'[39m)[33m;[39m
+     [90m 81 |[39m     } [36mfinally[39m {[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setSelectedOrderId (src/pages/WaiterDashboard.js:78:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 80 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load waiter dashboard data'[39m[33m,[39m [32m'error'[39m)[33m;[39m
+     [90m 81 |[39m     } [36mfinally[39m {
+    [31m[1m>[22m[39m[90m 82 |[39m       setLoading([36mfalse[39m)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 83 |[39m       setRefreshing([36mfalse[39m)[33m;[39m
+     [90m 84 |[39m     }
+     [90m 85 |[39m   }[33m,[39m [addToast])[33m;[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setLoading (src/pages/WaiterDashboard.js:82:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 81 |[39m     } [36mfinally[39m {
+     [90m 82 |[39m       setLoading([36mfalse[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 83 |[39m       setRefreshing([36mfalse[39m)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 84 |[39m     }
+     [90m 85 |[39m   }[33m,[39m [addToast])[33m;[39m
+     [90m 86 |[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setRefreshing (src/pages/WaiterDashboard.js:83:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 74 |[39m
+     [90m 75 |[39m       [36mconst[39m nextOrders [33m=[39m ordersRes[33m.[39mdata[33m.[39morders 
+[33m||[39m [][33m;[39m
+    [31m[1m>[22m[39m[90m 76 |[39m       setOrders(nextOrders)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 77 |[39m       setMenuItems(menuRes[33m.[39mdata[33m.[39mmenu [33m||[39m [])[33m;[39m
+     [90m 78 |[39m       setSelectedOrderId((current) [33m=>[39m current [33m||[39m 
+(nextOrders[[35m0[39m][33m?[39m[33m.[39mid [33m?[39m[33m?[39m [36mnull[39m))[33m;[39m
+     [90m 79 |[39m     } [36mcatch[39m (err) {[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setOrders (src/pages/WaiterDashboard.js:76:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 75 |[39m       [36mconst[39m nextOrders [33m=[39m ordersRes[33m.[39mdata[33m.[39morders 
+[33m||[39m [][33m;[39m
+     [90m 76 |[39m       setOrders(nextOrders)[33m;[39m
+    [31m[1m>[22m[39m[90m 77 |[39m       setMenuItems(menuRes[33m.[39mdata[33m.[39mmenu [33m||[39m 
+[])[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 78 |[39m       setSelectedOrderId((current) [33m=>[39m current [33m||[39m 
+(nextOrders[[35m0[39m][33m?[39m[33m.[39mid [33m?[39m[33m?[39m [36mnull[39m))[33m;[39m
+     [90m 79 |[39m     } [36mcatch[39m (err) {
+     [90m 80 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load waiter dashboard data'[39m[33m,[39m [32m'error'[39m)[33m;[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setMenuItems (src/pages/WaiterDashboard.js:77:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 76 |[39m       setOrders(nextOrders)[33m;[39m
+     [90m 77 |[39m       setMenuItems(menuRes[33m.[39mdata[33m.[39mmenu [33m||[39m [])[33m;[39m
+    [31m[1m>[22m[39m[90m 78 |[39m       setSelectedOrderId((current) [33m=>[39m current [33m||[39m 
+(nextOrders[[35m0[39m][33m?[39m[33m.[39mid [33m?[39m[33m?[39m [36mnull[39m))[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 79 |[39m     } [36mcatch[39m (err) {
+     [90m 80 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load waiter dashboard data'[39m[33m,[39m [32m'error'[39m)[33m;[39m
+     [90m 81 |[39m     } [36mfinally[39m {[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setSelectedOrderId (src/pages/WaiterDashboard.js:78:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 80 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load waiter dashboard data'[39m[33m,[39m [32m'error'[39m)[33m;[39m
+     [90m 81 |[39m     } [36mfinally[39m {
+    [31m[1m>[22m[39m[90m 82 |[39m       setLoading([36mfalse[39m)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 83 |[39m       setRefreshing([36mfalse[39m)[33m;[39m
+     [90m 84 |[39m     }
+     [90m 85 |[39m   }[33m,[39m [addToast])[33m;[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setLoading (src/pages/WaiterDashboard.js:82:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 81 |[39m     } [36mfinally[39m {
+     [90m 82 |[39m       setLoading([36mfalse[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 83 |[39m       setRefreshing([36mfalse[39m)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 84 |[39m     }
+     [90m 85 |[39m   }[33m,[39m [addToast])[33m;[39m
+     [90m 86 |[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setRefreshing (src/pages/WaiterDashboard.js:83:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 74 |[39m
+     [90m 75 |[39m       [36mconst[39m nextOrders [33m=[39m ordersRes[33m.[39mdata[33m.[39morders 
+[33m||[39m [][33m;[39m
+    [31m[1m>[22m[39m[90m 76 |[39m       setOrders(nextOrders)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 77 |[39m       setMenuItems(menuRes[33m.[39mdata[33m.[39mmenu [33m||[39m [])[33m;[39m
+     [90m 78 |[39m       setSelectedOrderId((current) [33m=>[39m current [33m||[39m 
+(nextOrders[[35m0[39m][33m?[39m[33m.[39mid [33m?[39m[33m?[39m [36mnull[39m))[33m;[39m
+     [90m 79 |[39m     } [36mcatch[39m (err) {[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setOrders (src/pages/WaiterDashboard.js:76:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 75 |[39m       [36mconst[39m nextOrders [33m=[39m ordersRes[33m.[39mdata[33m.[39morders 
+[33m||[39m [][33m;[39m
+     [90m 76 |[39m       setOrders(nextOrders)[33m;[39m
+    [31m[1m>[22m[39m[90m 77 |[39m       setMenuItems(menuRes[33m.[39mdata[33m.[39mmenu [33m||[39m 
+[])[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 78 |[39m       setSelectedOrderId((current) [33m=>[39m current [33m||[39m 
+(nextOrders[[35m0[39m][33m?[39m[33m.[39mid [33m?[39m[33m?[39m [36mnull[39m))[33m;[39m
+     [90m 79 |[39m     } [36mcatch[39m (err) {
+     [90m 80 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load waiter dashboard data'[39m[33m,[39m [32m'error'[39m)[33m;[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setMenuItems (src/pages/WaiterDashboard.js:77:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 76 |[39m       setOrders(nextOrders)[33m;[39m
+     [90m 77 |[39m       setMenuItems(menuRes[33m.[39mdata[33m.[39mmenu [33m||[39m [])[33m;[39m
+    [31m[1m>[22m[39m[90m 78 |[39m       setSelectedOrderId((current) [33m=>[39m current [33m||[39m 
+(nextOrders[[35m0[39m][33m?[39m[33m.[39mid [33m?[39m[33m?[39m [36mnull[39m))[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 79 |[39m     } [36mcatch[39m (err) {
+     [90m 80 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load waiter dashboard data'[39m[33m,[39m [32m'error'[39m)[33m;[39m
+     [90m 81 |[39m     } [36mfinally[39m {[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setSelectedOrderId (src/pages/WaiterDashboard.js:78:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 80 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load waiter dashboard data'[39m[33m,[39m [32m'error'[39m)[33m;[39m
+     [90m 81 |[39m     } [36mfinally[39m {
+    [31m[1m>[22m[39m[90m 82 |[39m       setLoading([36mfalse[39m)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 83 |[39m       setRefreshing([36mfalse[39m)[33m;[39m
+     [90m 84 |[39m     }
+     [90m 85 |[39m   }[33m,[39m [addToast])[33m;[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setLoading (src/pages/WaiterDashboard.js:82:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 81 |[39m     } [36mfinally[39m {
+     [90m 82 |[39m       setLoading([36mfalse[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 83 |[39m       setRefreshing([36mfalse[39m)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 84 |[39m     }
+     [90m 85 |[39m   }[33m,[39m [addToast])[33m;[39m
+     [90m 86 |[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setRefreshing (src/pages/WaiterDashboard.js:83:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 147 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not create order'[39m[33m,[39m [32m'error'[39m)[33m;[39m
+     [90m 148 |[39m     } [36mfinally[39m {
+    [31m[1m>[22m[39m[90m 149 |[39m       setSavingOrder([36mfalse[39m)[33m;[39m
+     [90m     |[39m       [31m[1m^[22m[39m
+     [90m 150 |[39m     }
+     [90m 151 |[39m   }
+     [90m 152 |[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setSavingOrder (src/pages/WaiterDashboard.js:149:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 74 |[39m
+     [90m 75 |[39m       [36mconst[39m nextOrders [33m=[39m ordersRes[33m.[39mdata[33m.[39morders 
+[33m||[39m [][33m;[39m
+    [31m[1m>[22m[39m[90m 76 |[39m       setOrders(nextOrders)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 77 |[39m       setMenuItems(menuRes[33m.[39mdata[33m.[39mmenu [33m||[39m [])[33m;[39m
+     [90m 78 |[39m       setSelectedOrderId((current) [33m=>[39m current [33m||[39m 
+(nextOrders[[35m0[39m][33m?[39m[33m.[39mid [33m?[39m[33m?[39m [36mnull[39m))[33m;[39m
+     [90m 79 |[39m     } [36mcatch[39m (err) {[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setOrders (src/pages/WaiterDashboard.js:76:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 75 |[39m       [36mconst[39m nextOrders [33m=[39m ordersRes[33m.[39mdata[33m.[39morders 
+[33m||[39m [][33m;[39m
+     [90m 76 |[39m       setOrders(nextOrders)[33m;[39m
+    [31m[1m>[22m[39m[90m 77 |[39m       setMenuItems(menuRes[33m.[39mdata[33m.[39mmenu [33m||[39m 
+[])[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 78 |[39m       setSelectedOrderId((current) [33m=>[39m current [33m||[39m 
+(nextOrders[[35m0[39m][33m?[39m[33m.[39mid [33m?[39m[33m?[39m [36mnull[39m))[33m;[39m
+     [90m 79 |[39m     } [36mcatch[39m (err) {
+     [90m 80 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load waiter dashboard data'[39m[33m,[39m [32m'error'[39m)[33m;[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setMenuItems (src/pages/WaiterDashboard.js:77:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 76 |[39m       setOrders(nextOrders)[33m;[39m
+     [90m 77 |[39m       setMenuItems(menuRes[33m.[39mdata[33m.[39mmenu [33m||[39m [])[33m;[39m
+    [31m[1m>[22m[39m[90m 78 |[39m       setSelectedOrderId((current) [33m=>[39m current [33m||[39m 
+(nextOrders[[35m0[39m][33m?[39m[33m.[39mid [33m?[39m[33m?[39m [36mnull[39m))[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 79 |[39m     } [36mcatch[39m (err) {
+     [90m 80 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load waiter dashboard data'[39m[33m,[39m [32m'error'[39m)[33m;[39m
+     [90m 81 |[39m     } [36mfinally[39m {[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setSelectedOrderId (src/pages/WaiterDashboard.js:78:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 80 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load waiter dashboard data'[39m[33m,[39m [32m'error'[39m)[33m;[39m
+     [90m 81 |[39m     } [36mfinally[39m {
+    [31m[1m>[22m[39m[90m 82 |[39m       setLoading([36mfalse[39m)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 83 |[39m       setRefreshing([36mfalse[39m)[33m;[39m
+     [90m 84 |[39m     }
+     [90m 85 |[39m   }[33m,[39m [addToast])[33m;[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setLoading (src/pages/WaiterDashboard.js:82:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 81 |[39m     } [36mfinally[39m {
+     [90m 82 |[39m       setLoading([36mfalse[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 83 |[39m       setRefreshing([36mfalse[39m)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 84 |[39m     }
+     [90m 85 |[39m   }[33m,[39m [addToast])[33m;[39m
+     [90m 86 |[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setRefreshing (src/pages/WaiterDashboard.js:83:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 74 |[39m
+     [90m 75 |[39m       [36mconst[39m nextOrders [33m=[39m ordersRes[33m.[39mdata[33m.[39morders 
+[33m||[39m [][33m;[39m
+    [31m[1m>[22m[39m[90m 76 |[39m       setOrders(nextOrders)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 77 |[39m       setMenuItems(menuRes[33m.[39mdata[33m.[39mmenu [33m||[39m [])[33m;[39m
+     [90m 78 |[39m       setSelectedOrderId((current) [33m=>[39m current [33m||[39m 
+(nextOrders[[35m0[39m][33m?[39m[33m.[39mid [33m?[39m[33m?[39m [36mnull[39m))[33m;[39m
+     [90m 79 |[39m     } [36mcatch[39m (err) {[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setOrders (src/pages/WaiterDashboard.js:76:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 75 |[39m       [36mconst[39m nextOrders [33m=[39m ordersRes[33m.[39mdata[33m.[39morders 
+[33m||[39m [][33m;[39m
+     [90m 76 |[39m       setOrders(nextOrders)[33m;[39m
+    [31m[1m>[22m[39m[90m 77 |[39m       setMenuItems(menuRes[33m.[39mdata[33m.[39mmenu [33m||[39m 
+[])[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 78 |[39m       setSelectedOrderId((current) [33m=>[39m current [33m||[39m 
+(nextOrders[[35m0[39m][33m?[39m[33m.[39mid [33m?[39m[33m?[39m [36mnull[39m))[33m;[39m
+     [90m 79 |[39m     } [36mcatch[39m (err) {
+     [90m 80 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load waiter dashboard data'[39m[33m,[39m [32m'error'[39m)[33m;[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setMenuItems (src/pages/WaiterDashboard.js:77:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 76 |[39m       setOrders(nextOrders)[33m;[39m
+     [90m 77 |[39m       setMenuItems(menuRes[33m.[39mdata[33m.[39mmenu [33m||[39m [])[33m;[39m
+    [31m[1m>[22m[39m[90m 78 |[39m       setSelectedOrderId((current) [33m=>[39m current [33m||[39m 
+(nextOrders[[35m0[39m][33m?[39m[33m.[39mid [33m?[39m[33m?[39m [36mnull[39m))[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 79 |[39m     } [36mcatch[39m (err) {
+     [90m 80 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load waiter dashboard data'[39m[33m,[39m [32m'error'[39m)[33m;[39m
+     [90m 81 |[39m     } [36mfinally[39m {[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setSelectedOrderId (src/pages/WaiterDashboard.js:78:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 80 |[39m       addToast(err[33m.[39mresponse[33m?[39m[33m.[39mdata[33m?[39m[33m.[39merror 
+[33m||[39m [32m'Could not load waiter dashboard data'[39m[33m,[39m [32m'error'[39m)[33m;[39m
+     [90m 81 |[39m     } [36mfinally[39m {
+    [31m[1m>[22m[39m[90m 82 |[39m       setLoading([36mfalse[39m)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 83 |[39m       setRefreshing([36mfalse[39m)[33m;[39m
+     [90m 84 |[39m     }
+     [90m 85 |[39m   }[33m,[39m [addToast])[33m;[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setLoading (src/pages/WaiterDashboard.js:82:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to WaiterDashboard inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 81 |[39m     } [36mfinally[39m {
+     [90m 82 |[39m       setLoading([36mfalse[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 83 |[39m       setRefreshing([36mfalse[39m)[33m;[39m
+     [90m    |[39m       [31m[1m^[22m[39m
+     [90m 84 |[39m     }
+     [90m 85 |[39m   }[33m,[39m [addToast])[33m;[39m
+     [90m 86 |[39m[0m
+
+      at node_modules/react-dom/cjs/react-dom-client.development.js:18758:19
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-dom/cjs/react-dom-client.development.js:18757:9)
+      at scheduleUpdateOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:16409:11)
+      at dispatchSetStateInternal (node_modules/react-dom/cjs/react-dom-client.development.js:9170:13)
+      at dispatchSetState (node_modules/react-dom/cjs/react-dom-client.development.js:9127:7)
+      at setRefreshing (src/pages/WaiterDashboard.js:83:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/pages/__tests__/OwnerDashboard.test.js
+PASS src/pages/__tests__/ManagerDashboard.test.js (6.382 s)
+-------------------------|---------|----------|---------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+File                     | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                                                                                                                                                                                                                                   
+-------------------------|---------|----------|---------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+All files                |   71.57 |    56.32 |   71.73 |   73.26 |                                                                                                                                                                                                                                                                                                     
+ src                     |       0 |        0 |       0 |       0 |                                                                                                                                                                                                                                                                                                     
+  App.js                 |       0 |        0 |       0 |       0 | 11-112                                                                                                                                                                                                                                                                                              
+  index.js               |       0 |      100 |     100 |       0 | 7-8                                                                                                                                                                                                                                                                                                 
+ src/api                 |       0 |        0 |       0 |       0 |                                                                                                                                                                                                                                                                                                     
+  client.js              |       0 |        0 |       0 |       0 | 3-138                                                                                                                                                                                                                                                                                               
+ src/components          |       0 |        0 |       0 |       0 |                                                                                                                                                                                                                                                                                                     
+  AppErrorBoundary.js    |       0 |        0 |       0 |       0 | 6-46                                                                                                                                                                                                                                                                                                
+  LanguageSwitcher.js    |       0 |        0 |       0 |       0 | 11-49                                                                                                                                                                                                                                                                                               
+  ToastContainer.js      |       0 |        0 |       0 |       0 | 12-35                                                                                                                                                                                                                                                                                               
+ src/components/kinetic  |       0 |        0 |       0 |       0 |                                                                                                                                                                                                                                                                                                     
+  KineticHeader.js       |       0 |        0 |       0 |       0 | 7-56                                                                                                                                                                                                                                                                                                
+  KineticSectionTitle.js |       0 |        0 |       0 |       0 | 6-22                                                                                                                                                                                                                                                                                                
+  KineticTabBar.js       |       0 |        0 |       0 |       0 | 6-25                                                                                                                                                                                                                                                                                                
+  MetricTile.js          |       0 |        0 |       0 |       0 | 6-43                                                                                                                                                                                                                                                                                                
+  WaiterBottomNav.js     |       0 |        0 |       0 |       0 | 6-47                                                                                                                                                                                                                                                                                                
+ src/context             |       0 |        0 |       0 |       0 |                                                                                                                                                                                                                                                                                                     
+  AuthContext.js         |       0 |        0 |       0 |       0 | 5-81                                                                                                                                                                                                                                                                                                
+ src/hooks               |       0 |        0 |       0 |       0 |                                                                                                                                                                                                                                                                                                     
+  useToast.js            |       0 |        0 |       0 |       0 | 3-62                                                                                                                                                                                                                                                                                                
+ src/pages               |   84.73 |    63.88 |   83.72 |    85.5 |                                                                                                                                                                                                                                                                                                     
+  KitchenDashboard.js    |   96.47 |    85.71 |     100 |    98.7 | 51                                                                                                                                                                                                                                                                                                  
+  LoginPage.js           |   97.77 |    86.36 |     100 |     100 | 29-31,72                                                                                                                                                                                                                                                                                            
+  ManagerDashboard.js    |   80.42 |    63.61 |   82.81 |   81.17 | 52-53,137,341-342,345-346,368,406,416,424,434,443-444,452-453,469-470,488-490,497-499,523,557-558,561-562,565-566,582,599,620,622,638,643-652,669-670,683-684,703-704,707-708,734,745,756-758,771-773,780,788,796-797,810,843,1038-1074,1238,1356-1365,1396,1434,1444,1458-1519,1638-1647,1666-1667 
+  OwnerDashboard.js      |   84.36 |    54.82 |   78.16 |   85.03 | 83,137,219-220,256,266-267,280,288,298,334-335,339,343-344,351,361,369,379,401-402,419,444-470,607,685,753-756,823-862,886,999-1007                                                                                                                                                                 
+  WaiterDashboard.js     |   90.62 |    68.11 |   82.05 |      90 | 54,80,158,426,478,501-538                                                                                                                                                                                                                                                                           
+ src/screens             |   91.96 |    72.92 |   93.79 |    92.7 |                                                                                                                                                                                                                                                                                                     
+  KitchenScreen.js       |    89.7 |    70.31 |   95.65 |   93.33 | 180,190,218-219                                                                                                                                                                                                                                                                                     
+  LoginScreen.js         |     100 |    76.66 |     100 |     100 | 41-47,66-82,142                                                                                                                                                                                                                                                                                     
+  ManagerScreen.js       |   89.04 |    74.35 |   96.87 |   88.97 | 56,127,140,152,183-184,202-203,231,246,463-467                                                                                                                                                                                                                                                      
+  NewOrderScreen.js      |   97.95 |     87.5 |   95.23 |   97.77 | 93                                                                                                                                                                                                                                                                                                  
+  OwnerScreen.js         |    93.1 |    68.08 |    87.5 |   94.23 | 51,83,111                                                                                                                                                                                                                                                                                           
+  WaiterScreen.js        |   90.16 |    65.62 |   89.28 |   90.56 | 162,190-191,236,257                                                                                                                                                                                                                                                                                 
+-------------------------|---------|----------|---------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Test Suites: 11 passed, 11 total
+Tests:       70 passed, 70 total
+Snapshots:   0 total
+Time:        9.215 s
+Ran all test suites.
