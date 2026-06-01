@@ -1,12 +1,31 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, View, Platform, Alert } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts, SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
 import { WorkSans_400Regular, WorkSans_600SemiBold } from '@expo-google-fonts/work-sans';
+
+if (Platform.OS === 'web') {
+  Alert.alert = (title, message, buttons) => {
+    const desc = message ? `\n${message}` : '';
+    const hasButtons = buttons && buttons.length > 0;
+    if (hasButtons) {
+      const result = window.confirm(`${title}${desc}`);
+      if (result) {
+        const confirmBtn = buttons.find(b => b.style !== 'cancel') || buttons[0];
+        if (confirmBtn && confirmBtn.onPress) confirmBtn.onPress();
+      } else {
+        const cancelBtn = buttons.find(b => b.style === 'cancel');
+        if (cancelBtn && cancelBtn.onPress) cancelBtn.onPress();
+      }
+    } else {
+      window.alert(`${title}${desc}`);
+    }
+  };
+}
 
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import AppErrorBoundary from './src/components/AppErrorBoundary';
