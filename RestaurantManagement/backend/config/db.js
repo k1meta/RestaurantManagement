@@ -126,7 +126,7 @@ async function ensureSeedData() {
 
   const now = new Date().toISOString();
   const passwordHash =
-    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy'; // password123
+    '$2a$10$hpll80mRzZrQW/1uxaj1dudQ3ONS6P4qDLvr0/17lWb3.HI4iljYS'; // password123
 
   const batch = db.batch();
   batch.set(db.collection('locations').doc('1'), {
