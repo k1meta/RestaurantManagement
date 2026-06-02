@@ -12,7 +12,7 @@ npm run test:integration # integration tests only
 npm run test:e2e         # E2E workflow tests only
 ```
 
-**Latest run:** 103 tests passed | **71.81% line coverage** (threshold: 70%)
+**Latest run:** 106 tests passed | **71.74% line coverage** (threshold: 70%)
 
 ---
 
@@ -119,14 +119,17 @@ backend/
 | AU-01 | POST `/login` | Positive | 200 + token | Pass |
 | AU-02 | POST `/login` | Negative | 401 wrong password | Pass |
 | AU-03 | POST `/login` | Negative | 400 missing fields | Pass |
-| AU-04 | POST `/register` | Positive | 201 + token | Pass |
-| AU-05 | POST `/register` | Negative | 409 duplicate email | Pass |
-| AU-06 | POST `/register` | Negative | 400 invalid role | Pass |
-| AU-07 | POST `/register` | Negative | 404 bad location | Pass |
+| AU-04 | POST `/api/users` (manager) | Positive | 201 new waiter | Pass |
+| AU-05 | POST `/api/users` | Negative | 409 duplicate email | Pass |
+| AU-06 | POST `/api/users` | Negative | 403 manager→owner | Pass |
+| AU-07 | POST `/api/users` (owner) | Negative | 404 bad location | Pass |
 | AU-08 | GET `/me` | Positive | 200 user payload | Pass |
 | AU-09 | GET `/me` | Negative | 401 no token | Pass |
 | AU-10 | PATCH `/language` | Positive/Negative | 200 / 400 | Pass |
-| AU-11 | GET `/login-profiles` | Positive | 200 sorted by role | Pass |
+| AU-11 | GET `/login-profiles` (enabled) | Positive | 200 sorted by role | Pass |
+| AU-12 | GET `/login-profiles` (disabled) | Negative | 404 not found | Pass |
+| AU-13 | POST `/api/users` | Negative | 401 no token | Pass |
+| AU-14 | POST `/auth/register` | Negative | 404 route removed | Pass |
 
 ### Integration — Organization (`/api/locations`, `/api/users`)
 

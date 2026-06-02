@@ -3,11 +3,10 @@ const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { authenticate } = require('../middleware/auth');
 const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/auth');
-const { db, nextSequence } = require('../config/db');
+const { db } = require('../config/db');
 const { roleRank, getById } = require('../utils/firestoreStore');
 
 const router = express.Router();
-const REGISTERABLE_ROLES = ['manager', 'waiter', 'kitchen'];
 
 function userPayload(user) {
   return {
@@ -24,8 +23,12 @@ function issueToken(user) {
   return jwt.sign(userPayload(user), JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 }
 
-// GET /api/auth/login-profiles
+// GET /api/auth/login-profiles — demo only when ENABLE_LOGIN_PROFILES=true
 router.get('/login-profiles', async (_req, res) => {
+  if (process.env.ENABLE_LOGIN_PROFILES !== 'true') {
+    return res.status(404).json({ error: 'Not found' });
+  }
+
   try {
     const snap = await db.collection('users').get();
     const profiles = snap.docs
@@ -81,67 +84,9 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// POST /api/auth/register
-router.post('/register', async (req, res) => {
-  const { name, email, password, role = 'waiter', location_id = 1 } = req.body;
-
-  if (!name || !email || !password) {
-    return res.status(400).json({ error: 'Name, email, and password are required' });
-  }
-
-  if (!REGISTERABLE_ROLES.includes(role)) {
-    return res.status(400).json({
-      error: `Role must be one of: ${REGISTERABLE_ROLES.join(', ')}`,
-    });
-  }
-
-  try {
-    const normalizedEmail = String(email).trim().toLowerCase();
-    const normalizedName = String(name).trim();
-    const parsedLocation = Number(location_id);
-    if (!Number.isInteger(parsedLocation) || parsedLocation <= 0) {
-      return res.status(400).json({ error: 'location_id must be a positive integer' });
-    }
-
-    const locationSnap = await db.collection('locations').doc(String(parsedLocation)).get();
-    if (!locationSnap.exists) {
-      return res.status(404).json({ error: 'Location not found' });
-    }
-
-    const existing = await db
-      .collection('users')
-      .where('email_lc', '==', normalizedEmail)
-      .limit(1)
-      .get();
-    if (!existing.empty) {
-      return res.status(409).json({ error: 'Email already registered' });
-    }
-
-    const id = await nextSequence('users');
-    const hashedPassword = await bcryptjs.hash(password, 10);
-    const createdAt = new Date().toISOString();
-    const user = {
-      id,
-      name: normalizedName,
-      email: normalizedEmail,
-      email_lc: normalizedEmail,
-      password_hash: hashedPassword,
-      role,
-      location_id: parsedLocation,
-      created_at: createdAt,
-    };
-
-    await db.collection('users').doc(String(id)).set(user);
-
-    const token = issueToken(user);
-    return res.status(201).json({
-      token,
-      user: userPayload(user),
-    });
-  } catch (err) {
-    console.error('Register error:', err);
-    return res.status(500).json({ error: 'Server error' });
-  }
+// POST /api/auth/register — removed; staff creation uses POST /api/users (manager/owner)
+router.post('/register', (_req, res) => {
+  res.status(404).json({ error: 'Not found' });
 });
 
 // GET /api/auth/me

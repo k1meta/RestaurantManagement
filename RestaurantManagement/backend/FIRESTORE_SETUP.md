@@ -9,7 +9,8 @@ Backend now uses **Firebase Firestore** through the Firebase Admin SDK.
 1. Create `backend/.env` from `backend/.env.example`.
 2. Set:
    - `FIREBASE_PROJECT_ID=...`
-   - `JWT_SECRET=...`
+   - `JWT_SECRET=...` (required — server will not start without it)
+   - `ENABLE_LOGIN_PROFILES=true` for local demo login UI only; omit or set `false` on Render/production
 3. Provide admin credentials using one option:
    - `FIREBASE_SERVICE_ACCOUNT_JSON=...`
    - `FIREBASE_SERVICE_ACCOUNT_JSON_B64=...` (recommended on Render)

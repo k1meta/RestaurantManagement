@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 3000;
 
 async function start() {
   try {
+    require('./config/auth');
     await ensureSeedData();
     app.listen(PORT, () => {
       console.log(`🍽️  Restaurant API listening on port ${PORT}`);
