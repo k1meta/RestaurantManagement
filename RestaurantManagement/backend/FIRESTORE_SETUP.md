@@ -1,5 +1,7 @@
 # Firebase Firestore Setup
 
+> Formerly `NEON_SETUP.md` — this project uses Firestore, not PostgreSQL/Neon.
+
 Backend now uses **Firebase Firestore** through the Firebase Admin SDK.
 
 ## 1) One-time setup

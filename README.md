@@ -1,5 +1,7 @@
 # Restaurant Management
 
+**Repository:** https://github.com/k1meta/RestaurantManagement
+
 Setup and run guide for project.
 
 ## 1) Prerequisites
@@ -10,13 +12,17 @@ Setup and run guide for project.
 
 ## 2) Project structure
 
-```text
-RestaurantManagement/
-  backend/
-  frontend/
-```
+After cloning, your **repository root** is the folder that contains this README. All paths below are relative to that root.
 
-All commands below run from repository root (`RestaurantManagment`).
+```text
+RestaurantManagement/          ← repo root (you are here)
+  README.md
+  .gitignore
+  RestaurantManagement/        ← application root
+    backend/
+    frontend/
+    START.bat
+```
 
 ## 3) Setup
 
@@ -33,6 +39,8 @@ Copy-Item .\RestaurantManagement\backend\.env.example .\RestaurantManagement\bac
   - `FIREBASE_SERVICE_ACCOUNT_JSON`
   - or `FIREBASE_SERVICE_ACCOUNT_PATH`
   - or `GOOGLE_APPLICATION_CREDENTIALS`
+
+For detailed Firestore setup, see [`RestaurantManagement/backend/FIRESTORE_SETUP.md`](RestaurantManagement/backend/FIRESTORE_SETUP.md).
 
 For Render web deploys, set `REACT_APP_API_URL` (or `EXPO_PUBLIC_API_URL`) so the frontend points at the hosted backend.
 
@@ -53,6 +61,8 @@ npm --prefix .\RestaurantManagement\frontend install
 ```powershell
 npm --prefix .\RestaurantManagement\backend run db:seed
 ```
+
+**Demo login credentials** (after seeding): `owner@restaurant.com`, `manager@restaurant.com`, `waiter@restaurant.com`, `kitchen@restaurant.com` — password: `password123`
 
 ## 4) Run project
 
@@ -110,3 +120,5 @@ npm run build:android:apk
 npm --prefix .\RestaurantManagement\backend run db:seed   # seed baseline data
 npm --prefix .\RestaurantManagement\backend run db:reset  # reset Firestore collections (destructive)
 ```
+
+Backend testing documentation: [`RestaurantManagement/backend/TESTING.md`](RestaurantManagement/backend/TESTING.md)
