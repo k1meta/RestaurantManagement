@@ -71,7 +71,7 @@
     "patch-package": "^8.0.0",
     "react-refresh": "^0.18.0",
     "react-scripts": "^5.0.1",
-    "react-test-renderer": "^19.2.6",
+    "react-test-renderer": "19.2.3",
     "wait-on": "^9.0.10"
   },
   "overrides": {
