@@ -71,8 +71,8 @@ describe('ManagerDashboard', () => {
   const mockAddToast = jest.fn();
 
   const mockInventory = [
-    { id: 1, ingredient: 'Tomato', ingredient_id: 10, quantity: 20, unit: 'Kg', low_stock_threshold: 30, full_stock_target: 100 },
-    { id: 2, ingredient: 'Cheese', ingredient_id: 11, quantity: 5, unit: 'Kg', low_stock_threshold: 10, full_stock_target: 20 },
+    { id: 1, ingredient: 'Tomato', ingredient_id: 10, quantity: 20, unit: 'cans', low_stock_threshold: 30, full_stock_target: 100 },
+    { id: 2, ingredient: 'Cheese', ingredient_id: 11, quantity: 5, unit: 'pieces', low_stock_threshold: 10, full_stock_target: 20 },
   ];
 
   const mockMenu = [
@@ -82,7 +82,7 @@ describe('ManagerDashboard', () => {
       price: 12.5,
       active: true,
       category: 'Main',
-      ingredients: [{ ingredient_id: 10, quantity_required: 0.2, unit: 'Kg' }],
+      ingredients: [{ ingredient_id: 10, quantity_required: 2, unit: 'cans' }],
     },
   ];
 
@@ -92,8 +92,8 @@ describe('ManagerDashboard', () => {
   ];
 
   const mockIngredients = [
-    { id: 10, name: 'Tomato', default_unit: 'Kg' },
-    { id: 11, name: 'Cheese', default_unit: 'Kg' },
+    { id: 10, name: 'Tomato', default_unit: 'cans' },
+    { id: 11, name: 'Cheese', default_unit: 'pieces' },
   ];
 
   beforeEach(() => {
@@ -335,7 +335,7 @@ describe('ManagerDashboard', () => {
     await waitFor(() => {
       expect(patchInventoryItem).toHaveBeenCalledWith(1, {
         quantity: 20,
-        unit: 'Kg',
+        unit: 'cans',
         low_stock_threshold: 40,
         full_stock_target: 120,
       });
@@ -397,7 +397,7 @@ describe('ManagerDashboard', () => {
         ingredient_id: 10,
         ingredient: undefined,
         quantity: 100,
-        unit: 'Kg',
+        unit: 'cans',
       });
     });
   });
@@ -446,7 +446,7 @@ describe('ManagerDashboard', () => {
     fireEvent.change(qtyInput, { target: { value: '0.1' } });
 
     const unitSelect = within(createFormContainer).getByDisplayValue('Select unit');
-    fireEvent.change(unitSelect, { target: { value: 'Kg' } });
+    fireEvent.change(unitSelect, { target: { value: 'cans' } });
 
     fireEvent.click(addMenuButton);
 
@@ -456,7 +456,7 @@ describe('ManagerDashboard', () => {
         category: null,
         price: 10.5,
         active: true,
-        ingredients: [{ ingredient_id: 10, quantity_required: 0.1, unit: 'Kg' }],
+        ingredients: [{ ingredient_id: 10, quantity_required: 0.1, unit: 'cans' }],
       });
       expect(mockAddToast).toHaveBeenCalledWith('New menu item created successfully.', 'success');
     });
@@ -510,7 +510,7 @@ describe('ManagerDashboard', () => {
         category: 'Main',
         price: 14.99,
         active: true,
-        ingredients: [{ ingredient_id: 10, quantity_required: 0.2, unit: 'Kg' }],
+        ingredients: [{ ingredient_id: 10, quantity_required: 2, unit: 'cans' }],
       });
       expect(mockAddToast).toHaveBeenCalledWith('Saved changes for Pizza Margherita.', 'success');
     });
@@ -558,7 +558,7 @@ describe('ManagerDashboard', () => {
         category: 'Main',
         price: 15.99,
         active: true,
-        ingredients: [{ ingredient_id: 10, quantity_required: 0.2, unit: 'Kg' }],
+        ingredients: [{ ingredient_id: 10, quantity_required: 2, unit: 'cans' }],
       });
       expect(mockAddToast).toHaveBeenCalledWith('Published 1 menu change(s).', 'success');
     });

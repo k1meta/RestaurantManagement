@@ -1,8 +1,8 @@
 const { parseAllowedUnit } = require('../../constants/units');
 
 describe('units', () => {
-  test('UU-01 accepts valid unit Kg', () => {
-    expect(parseAllowedUnit('Kg')).toEqual({ ok: true, value: 'Kg' });
+  test('UU-01 accepts valid unit cans', () => {
+    expect(parseAllowedUnit('cans')).toEqual({ ok: true, value: 'cans' });
   });
 
   test('UU-02 treats empty/null as null value', () => {
@@ -12,8 +12,8 @@ describe('units', () => {
   });
 
   test('UU-03 rejects invalid unit', () => {
-    const result = parseAllowedUnit('lbs');
-    expect(result.ok).toBe(false);
-    expect(result.error).toMatch(/unit must be one of/);
+    expect(parseAllowedUnit('Kg').ok).toBe(false);
+    expect(parseAllowedUnit('lbs').ok).toBe(false);
+    expect(parseAllowedUnit('Kg').error).toMatch(/unit must be one of/);
   });
 });

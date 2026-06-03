@@ -41,8 +41,8 @@ describe('menu and sales routes', () => {
         price: 9.5,
         active: true,
         ingredients: [
-          { ingredient_id: 1, quantity_required: 0.1, unit: 'Kg' },
-          { ingredient_id: 2, quantity_required: 50, unit: 'g' },
+          { ingredient_id: 1, quantity_required: 2, unit: 'cans' },
+          { ingredient_id: 2, quantity_required: 3, unit: 'pieces' },
         ],
       });
 
@@ -67,8 +67,8 @@ describe('menu and sales routes', () => {
         name: 'Bad BOM',
         price: 5,
         ingredients: [
-          { ingredient_id: 1, quantity_required: 0.1, unit: 'Kg' },
-          { ingredient_id: 1, quantity_required: 100, unit: 'g' },
+          { ingredient_id: 1, quantity_required: 2, unit: 'cans' },
+          { ingredient_id: 1, quantity_required: 3, unit: 'pieces' },
         ],
       });
 

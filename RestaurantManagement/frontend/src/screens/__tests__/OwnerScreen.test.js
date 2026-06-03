@@ -43,11 +43,13 @@ describe('OwnerScreen', () => {
   const mockUser = { name: 'Owner Olivia' };
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
     useAuth.mockReturnValue({
       user: mockUser,
       logout: mockLogout,
     });
+    getSales.mockResolvedValue({ data: { sales: [], summary: { total_revenue: 0, total_orders: 0 } } });
+    getOrders.mockResolvedValue({ data: { orders: [] } });
   });
 
   it('loads summary, location performance, and top sellers, and switches periods', async () => {

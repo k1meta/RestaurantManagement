@@ -108,13 +108,13 @@ describe('ManagerScreen', () => {
   ];
 
   const mockInventory = [
-    { id: 10, ingredient: 'Cheese', quantity: 20, unit: 'Kg', status: 'stable', percent: 80, ingredient_id: 101 },
-    { id: 11, ingredient: 'Tomato', quantity: 5, unit: 'Kg', status: 'warning', percent: 20, low_stock_threshold: 10, full_stock_target: 25, ingredient_id: 102 },
+    { id: 10, ingredient: 'Cheese', quantity: 20, unit: 'pieces', status: 'stable', percent: 80, ingredient_id: 101 },
+    { id: 11, ingredient: 'Tomato', quantity: 5, unit: 'cans', status: 'warning', percent: 20, low_stock_threshold: 10, full_stock_target: 25, ingredient_id: 102 },
   ];
 
   const mockIngredients = [
-    { id: 101, name: 'Cheese', default_unit: 'Kg' },
-    { id: 102, name: 'Tomato', default_unit: 'Kg' },
+    { id: 101, name: 'Cheese', default_unit: 'pieces' },
+    { id: 102, name: 'Tomato', default_unit: 'cans' },
   ];
 
   const mockSales = [
@@ -182,10 +182,10 @@ describe('ManagerScreen', () => {
     
     // Try saving without stock unit
     fireEvent.press(screen.getByText('Save'));
-    expect(Alert.alert).toHaveBeenCalledWith('Error', 'Select a stock unit (Kg, g, pieces, L, ml)');
+    expect(Alert.alert).toHaveBeenCalledWith('Error', 'Select a stock unit (pieces, buns, patties, cans)');
 
-    // Select stock unit
-    fireEvent.press(screen.getAllByText('Kg')[1]); // index 1 is stock unit chip row
+    // Select stock unit (second chip row)
+    fireEvent.press(screen.getAllByText('cans')[1]);
 
     // Try setting invalid threshold (low > full)
     fireEvent.changeText(screen.getByPlaceholderText('Below = low stock'), '50');
@@ -205,7 +205,7 @@ describe('ManagerScreen', () => {
       expect(upsertInventoryItem).toHaveBeenCalledWith({
         ingredient_id: 103,
         quantity: 10,
-        unit: 'Kg',
+        unit: 'cans',
         low_stock_threshold: 30,
         full_stock_target: 50,
       });

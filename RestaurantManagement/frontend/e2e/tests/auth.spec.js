@@ -10,7 +10,7 @@ test.describe('Authentication and Core Flows', () => {
     });
 
     test('1. Valid Waiter Login', async ({ page }) => {
-        await loginPage.login('waiterstup1@restaurant.com', 'waiterstup1');
+        await loginPage.login('waiter@restaurant.com', 'password123');
         await expect(page.getByText('Active Shift')).toBeVisible();
     });
 
@@ -22,7 +22,7 @@ test.describe('Authentication and Core Flows', () => {
     });
 
     test('3. Global Session Logout Flow', async ({ page }) => {
-        await loginPage.login('managerstup1@restaurant.com', 'managerstup1');
+        await loginPage.login('manager@restaurant.com', 'password123');
         await expect(page.getByText('MISE EN PLACE')).toBeVisible();
         await loginPage.logout();
         await expect(loginPage.loginButton).toBeVisible();

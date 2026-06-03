@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const isReactNative = typeof navigator !== 'undefined' && navigator.product === 'ReactNative';
-const DEFAULT_RENDER_URL = 'https://restaurantmanagement-zx62.onrender.com';
+const LOCAL_API_URL = 'http://localhost:3000';
 const isBrowser = typeof window !== 'undefined' && typeof window.location !== 'undefined';
 
 let runtimeApiUrl = '';
@@ -28,14 +28,16 @@ function isLocalHost(hostname) {
 
 function getDefaultBaseUrl() {
   if (runtimeApiUrl) return runtimeApiUrl;
-  if (isReactNative) return DEFAULT_RENDER_URL;
   if (isBrowser) {
     const hostname = window.location && window.location.hostname;
-    if (hostname && !isLocalHost(hostname)) {
-      return DEFAULT_RENDER_URL;
+    if (hostname && isLocalHost(hostname)) {
+      return LOCAL_API_URL;
     }
   }
-  return DEFAULT_RENDER_URL;
+  if (isReactNative) {
+    return LOCAL_API_URL;
+  }
+  return LOCAL_API_URL;
 }
 
 export const BASE_URL = getDefaultBaseUrl();

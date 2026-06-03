@@ -42,7 +42,9 @@ Copy-Item .\RestaurantManagement\backend\.env.example .\RestaurantManagement\bac
 
 For detailed Firestore setup, see [`RestaurantManagement/backend/FIRESTORE_SETUP.md`](RestaurantManagement/backend/FIRESTORE_SETUP.md).
 
-For Render web deploys, set `REACT_APP_API_URL` (or `EXPO_PUBLIC_API_URL`) so the frontend points at the hosted backend.
+For production, set `REACT_APP_API_URL` and `EXPO_PUBLIC_API_URL` in `frontend/.env` (local) or your host/EAS dashboard (deployed). See [`DEPLOYMENT.md`](DEPLOYMENT.md).
+
+**Primary demo client:** Expo mobile (`npm run start:mobile`). Alternate: CRA web on port 3001 (`npm start`).
 
 3. Install backend dependencies.
 
@@ -122,3 +124,7 @@ npm --prefix .\RestaurantManagement\backend run db:reset  # reset Firestore coll
 ```
 
 Backend testing documentation: [`RestaurantManagement/backend/TESTING.md`](RestaurantManagement/backend/TESTING.md)
+
+Deployment and production env checklist: [`DEPLOYMENT.md`](DEPLOYMENT.md)
+
+CI runs backend and frontend unit tests on push (see [`.github/workflows/ci.yml`](.github/workflows/ci.yml)).

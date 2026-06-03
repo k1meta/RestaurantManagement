@@ -40,7 +40,7 @@ describe('API E2E workflows', () => {
     const ingredient = await api()
       .post('/api/inventory/ingredients')
       .set(headers)
-      .send({ name: 'Mozzarella', default_unit: 'g' });
+      .send({ name: 'Mozzarella', default_unit: 'pieces' });
     expect(ingredient.status).toBe(201);
 
     const inventory = await api()
@@ -48,8 +48,8 @@ describe('API E2E workflows', () => {
       .set(headers)
       .send({
         ingredient_id: ingredient.body.ingredient.id,
-        quantity: 2000,
-        unit: 'g',
+        quantity: 200,
+        unit: 'pieces',
       });
     expect(inventory.status).toBe(201);
 
@@ -63,8 +63,8 @@ describe('API E2E workflows', () => {
         ingredients: [
           {
             ingredient_id: ingredient.body.ingredient.id,
-            quantity_required: 100,
-            unit: 'g',
+            quantity_required: 10,
+            unit: 'pieces',
           },
         ],
       });

@@ -195,16 +195,16 @@ describe('orders routes', () => {
         location_id: 1,
         ingredient_id: 1,
         ingredient: 'Tomato',
-        quantity: 0.01,
-        unit: 'Kg',
+        quantity: 1,
+        unit: 'cans',
       },
       {
         id: 2,
         location_id: 1,
         ingredient_id: 2,
         ingredient: 'Cheese',
-        quantity: 1,
-        unit: 'g',
+        quantity: 50,
+        unit: 'pieces',
       },
     ]);
 

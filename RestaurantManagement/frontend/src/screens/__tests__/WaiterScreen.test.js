@@ -48,11 +48,13 @@ describe('WaiterScreen', () => {
   const mockUser = { name: 'Waiter Will', location_name: 'Main Room' };
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
     useAuth.mockReturnValue({
       user: mockUser,
       logout: mockLogout,
     });
+    getOrders.mockResolvedValue({ data: { orders: [] } });
+    updateOrderStatus.mockResolvedValue({});
   });
 
   it('loads active orders, displays pickups and floor map, and handles serve action', async () => {
@@ -82,9 +84,7 @@ describe('WaiterScreen', () => {
       },
     ];
 
-    getOrders.mockResolvedValueOnce({ data: { orders: mockOrders } });
-    updateOrderStatus.mockResolvedValueOnce({});
-    getOrders.mockResolvedValueOnce({ data: { orders: [mockOrders[1]] } });
+    getOrders.mockResolvedValue({ data: { orders: mockOrders } });
 
     render(<WaiterScreen navigation={mockNavigation} />);
 

@@ -1,5 +1,5 @@
-/** Canonical inventory/menu ingredient units (match frontend). */
-const ALLOWED_UNITS = Object.freeze(['Kg', 'g', 'pieces', 'L', 'ml']);
+/** Count-only inventory/menu units (pieces, buns, patties, cans). */
+const ALLOWED_UNITS = Object.freeze(['pieces', 'buns', 'patties', 'cans']);
 
 const ALLOWED_SET = new Set(ALLOWED_UNITS);
 

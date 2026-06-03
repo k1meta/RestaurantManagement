@@ -9,7 +9,25 @@ const organizationRoutes = require('./routes/organization');
 
 const app = express();
 
-app.use(cors());
+const corsOrigins = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const corsOptions =
+  corsOrigins.length > 0
+    ? {
+        origin(origin, callback) {
+          if (!origin || corsOrigins.includes(origin)) {
+            callback(null, true);
+            return;
+          }
+          callback(new Error('Not allowed by CORS'));
+        },
+      }
+    : {};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);

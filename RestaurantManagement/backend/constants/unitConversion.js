@@ -1,62 +1,6 @@
-const ALLOWED_SET = new Set(['Kg', 'g', 'pieces', 'L', 'ml']);
+const { ALLOWED_UNITS } = require('./units');
 
-/** @type {Record<string, 'mass'|'volume'|'count'>} */
-const DIMENSION = {
-  Kg: 'mass',
-  g: 'mass',
-  L: 'volume',
-  ml: 'volume',
-  pieces: 'count',
-};
-
-/**
- * @param {number} qty
- * @param {string|null|undefined} unit
- * @returns {{ dimension: string, value: number } | null}
- */
-function toCanonical(qty, unit) {
-  const u = unit == null || unit === '' ? null : String(unit).trim();
-  if (!u || !ALLOWED_SET.has(u)) return null;
-  const q = Number(qty);
-  if (!Number.isFinite(q)) return null;
-
-  switch (u) {
-    case 'g':
-      return { dimension: DIMENSION[u], value: q };
-    case 'Kg':
-      return { dimension: 'mass', value: q * 1000 };
-    case 'ml':
-      return { dimension: 'volume', value: q };
-    case 'L':
-      return { dimension: 'volume', value: q * 1000 };
-    case 'pieces':
-      return { dimension: 'count', value: q };
-    default:
-      return null;
-  }
-}
-
-/**
- * @param {number} canonicalValue grams, ml, or piece count
- * @param {string} unit
- */
-function fromCanonical(canonicalValue, unit) {
-  const u = String(unit).trim();
-  switch (u) {
-    case 'g':
-      return canonicalValue;
-    case 'Kg':
-      return canonicalValue / 1000;
-    case 'ml':
-      return canonicalValue;
-    case 'L':
-      return canonicalValue / 1000;
-    case 'pieces':
-      return canonicalValue;
-    default:
-      throw new Error(`fromCanonical: unsupported unit ${unit}`);
-  }
-}
+const ALLOWED_SET = new Set(ALLOWED_UNITS);
 
 function roundQty(q, decimals = 4) {
   const f = 10 ** decimals;
@@ -64,7 +8,7 @@ function roundQty(q, decimals = 4) {
 }
 
 /**
- * Subtract recipe usage from inventory when units may differ within the same dimension (L/ml, Kg/g).
+ * Subtract recipe usage from inventory (count units only; units must match exactly).
  * @returns {{ ok: true, nextQty: number } | { ok: false, code: string, error: string }}
  */
 function convertUsageForDeduction(usageQty, usageUnitRaw, inventoryQty, inventoryUnitRaw) {
@@ -92,9 +36,9 @@ function convertUsageForDeduction(usageQty, usageUnitRaw, inventoryQty, inventor
     };
   }
 
-  const usageCanon = toCanonical(usageQty, usageUnit);
-  const invCanon = toCanonical(inventoryQty, inventoryUnit);
-  if (!usageCanon || !invCanon) {
+  const usage = Number(usageQty);
+  const stock = Number(inventoryQty);
+  if (!Number.isFinite(usage) || !Number.isFinite(stock)) {
     return {
       ok: false,
       code: 'invalid_quantity',
@@ -102,17 +46,17 @@ function convertUsageForDeduction(usageQty, usageUnitRaw, inventoryQty, inventor
     };
   }
 
-  if (usageCanon.dimension !== invCanon.dimension) {
+  if (usageUnit !== inventoryUnit) {
     return {
       ok: false,
       code: 'incompatible_units',
-      error: `Cannot deduct: recipe uses "${usageUnit}" but inventory stock is tracked in "${inventoryUnit}". Use compatible units (Kg/g, L/ml, or pieces).`,
+      error: `Cannot deduct: recipe uses "${usageUnit}" but inventory stock is tracked in "${inventoryUnit}". Use the same unit.`,
     };
   }
 
-  const nextCanon = invCanon.value - usageCanon.value;
+  const nextQty = stock - usage;
   const EPS = 1e-9;
-  if (nextCanon < -EPS) {
+  if (nextQty < -EPS) {
     return {
       ok: false,
       code: 'insufficient_stock',
@@ -120,21 +64,10 @@ function convertUsageForDeduction(usageQty, usageUnitRaw, inventoryQty, inventor
     };
   }
 
-  try {
-    const nextQty = Math.max(0, fromCanonical(nextCanon, inventoryUnit));
-    return { ok: true, nextQty: roundQty(nextQty, 4) };
-  } catch (_e) {
-    return {
-      ok: false,
-      code: 'conversion_failed',
-      error: 'Could not convert stock units for deduction.',
-    };
-  }
+  return { ok: true, nextQty: roundQty(Math.max(0, nextQty), 4) };
 }
 
 module.exports = {
-  toCanonical,
-  fromCanonical,
   convertUsageForDeduction,
   roundQty,
 };

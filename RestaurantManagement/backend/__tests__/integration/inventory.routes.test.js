@@ -21,7 +21,7 @@ describe('inventory routes', () => {
       .send({
         ingredient_id: 1,
         quantity: 5,
-        unit: 'Kg',
+        unit: 'cans',
         low_stock_threshold: 1,
         full_stock_target: 10,
       });
@@ -37,7 +37,7 @@ describe('inventory routes', () => {
       .send({
         ingredient: 'Fresh Basil',
         quantity: 2,
-        unit: 'Kg',
+        unit: 'buns',
       });
 
     expect(res.status).toBe(201);
@@ -51,7 +51,7 @@ describe('inventory routes', () => {
       .send({
         ingredient_id: 2,
         quantity: 1,
-        unit: 'g',
+        unit: 'pieces',
         low_stock_threshold: 10,
         full_stock_target: 5,
       });
@@ -76,7 +76,7 @@ describe('inventory routes', () => {
     const res = await api()
       .post('/api/inventory')
       .set(asUser('waiter').headers)
-      .send({ ingredient_id: 1, quantity: 1, unit: 'Kg' });
+      .send({ ingredient_id: 1, quantity: 1, unit: 'cans' });
 
     expect(res.status).toBe(403);
   });
@@ -109,14 +109,14 @@ describe('inventory routes', () => {
     const created = await api()
       .post('/api/inventory/ingredients')
       .set(asUser('manager').headers)
-      .send({ name: 'Basil', default_unit: 'Kg' });
+      .send({ name: 'Basil', default_unit: 'cans' });
 
     expect(created.status).toBe(201);
 
     const duplicate = await api()
       .post('/api/inventory/ingredients')
       .set(asUser('manager').headers)
-      .send({ name: 'Basil', default_unit: 'g' });
+      .send({ name: 'Basil', default_unit: 'patties' });
 
     expect(duplicate.status).toBe(201);
     expect(duplicate.body.ingredient.name).toBe('Basil');

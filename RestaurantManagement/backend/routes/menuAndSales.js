@@ -44,7 +44,7 @@ function normalizeIngredientRequirements(rawIngredients) {
     if (!Number.isFinite(quantity_required) || quantity_required <= 0) {
       return { error: 'Each ingredient requires quantity_required > 0' };
     }
-    if (!unitVal) return { error: 'Each ingredient requires a unit (Kg, g, pieces, L, or ml)' };
+    if (!unitVal) return { error: 'Each ingredient requires a unit (pieces, buns, patties, or cans)' };
 
     let current = byIngredientId.get(ingredient_id);
     if (!current) {

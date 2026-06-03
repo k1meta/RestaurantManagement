@@ -39,34 +39,33 @@ describe('KitchenScreen', () => {
   const mockLogout = jest.fn();
   const mockUser = { name: 'Chef Mario', location_name: 'Main Kitchen' };
 
+  const baseOrders = [
+    {
+      id: 1,
+      status: 'pending',
+      created_at: new Date().toISOString(),
+      items: [{ id: 101, item_name: 'Pasta', quantity: 2, notes: 'No gluten' }],
+      notes: 'Order notes',
+    },
+    {
+      id: 2,
+      status: 'ready',
+      created_at: new Date().toISOString(),
+      items: [],
+    },
+  ];
+
   beforeEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
     useAuth.mockReturnValue({
       user: mockUser,
       logout: mockLogout,
     });
+    getOrders.mockResolvedValue({ data: { orders: baseOrders } });
+    updateOrderStatus.mockResolvedValue({});
   });
 
   it('renders successfully, loads orders and handles bump and ready actions', async () => {
-    const mockOrders = [
-      {
-        id: 1,
-        status: 'pending',
-        created_at: new Date().toISOString(),
-        items: [{ id: 101, item_name: 'Pasta', quantity: 2, notes: 'No gluten' }],
-        notes: 'Order notes',
-      },
-      {
-        id: 2,
-        status: 'ready',
-        created_at: new Date().toISOString(),
-        items: [],
-      },
-    ];
-    getOrders.mockResolvedValueOnce({ data: { orders: mockOrders } });
-    updateOrderStatus.mockResolvedValueOnce({});
-    getOrders.mockResolvedValueOnce({ data: { orders: [{ ...mockOrders[0], status: 'preparing' }, mockOrders[1]] } });
-
     render(<KitchenScreen />);
 
     await waitFor(() => {
@@ -85,8 +84,12 @@ describe('KitchenScreen', () => {
       expect(updateOrderStatus).toHaveBeenCalledWith(1, 'preparing');
     });
 
-    // Click "Mark Ready" on order 1
-    updateOrderStatus.mockResolvedValueOnce({});
+    getOrders.mockResolvedValue({
+      data: {
+        orders: [{ ...baseOrders[0], status: 'preparing' }, baseOrders[1]],
+      },
+    });
+
     fireEvent.press(screen.getByText('Mark Ready'));
 
     await waitFor(() => {

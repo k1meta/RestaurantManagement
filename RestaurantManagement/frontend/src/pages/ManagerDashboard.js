@@ -342,7 +342,7 @@ export default function ManagerDashboard({ user, onLogout }) {
       return;
     }
     if (parsedIngredients.some((entry) => !isAllowedUnit(entry.unit))) {
-      addToast('Each ingredient must have a unit selected (Kg, g, pieces, L, ml)', 'error');
+      addToast('Each ingredient must have a unit selected (pieces, buns, patties, cans)', 'error');
       return;
     }
 
@@ -466,7 +466,7 @@ export default function ManagerDashboard({ user, onLogout }) {
 
     const inventoryUnit = String(unit || '').trim();
     if (!isAllowedUnit(inventoryUnit)) {
-      addToast('Select a unit (Kg, g, pieces, L, or ml)', 'error');
+      addToast('Select a unit (pieces, buns, patties, or cans)', 'error');
       return;
     }
 
@@ -562,7 +562,7 @@ export default function ManagerDashboard({ user, onLogout }) {
       return;
     }
     if (parsedIngredients.some((entry) => !isAllowedUnit(entry.unit))) {
-      addToast('Each ingredient must have a unit selected (Kg, g, pieces, L, ml)', 'error');
+      addToast('Each ingredient must have a unit selected (pieces, buns, patties, cans)', 'error');
       return;
     }
 
@@ -704,7 +704,7 @@ export default function ManagerDashboard({ user, onLogout }) {
         return;
       }
       if (parsedIngredients.some((entry) => !isAllowedUnit(entry.unit))) {
-        addToast(`"${item.name}": each ingredient needs a unit (Kg, g, pieces, L, ml)`, 'error');
+        addToast(`"${item.name}": each ingredient needs a unit (pieces, buns, patties, cans)`, 'error');
         return;
       }
     }

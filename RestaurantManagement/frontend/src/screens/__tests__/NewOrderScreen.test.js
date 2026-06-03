@@ -17,10 +17,14 @@ jest.mock('react-native-safe-area-context', () => ({
   SafeAreaView: ({ children }) => children,
 }));
 
-jest.mock('../../components/kinetic/KineticHeader', () => ({
-  __esModule: true,
-  default: 'KineticHeader',
-}));
+jest.mock('../../components/kinetic/KineticHeader', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    __esModule: true,
+    default: ({ title }) => React.createElement(View, null, title),
+  };
+});
 
 jest.spyOn(Alert, 'alert');
 
@@ -28,7 +32,9 @@ describe('NewOrderScreen', () => {
   const mockNavigation = { goBack: jest.fn() };
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
+    getMenu.mockResolvedValue({ data: { menu: [] } });
+    createOrder.mockResolvedValue({});
   });
 
   it('loads menu, changes quantities (including decrement to 0), and submits order successfully', async () => {

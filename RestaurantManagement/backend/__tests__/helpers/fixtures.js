@@ -87,9 +87,9 @@ function buildDefaultSeed() {
   ];
 
   const ingredients = [
-    { id: 1, name: 'Tomato', default_unit: 'Kg', created_at: NOW },
-    { id: 2, name: 'Cheese', default_unit: 'g', created_at: NOW },
-    { id: 3, name: 'Olive Oil', default_unit: 'L', created_at: NOW },
+    { id: 1, name: 'Tomato', default_unit: 'cans', created_at: NOW },
+    { id: 2, name: 'Cheese', default_unit: 'pieces', created_at: NOW },
+    { id: 3, name: 'Burger Bun', default_unit: 'buns', created_at: NOW },
   ];
 
   const inventory = [
@@ -99,7 +99,7 @@ function buildDefaultSeed() {
       ingredient_id: 1,
       ingredient: 'Tomato',
       quantity: 10,
-      unit: 'Kg',
+      unit: 'cans',
       low_stock_threshold: 2,
       full_stock_target: 20,
       updated_at: NOW,
@@ -109,17 +109,17 @@ function buildDefaultSeed() {
       location_id: 1,
       ingredient_id: 2,
       ingredient: 'Cheese',
-      quantity: 5000,
-      unit: 'g',
+      quantity: 50,
+      unit: 'pieces',
       updated_at: NOW,
     },
     {
       id: 3,
       location_id: 1,
       ingredient_id: 3,
-      ingredient: 'Olive Oil',
-      quantity: 5,
-      unit: 'L',
+      ingredient: 'Burger Bun',
+      quantity: 24,
+      unit: 'buns',
       updated_at: NOW,
     },
   ];
@@ -148,16 +148,16 @@ function buildDefaultSeed() {
       id: 1,
       menu_item_id: 1,
       ingredient_id: 1,
-      quantity_required: 0.2,
-      unit: 'Kg',
+      quantity_required: 2,
+      unit: 'cans',
       created_at: NOW,
     },
     {
       id: 2,
       menu_item_id: 1,
       ingredient_id: 2,
-      quantity_required: 150,
-      unit: 'g',
+      quantity_required: 3,
+      unit: 'pieces',
       created_at: NOW,
     },
   ];

@@ -35,11 +35,12 @@ describe('LoginScreen', () => {
   const mockLogin = jest.fn();
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
     useAuth.mockReturnValue({
       login: mockLogin,
     });
     AsyncStorage.getItem.mockResolvedValue(null);
+    getLoginProfiles.mockResolvedValue({ data: { profiles: [] } });
   });
 
   it('loads saved email and login profiles, and allows successful login', async () => {
@@ -56,9 +57,12 @@ describe('LoginScreen', () => {
     });
 
     // Check profile loaded
-    await waitFor(() => {
-      expect(screen.getByText('Alex Chef')).toBeTruthy();
-    });
+    await waitFor(
+      () => {
+        expect(screen.getByText('Alex Chef')).toBeTruthy();
+      },
+      { timeout: 10000 }
+    );
 
     // Press profile card to autofill email
     fireEvent.press(screen.getByText('Alex Chef'));

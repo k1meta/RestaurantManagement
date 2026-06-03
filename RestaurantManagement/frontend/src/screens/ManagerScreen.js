@@ -190,7 +190,7 @@ export default function ManagerScreen() {
 
     const invUnit = String(unit || '').trim();
     if (!isAllowedUnit(invUnit)) {
-      Alert.alert('Error', 'Select a stock unit (Kg, g, pieces, L, ml)');
+      Alert.alert('Error', 'Select a stock unit (pieces, buns, patties, cans)');
       return;
     }
 

@@ -23,6 +23,9 @@ yarn-error.log*
 
 # Test artifacts
 backend/coverage/
+frontend/coverage/
+frontend/test-results/
+frontend/playwright-report/
 
 # Local test notes (not for submission)
 backend/BACKEND_TEST_COVERAGE_REPORT.md

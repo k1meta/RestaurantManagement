@@ -12,7 +12,7 @@ npm run test:integration # integration tests only
 npm run test:e2e         # E2E workflow tests only
 ```
 
-**Latest run:** 106 tests passed | **71.74% line coverage** (threshold: 70%)
+**Latest run:** 102 tests passed | **71%+ line coverage** (threshold: 70%)
 
 ---
 
@@ -65,28 +65,30 @@ backend/
 
 ## 3. Test Cases
 
+### Unit model (inventory / menu BOM)
+
+Allowed units: **pieces**, **buns**, **patties**, **cans** only. Mass/volume units (Kg, g, L, ml) are not supported. Recipe and inventory must use the **same** unit for deduction on order close.
+
+If a live Firestore database still has legacy units, run `npm run db:reset` (destructive) and recreate inventory/menu data, or update documents manually.
+
 ### Unit tests — `constants/unitConversion.js`
 
 | ID | Functionality | Type | Expected | Actual |
 |----|---------------|------|----------|--------|
-| UC-01 | `toCanonical` grams | Positive | `{ dimension: 'mass', value: 500 }` | Pass |
-| UC-02 | `toCanonical` Kg→grams | Positive | `{ dimension: 'mass', value: 2000 }` | Pass |
-| UC-03 | `toCanonical` L→ml | Positive | `{ dimension: 'volume', value: 1000 }` | Pass |
-| UC-04 | `toCanonical` pieces | Positive | `{ dimension: 'count', value: 3 }` | Pass |
-| UC-05 | Invalid unit | Negative | `null` | Pass |
-| UC-06 | Invalid quantity | Negative | `null` | Pass |
-| UC-07 | `fromCanonical` round-trip | Positive | Correct inverse values | Pass |
-| UC-08 | Same-dimension deduction | Positive | `{ ok: true, nextQty: 1.5 }` | Pass |
-| UC-09 | Cross-dimension units | Negative | `incompatible_units` | Pass |
-| UC-10 | Insufficient stock | Negative | `insufficient_stock` | Pass |
-| UC-11 | Missing unit | Negative | `missing_unit` | Pass |
-| UC-12 | `roundQty` precision | Positive | 4-decimal rounding | Pass |
+| UC-01 | Same-unit deduct (`cans`) | Positive | `{ ok: true, nextQty: 8 }` | Pass |
+| UC-02 | Same-unit deduct (`pieces`) | Positive | `{ ok: true, nextQty: 47 }` | Pass |
+| UC-03 | Different count units (`buns` vs `pieces`) | Negative | `incompatible_units` | Pass |
+| UC-04 | Legacy unit `Kg` | Negative | `unknown_unit` | Pass |
+| UC-05 | Invalid quantity | Negative | `invalid_quantity` | Pass |
+| UC-06 | Insufficient stock | Negative | `insufficient_stock` | Pass |
+| UC-07 | Missing unit | Negative | `missing_unit` | Pass |
+| UC-08 | `roundQty` precision | Positive | 4-decimal rounding | Pass |
 
 ### Unit tests — `constants/units.js`
 
 | ID | Functionality | Type | Expected | Actual |
 |----|---------------|------|----------|--------|
-| UU-01 | Valid unit `Kg` | Positive | `{ ok: true, value: 'Kg' }` | Pass |
+| UU-01 | Valid unit `cans` | Positive | `{ ok: true, value: 'cans' }` | Pass |
 | UU-02 | Empty/null unit | Positive | `{ ok: true, value: null }` | Pass |
 | UU-03 | Invalid unit `lbs` | Negative | `{ ok: false, error: ... }` | Pass |
 

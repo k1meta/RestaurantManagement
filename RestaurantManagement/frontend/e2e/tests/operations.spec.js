@@ -9,7 +9,7 @@ test.describe('Role-Based Operations', () => {
         const waiterPage = new WaiterPage(page);
 
         await loginPage.goto();
-        await loginPage.login('waiterstup1@restaurant.com', 'waiterstup1');
+        await loginPage.login('waiter@restaurant.com', 'password123');
 
         await expect(waiterPage.dashboardHeader).toBeVisible();
 
@@ -26,7 +26,7 @@ test.describe('Role-Based Operations', () => {
         const kitchenPage = new KitchenPage(page);
 
         await loginPage.goto();
-        await loginPage.login('kitchenstup1@restaurant.com', 'kitchenstup1');
+        await loginPage.login('kitchen@restaurant.com', 'password123');
 
         // Assert kitchen specific UI elements
         await expect(kitchenPage.activeQueueTitle).toBeVisible();
