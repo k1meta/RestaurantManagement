@@ -22,17 +22,12 @@
       "bundler": "metro"
     },
     "plugins": [],
+    "owner": "tariktt",
+    "runtimeVersion": "1.0.0",
     "extra": {
       "eas": {
-        "projectId": "22a37ed8-1718-4c0d-9a2b-1c32b7ff17c9"
+        "projectId": "46efc861-8f92-4988-bc91-541d9753ee25"
       }
-    },
-    "owner": "k1meta",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/22a37ed8-1718-4c0d-9a2b-1c32b7ff17c9"
     }
   }
 }

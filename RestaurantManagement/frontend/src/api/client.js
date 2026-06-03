@@ -5,13 +5,14 @@ const LOCAL_API_URL = 'http://localhost:3000';
 const isBrowser = typeof window !== 'undefined' && typeof window.location !== 'undefined';
 
 let runtimeApiUrl = '';
-// Try build-time envs, but guard against ReferenceError in browser runtime
+// Read build-time envs. Access process.env.* tokens directly: bundlers (CRA
+// DefinePlugin / Expo) inline these specific member expressions at build time,
+// so we must NOT gate them behind `typeof process` — in CRA5/webpack5 the bare
+// `process` identifier is undefined in the browser, which would skip them and
+// silently fall back to the localhost default.
 try {
-  if (typeof process !== 'undefined' && process && process.env && process.env.EXPO_PUBLIC_API_URL) {
-    runtimeApiUrl = process.env.EXPO_PUBLIC_API_URL;
-  } else if (typeof process !== 'undefined' && process && process.env && process.env.REACT_APP_API_URL) {
-    runtimeApiUrl = process.env.REACT_APP_API_URL;
-  }
+  runtimeApiUrl =
+    (process.env.EXPO_PUBLIC_API_URL || process.env.REACT_APP_API_URL) || '';
 } catch (e) {
   // process not defined at runtime; ignore
 }

@@ -1,0 +1,40 @@
+diff --git a/node_modules/react-native/src/private/webapis/errors/DOMException.js b/node_modules/react-native/src/private/webapis/errors/DOMException.js
+index b759632..39e7b4c 100644
+--- a/node_modules/react-native/src/private/webapis/errors/DOMException.js
++++ b/node_modules/react-native/src/private/webapis/errors/DOMException.js
+@@ -125,27 +125,20 @@ export default class DOMException extends Error {
+   +INVALID_NODE_TYPE_ERR: 24;
+   +DATA_CLONE_ERR: 25;
+ 
+-  #name: string;
+-  #code: number;
+-
+-  constructor(message?: string, name?: string) {
++  constructor(message, name) {
+     super(message);
+ 
+-    if (typeof name === 'undefined') {
+-      this.#name = 'Error';
+-      this.#code = 0;
+-    } else {
+-      this.#name = String(name);
+-      this.#code = ERROR_NAME_TO_ERROR_CODE_MAP[this.name] ?? 0;
+-    }
++    const resolvedName = typeof name === 'undefined' ? 'Error' : String(name);
++    this._name = resolvedName;
++    this._code = ERROR_NAME_TO_ERROR_CODE_MAP[resolvedName] ?? 0;
+   }
+ 
+-  get name(): string {
+-    return this.#name;
++  get name() {
++    return this._name;
+   }
+ 
+-  get code(): number {
+-    return this.#code;
++  get code() {
++    return this._code;
+   }
+ }
+ 
